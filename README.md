@@ -12,8 +12,9 @@ To set up a virtual environment, execute the following command:
 
     virtualenv data-gen-env
 
-Where `data-gen-env` is the name of the directory where you want your environment files placed. You can activate the
-virtual environment with this command:
+> Where `data-gen-env` is the name of the directory where you want your environment files placed. 
+
+You can activate the virtual environment with this command:
 
     source data-gen-env/bin/activate
 
@@ -50,40 +51,23 @@ There are two scripts you can choose to run.
 
 First is `generate_data.py`. This generates the data in the requested output formats (supports do multiple formats at once).
 
-The following arguments apply:
+> The following arguments apply:
 
-* '--type': regular, udl
-* `--state_name STATE_NAME`: Specify the name of the state that gets generated (defaults to `North Carolina`)
-* `--state_code STATE_CODE`: Specify the code of the state that gets generated (defaults to `NC`)
-* `--state_type STATE_TYPE`: Specify the hierarchy type for the state to generate (expects `devel`, `typical_1`, or
+> * `--type`: regular, url
+> * `--state_name STATE_NAME`: Specify the name of the state that gets generated (defaults to `North Carolina`)
+> * `--state_code STATE_CODE`: Specify the code of the state that gets generated (defaults to `NC`)
+> * `--state_type STATE_TYPE`: Specify the hierarchy type for the state to generate (expects `devel`, `typical_1`, or
 `california`)
-* `--pg_out`: Output data to a PostgreSQL database
-* `--star_out`: Output data to star schema CSV
-* `--lz_out`: Output data to landing zone CSV and JSON
+> * `--pg_out`: Output data to a PostgreSQL database
+> * `--star_out`: Output data to star schema CSV
+> * `--lz_out`: Output data to landing zone CSV and JSON
 
-If using PostgreSQL output:
-* `--host`: Host for PostgreSQL server
-* `--schema`: Schema for PostgreSQL database
+> If using PostgreSQL output:
+*(Note: with PostgreSQL the db schema must exists.)*
+
+> * `--host`: Host for PostgreSQL server
+> * `--schema`: Schema for PostgreSQL database
 
 
 The second is 'calculate_state_size.py'.
 This will print out all the configured 'state_type's (in data_generator/state_type.py) and the stats for them.
-
-### Database configuration
-
-If using PostgreSQL output:
- `--host`: Host for PostgreSQL server
- `--schema`: Schema for PostgreSQL database
-
-With PostgreSQL the db schema must exists. To create a schema, from venv:
- cd RDW_DataWarehouse/edschema/edschema
- python ``.py -s edware_test_ca -m edware -d edware --host localhost:5432 -u edware -p edware2013
-
-metadata_generator arguments:
-  '-s': set schema name
-  '-m': metadata, 'edware' or 'stats'
-  '-d': database, default='edware'
-  '--host': default='127.0.0.1:5432'
-  '-u': postgre user, default='edware'
-  '-p': postgre password , default='edware'
-  '-a': action, default='setup', use teardown to drop all tables
