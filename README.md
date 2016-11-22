@@ -49,15 +49,13 @@ confidence that comes with it.
 
 There are two scripts you can choose to run.
 
-First is `generate_data.py`. This generates the data in the requested output formats (supports do multiple formats at once).
+First is `generate_data.py`. This generates the data in the requested output formats (can generate multiple formats at once).
 
 > The following arguments apply:
 
-> * `--type`: regular, url
-> * `--state_name STATE_NAME`: Specify the name of the state that gets generated (defaults to `North Carolina`)
-> * `--state_code STATE_CODE`: Specify the code of the state that gets generated (defaults to `NC`)
-> * `--state_type STATE_TYPE`: Specify the hierarchy type for the state to generate (expects `devel`, `typical_1`, or
-`california`)
+> * `--state_name STATE_NAME`: Specify the name of the state that gets generated (defaults to `California)
+> * `--state_code STATE_CODE`: Specify the code of the state that gets generated (defaults to `CA`)
+> * `--state_type STATE_TYPE`: Specify the hierarchy type for the state to generate. This has to match configuration in in data_generator/state_type.py 
 > * `--pg_out`: Output data to a PostgreSQL database
 > * `--star_out`: Output data to star schema CSV
 > * `--lz_out`: Output data to landing zone CSV and JSON
@@ -67,7 +65,6 @@ First is `generate_data.py`. This generates the data in the requested output for
 
 > * `--host`: Host for PostgreSQL server
 > * `--schema`: Schema for PostgreSQL database
-
 
 The second is 'calculate_state_size.py'.
 This will print out all the configured 'state_type's (in data_generator/state_type.py) and the stats for them.
