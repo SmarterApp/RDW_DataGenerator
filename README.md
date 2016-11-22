@@ -6,24 +6,19 @@ This project generates sample data to be used in SBAC RDW project for functional
 
 ### How do I get set up? ###
 
-* Summary of set up
 This is a Python 3 project and as such you will need Python 3 installed to use and/or develop the project.
 
-* Configuration
-
-** To set up a virtual environment, execute the following command:
+To set up a virtual environment, execute the following command:
 
     virtualenv data-gen-env
 
-** Where `data-gen-env` is the name of the directory where you want your environment files placed. You can activate the
+Where `data-gen-env` is the name of the directory where you want your environment files placed. You can activate the
 virtual environment with this command:
 
     source data-gen-env/bin/activate
 
 Note that `data-gen-env` is the same name that was used with the creation of the environment. If you change the name of
 the environment in the first command, change it in this command too.
-
-** Install Run Dependencies
 
 Once you have your environment activated (or you've decided not to use an environment), go into your repository and run
 this command to finish setup:
@@ -34,8 +29,6 @@ Note the use of `develop` in the call to `setup.py`. This will create a sym-link
 working directory of your code. If instead you use `install`, it will copy the code and changes you make to the code
 will probably not be picked up.
 
-** Install Development Dependencies
-
 You will need `nose` to run the test suites. Along with those, we are using
 [`coverage`](http://nedbatchelder.com/code/coverage/) for a unit testing code coverage report and
 [`pep8`](http://pep8.readthedocs.org/en/latest/) as a style checker. If you have a virtual environment, run this within
@@ -43,7 +36,6 @@ it:
 
     pip install nose coverage pep8
 
-* How to run tests
 Within the project is a suite of unit tests that cover a large percentage of the codebase. We are using `nose` for the
 unit tests. To run the unit tests, start from the root of the project and call:
 
@@ -56,7 +48,7 @@ confidence that comes with it.
 
 There are two scripts you can choose to run.
 
-First is `generate_data.py`. This generates the data in the requested output formats (could do multiple format at once).
+First is `generate_data.py`. This generates the data in the requested output formats (supports do multiple formats at once).
 
 The following arguments apply:
 
@@ -77,7 +69,7 @@ If using PostgreSQL output:
 The second is 'calculate_state_size.py'.
 This will print out all the configured 'state_type's (in data_generator/state_type.py) and the stats for them.
 
-* Database configuration
+### Database configuration
 
 If using PostgreSQL output:
  `--host`: Host for PostgreSQL server
