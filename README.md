@@ -69,4 +69,4 @@ First is `generate_data.py`. This generates the data in the requested output for
 > * `--schema`: Schema for PostgreSQL database
 
 The second is `calculate_state_size.py`.
-This will print out all the configured 'state_type's (in data_generator/state_type.py) and the stats for them.
+This will print out all the configured 'state_type's (from data_generator/state_type.py) and the stats for them.
