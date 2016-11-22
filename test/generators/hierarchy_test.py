@@ -6,10 +6,10 @@ Unit tests for the sbac_data_generation.generators.hierarchy module.
 import datetime
 
 import data_generator.sbac_generators.hierarchy as hier_gen
-from data_generator.sbac_model.district import SBACDistrict
-from data_generator.sbac_model.group import SBACgroup
-from data_generator.sbac_model.school import SBACSchool
-from data_generator.sbac_model.state import SBACState
+from data_generator.model.district import District
+from data_generator.model.group import Group
+from data_generator.model.school import School
+from data_generator.model.state import State
 from data_generator.util.id_gen import IDGen
 from nose.tools import assert_is_instance, assert_raises, assert_regexp_matches
 
@@ -24,7 +24,7 @@ def test_generate_state():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
 
     # Tests
-    assert_is_instance(state, SBACState)
+    assert_is_instance(state, State)
     assert state.name == 'Example State'
     assert state.code == 'ES'
     assert_regexp_matches(state.guid_sr, SR_GUID_REGEX)
@@ -40,7 +40,7 @@ def test_generate_district():
     district = hier_gen.generate_district('Big Average', state, ID_GEN)
 
     # Tests
-    assert_is_instance(district, SBACDistrict)
+    assert_is_instance(district, District)
     assert district.state == state
     assert_regexp_matches(district.guid_sr, SR_GUID_REGEX)
 
@@ -57,7 +57,7 @@ def test_generate_school():
     school = hier_gen.generate_school('High School', district, ID_GEN)
 
     # Tests
-    assert_is_instance(school, SBACSchool)
+    assert_is_instance(school, School)
     assert school.district == district
     assert_regexp_matches(school.guid_sr, SR_GUID_REGEX)
 
@@ -76,7 +76,7 @@ def test_generate_group():
     group = hier_gen.generate_group('section_based', school, ID_GEN)
 
     # Tests
-    assert_is_instance(group, SBACgroup)
+    assert_is_instance(group, Group)
     assert group.school == school
     assert_regexp_matches(group.guid_sr, SR_GUID_REGEX)
     assert group.type == 'section_based'

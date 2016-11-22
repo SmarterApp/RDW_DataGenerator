@@ -1,12 +1,12 @@
 """
-Model an item data generated for an assessment outcome (an instance of a student taking an assessment) for the SBAC assessment.
+Model an item data generated for an assessment outcome (an instance of a student taking an assessment) for the assessment.
 
 """
 
 
-class SBACAssessmentOutcomeItemData:
+class AssessmentOutcomeItemData:
     """
-    The SBAC-specific assessment outcome Item Data class.
+    An assessment outcome Item Data class.
     """
 
     def __init__(self):

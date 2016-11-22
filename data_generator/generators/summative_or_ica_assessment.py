@@ -10,11 +10,11 @@ from collections import OrderedDict
 import data_generator.config.cfg as sbac_config
 import data_generator.config.hierarchy as hierarchy_config
 import data_generator.generators.assessment as gen_asmt_generator
-from data_generator.sbac_model.institutionhierarchy import InstitutionHierarchy
-from data_generator.sbac_model.itemdata import SBACAssessmentOutcomeItemData
-from data_generator.sbac_model.student import SBACStudent
-from data_generator.sbac_model.summative_or_ica_assessment import SBACAssessment
-from data_generator.sbac_model.summative_or_ica_assessmentoutcome import SBACAssessmentOutcome
+from data_generator.model.institutionhierarchy import InstitutionHierarchy
+from data_generator.model.itemdata import AssessmentOutcomeItemData
+from data_generator.model.student import Student
+from data_generator.model.assessment import Assessment
+from data_generator.model.assessmentoutcome import AssessmentOutcome
 from data_generator.util.assessment_stats import Properties, RandomLevelByDemographics
 from data_generator.util.assessment_stats import adjust_score
 from data_generator.util.assessment_stats import random_claims
@@ -45,7 +45,7 @@ def generate_assessment(asmt_type, period, asmt_year, subject, id_gen, from_date
     claims = claim_definitions[subject]
 
     # Run the General generator
-    sa = gen_asmt_generator.generate_assessment(SBACAssessment)
+    sa = gen_asmt_generator.generate_assessment(Assessment)
 
     # Determine the period month
     year_adj = 1
@@ -113,7 +113,7 @@ def generate_assessment(asmt_type, period, asmt_year, subject, id_gen, from_date
     return sa
 
 
-def generate_assessment_outcome(student: SBACStudent, assessment: SBACAssessment, inst_hier: InstitutionHierarchy,
+def generate_assessment_outcome(student: Student, assessment: Assessment, inst_hier: InstitutionHierarchy,
                                 id_gen, generate_item_level=True):
     """
     Generate an assessment outcome for a given student.
@@ -133,7 +133,7 @@ def generate_assessment_outcome(student: SBACStudent, assessment: SBACAssessment
     claim_cut_points = [assessment.claim_cut_point_1, assessment.claim_cut_point_2]
 
     # Run the General generator
-    sao = gen_asmt_generator.generate_assessment_outcome(student, assessment, SBACAssessmentOutcome)
+    sao = gen_asmt_generator.generate_assessment_outcome(student, assessment, AssessmentOutcome)
 
     # Set other specifics
     sao.rec_id = id_gen.get_rec_id('assessment_outcome')
@@ -156,7 +156,7 @@ def generate_assessment_outcome(student: SBACStudent, assessment: SBACAssessment
 
         for pos in od:
             item_format = random.choice(sbac_config.ASMT_ITEM_BANK_FORMAT)
-            item_level_data = SBACAssessmentOutcomeItemData()
+            item_level_data = AssessmentOutcomeItemData()
             item_level_data.student_id = student.guid_sr
             item_level_data.key = od[pos]
             item_level_data.segment_id = segment_id

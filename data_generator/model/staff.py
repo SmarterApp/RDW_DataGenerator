@@ -1,9 +1,7 @@
 """
-Model the core of different staff members.
+Models of different staff members.
 
 """
-
-from data_generator import run_id as global_run_id
 
 
 class Staff:
@@ -11,7 +9,6 @@ class Staff:
     """
 
     def __init__(self):
-        self.run_id = global_run_id
         self.guid = None
         self.gender = None
         self.first_name = None
@@ -44,3 +41,4 @@ class TeachingStaff(Staff):
     def __init__(self):
         super().__init__()
         self.school = None
+        self.guid_sr = None

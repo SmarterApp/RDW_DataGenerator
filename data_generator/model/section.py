@@ -1,17 +1,14 @@
 """
-Model the core of a section.
+A section.
 
 """
 
-from data_generator import run_id as global_run_id
-
-
+#TODO: understand what section means and if we need it
 class Section:
-    """The core of a section.
+    """A section.
     """
 
     def __init__(self):
-        self.run_id = global_run_id
         self.guid = None
         self.clss = None
         self.teachers = []

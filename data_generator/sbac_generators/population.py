@@ -8,12 +8,12 @@ import random
 
 import data_generator.config.cfg as sbac_in_config
 import data_generator.generators.population as general_pop_gen
-from data_generator.sbac_model.school import SBACSchool
-from data_generator.sbac_model.student import SBACStudent
-from data_generator.sbac_model.teachingstaff import SBACTeachingStaff
+from data_generator.model.school import School
+from data_generator.model.student import Student
+from data_generator.model.staff import TeachingStaff
 
 
-def generate_student(school: SBACSchool, grade, id_gen, state, acad_year=datetime.datetime.now().year):
+def generate_student(school: School, grade, id_gen, state, acad_year=datetime.datetime.now().year):
     """
     Generate a student.
 
@@ -26,7 +26,7 @@ def generate_student(school: SBACSchool, grade, id_gen, state, acad_year=datetim
     @return: The student
     """
     # Run the General generator
-    s = general_pop_gen.generate_student(school, grade, acad_year, SBACStudent)
+    s = general_pop_gen.generate_student(school, grade, acad_year, Student)
 
     # Get the demographic config
     demo_config = school.demo_config[str(grade)]
@@ -56,7 +56,7 @@ def generate_student(school: SBACSchool, grade, id_gen, state, acad_year=datetim
     return s
 
 
-def advance_student(student: SBACStudent, schools_by_grade, hold_back_rate=sbac_in_config.HOLD_BACK_RATE,
+def advance_student(student: Student, schools_by_grade, hold_back_rate=sbac_in_config.HOLD_BACK_RATE,
                     drop_out_rate=sbac_in_config.NOT_ADVANCED_DROP_OUT_RATE,
                     transfer_rate=sbac_in_config.TRANSFER_RATE):
     """
@@ -81,7 +81,7 @@ def advance_student(student: SBACStudent, schools_by_grade, hold_back_rate=sbac_
     return True
 
 
-def repopulate_school_grade(school: SBACSchool, grade, grade_students, id_gen, state, reg_sys,
+def repopulate_school_grade(school: School, grade, grade_students, id_gen, state, reg_sys,
                             acad_year=datetime.datetime.now().year,
                             additional_student_choice=sbac_in_config.REPOPULATE_ADDITIONAL_STUDENTS):
     """
@@ -195,7 +195,7 @@ def assign_student_groups(school, grade, grade_students, schools_with_groupings)
             #     cur_grp_idx += 1
 
 
-def generate_teaching_staff_member(school: SBACSchool, id_gen):
+def generate_teaching_staff_member(school: School, id_gen):
     """
     Generate a teaching_staff for the given school.
 
@@ -204,7 +204,7 @@ def generate_teaching_staff_member(school: SBACSchool, id_gen):
     @returns: The staff_member
     """
     # Run the general generator
-    s = general_pop_gen.generate_teaching_staff_member(school, SBACTeachingStaff)
+    s = general_pop_gen.generate_teaching_staff_member(school, TeachingStaff)
 
     # Set the SR guid
     s.guid_sr = id_gen.get_sr_uuid()

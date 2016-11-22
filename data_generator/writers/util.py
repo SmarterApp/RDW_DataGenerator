@@ -3,7 +3,6 @@ Utility functions for the general writers module.
 
 """
 
-from data_generator import run_id as global_run_id
 from data_generator.util.id_gen import IDGen as id_gen
 
 
@@ -74,7 +73,7 @@ def _get_attr_value(attr_path, obj=None, tbl_name=None):
         else:
             return id_gen.get_rec_id(tbl_name)
     elif attr_path == 'BATCH_GUID':
-        return global_run_id
+        return id_gen.get_uuid()
     elif not '.' in attr_path:
         return attr_path
     elif obj is None:

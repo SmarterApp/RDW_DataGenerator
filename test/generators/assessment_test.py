@@ -8,7 +8,7 @@ import datetime
 import data_generator.generators.summative_or_ica_assessment as asmt_gen
 import data_generator.sbac_generators.hierarchy as hier_gen
 import data_generator.sbac_generators.population as pop_gen
-import data_generator.sbac_model.itemdata as item_lvl_data
+import data_generator.model.itemdata as item_lvl_data
 from data_generator.util.id_gen import IDGen
 from nose.tools import assert_raises
 
@@ -27,7 +27,7 @@ def test_generate_assessment():
 
 
 def test_generate_item_data():
-    item_data = item_lvl_data.SBACAssessmentOutcomeItemData()
+    item_data = item_lvl_data.AssessmentOutcomeItemData()
     item_data.student_id = '0b43854416674ec8961b9db797bca2'
     item_data.key = 1938
     item_data.segment_id = '(SBAC)SBAC-MG110PT-S2-ELA-7-Spring-2014-2015'

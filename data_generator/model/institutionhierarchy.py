@@ -1,12 +1,12 @@
 """
-Model an institution hierarchy as defined for SBAC.
+An institution hierarchy
 
 """
 
 
 class InstitutionHierarchy:
     """
-    Model an institution hierarchy.
+    An institution hierarchy.
     """
 
     def __init__(self):

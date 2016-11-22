@@ -1,22 +1,21 @@
 """
-Model the core of a school.
+A school.
 """
-
-from data_generator import run_id as global_run_id
 
 
 class School:
-    """The core of a school.
+    """A core of a school.
     """
 
     def __init__(self):
-        self.run_id = global_run_id
         self.guid = None
         self.name = None
         self.district = None
         self.type_str = None
         self.config = None
         self.demo_config = None
+        self.guid_sr = None
+        self.takes_interim_asmts = False
 
     @property
     def grades(self):

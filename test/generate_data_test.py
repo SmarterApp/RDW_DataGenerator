@@ -36,7 +36,6 @@ def test_set_configuration_regular():
     assert 'Fall' in generate_data.INTERIM_ASMT_PERIODS
     assert 'Winter' in generate_data.INTERIM_ASMT_PERIODS
     assert 'Spring' in generate_data.INTERIM_ASMT_PERIODS
-    assert generate_data.NUMBER_REGISTRATION_SYSTEMS == 1
 
 
 def test_create_assessment_object():

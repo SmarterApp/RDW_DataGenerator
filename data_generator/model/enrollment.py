@@ -1,16 +1,13 @@
 """
-Model a student being enrolled in a section of a class.
+A student being enrolled in a section of a class.
 """
-
-from data_generator import run_id as global_run_id
 
 
 class Enrollment:
-    """The core of a student being enrolled in a section.
+    """A student being enrolled in a section.
     """
 
     def __init__(self):
-        self.run_id = global_run_id
         self.guid = None
         self.section = None
         self.student = None

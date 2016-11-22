@@ -21,12 +21,12 @@ import data_generator.util.hiearchy as hier_util
 import data_generator.writers.writecsv as csv_writer
 import data_generator.writers.writejson as json_writer
 import data_generator.writers.writepostgres as postgres_writer
-from data_generator.sbac_model.district import SBACDistrict
-from data_generator.sbac_model.institutionhierarchy import InstitutionHierarchy
-from data_generator.sbac_model.state import SBACState
-from data_generator.sbac_model.student import SBACStudent
-from data_generator.sbac_model.summative_or_ica_assessment import SBACAssessment
-from data_generator.sbac_model.summative_or_ica_assessmentoutcome import SBACAssessmentOutcome
+from data_generator.model.district import District
+from data_generator.model.institutionhierarchy import InstitutionHierarchy
+from data_generator.model.interimassessment import InterimAssessment
+from data_generator.model.interimassessmentoutcome import InterimAssessmentOutcome
+from data_generator.model.state import State
+from data_generator.model.student import Student
 from data_generator.util import all_combinations
 from data_generator.util.id_gen import IDGen
 from data_generator.writers.datefilters import FILTERS as DG_FILTERS
@@ -41,17 +41,12 @@ WRITE_LZ = False
 WRITE_PG = False
 WRITE_IL = False
 
-# See assign_team_configuration_options for these values
-STATES = []
 YEARS = [2015, 2016, 2017]  # Student registration years, expected sorted lowest to highest
 ASMT_YEARS = [2015, 2016, 2017]  # Expected sorted lowest to highest
 INTERIM_ASMT_PERIODS = ['Fall', 'Winter', 'Spring']  # The periods for interim assessments
-NUMBER_REGISTRATION_SYSTEMS = 1
 
 # These are global regardless of team
 GRADES_OF_CONCERN = {3, 4, 5, 6, 7, 8, 11}  # Made as a set for intersection later
-REGISTRATION_SYSTEM_GUIDS = []
-REGISTRATION_SYSTEMS = {}
 
 # Register output filters
 csv_writer.register_filters(SBAC_FILTERS)
@@ -89,13 +84,13 @@ def prepare_output_files():
     csv_writer.prepare_csv_file(sbac_out_config.SR_FORMAT['name'], sbac_out_config.SR_FORMAT['columns'], root_path=OUT_PATH_ROOT)
 
 
-def build_registration_systems(years, id_gen):
+def build_registration_system(years, id_gen):
     """"
-    Build the registration systems that will be used during the data generation run.
+    Build the registration system that will be used during the data generation run.
 
     @param years: The years for which data will be generated
     @param id_gen: ID generator
-    @returns: A list of GUIDs for the registration systems that were created
+    @returns: A list of year for the registration systems that was created
     """
     # Validate years
     if len(years) == 0:
@@ -106,33 +101,31 @@ def build_registration_systems(years, id_gen):
     rs_out_layout = sbac_out_config.REGISTRATION_SYSTEM_FORMAT['layout']
 
     # Build the registration systems for every year
-    guids = {}
+    rs_by_year = {}
     start_year = years[0] - 1
-    for i in range(NUMBER_REGISTRATION_SYSTEMS):
-        # Build the original system
-        rs = sbac_hier_gen.generate_registration_system(start_year, str(start_year - 1) + '-02-25', id_gen)
-        guids[rs.guid_sr] = {}
+    # Build the original system
+    rs = sbac_hier_gen.generate_registration_system(start_year, str(start_year - 1) + '-02-25', id_gen)
 
-        # Update it over every year
-        for year in YEARS:
-            # Update the system
-            rs.academic_year = year
-            rs.extract_date = str(year - 1) + '-02-27'
-            guids[rs.guid_sr][year] = copy.deepcopy(rs)
+    # Update it over every year
+    for year in YEARS:
+        # Update the system
+        rs.academic_year = year
+        rs.extract_date = str(year - 1) + '-02-27'
+        rs_by_year[year] = copy.deepcopy(rs)
 
-            # Write landing zone files if requested
-            if WRITE_LZ:
-                # Create the JSON file
-                file_name = sbac_out_config.REGISTRATION_SYSTEM_FORMAT['name']
-                file_name = file_name.replace('<YEAR>', str(year)).replace('<GUID>', rs.guid_sr)
-                json_writer.write_object_to_file(file_name, rs_out_layout, rs, root_path=OUT_PATH_ROOT)
+        # Write landing zone files if requested
+        if WRITE_LZ:
+            # Create the JSON file
+            file_name = sbac_out_config.REGISTRATION_SYSTEM_FORMAT['name']
+            file_name = file_name.replace('<YEAR>', str(year)).replace('<GUID>', rs.guid_sr)
+            json_writer.write_object_to_file(file_name, rs_out_layout, rs, root_path=OUT_PATH_ROOT)
 
-                # Prepare the SR CSV file
-                file_name = sbac_out_config.SR_FORMAT['name'].replace('<YEAR>', str(year)).replace('<GUID>', rs.guid_sr)
-                csv_writer.prepare_csv_file(file_name, sr_out_cols, root_path=OUT_PATH_ROOT)
+            # Prepare the SR CSV file
+            file_name = sbac_out_config.SR_FORMAT['name'].replace('<YEAR>', str(year)).replace('<GUID>', rs.guid_sr)
+            csv_writer.prepare_csv_file(file_name, sr_out_cols, root_path=OUT_PATH_ROOT)
 
     # Return the generated GUIDs
-    return guids
+    return rs_by_year
 
 
 def create_assessment_object(asmt_type, period, year, subject, id_gen, generate_item_level=True):
@@ -312,11 +305,11 @@ def create_assessment_outcome_objects(student, asmt_summ, interim_asmts, inst_hi
                                          retake_rate, delete_rate, update_rate, generate_item_level)
 
 
-def create_iab_outcome_object(student: SBACStudent,
-                              iab_asmt: SBACAssessment,
+def create_iab_outcome_object(student: Student,
+                              iab_asmt: InterimAssessment,
                               inst_hier: InstitutionHierarchy,
                               id_gen: IDGen,
-                              iab_results: {str: SBACAssessmentOutcome},
+                              iab_results: {str: InterimAssessmentOutcome},
                               generate_item_level=True):
     """
 
@@ -338,14 +331,14 @@ def create_iab_outcome_object(student: SBACStudent,
     iab_results[iab_asmt.guid_sr].append(ao)
 
 
-def create_iab_outcome_objects(student: SBACStudent,
+def create_iab_outcome_objects(student: Student,
                                asmt_year: int,
                                grade: int,
                                subject: str,
-                               asmts: {str: SBACAssessment},
+                               asmts: {str: InterimAssessment},
                                inst_hier: InstitutionHierarchy,
                                id_gen: IDGen,
-                               iab_results: {str: SBACAssessmentOutcome},
+                               iab_results: {str: InterimAssessmentOutcome},
                                generate_item_level=True):
     """
     Create a set of interim assessment outcome objects for a student.
@@ -478,10 +471,10 @@ def write_school_data(asmt_year, sr_out_name, dim_students, sr_students, assessm
                     print('PostgreSQL EXCEPTION ::: %s' % str(e))
 
 
-def generate_district_data(state: SBACState,
-                           district: SBACDistrict,
-                           reg_sys_guid: str,
-                           assessments: {str: SBACAssessment},
+def generate_district_data(state: State,
+                           district: District,
+                           reg_sys,
+                           assessments: {str: InterimAssessment},
                            asmt_skip_rates_by_subject: {str: float},
                            id_gen: IDGen):
     """
@@ -489,13 +482,11 @@ def generate_district_data(state: SBACState,
 
     @param state: State the district belongs to
     @param district: District to generate data for
-    @param reg_sys_guid: GUID for registration system this district is assigned to
+    @param reg_sys:
     @param assessments: Dictionary of all assessment objects
     @param asmt_skip_rates_by_subject: The rate that students skip a given assessment
     @param id_gen: ID generator
     """
-    # Grab the registration system
-    reg_sys = REGISTRATION_SYSTEMS[reg_sys_guid]
 
     # Decide how many schools to make
     school_count = random.triangular(district.config['school_counts']['min'],
@@ -668,9 +659,10 @@ def get_iab_key(date, grade, subject, block):
     return "%i-%i-%i IAB %i %s %s" % (date.year, date.month, date.day, grade, subject, block)
 
 
-def generate_state_data(state: SBACState,
+def generate_state_data(state: State,
                         id_gen: IDGen,
-                        generate_iabs: bool):
+                        generate_iabs: bool.bit_length,
+                        reg_sys):
     """
     Generate an entire data set for a single state.
 
@@ -684,9 +676,8 @@ def generate_state_data(state: SBACState,
     assessments = {}
 
     if generate_iabs:
-        for subject, grade in itertools.product(sbac_in_config.SUBJECTS,
-                                                GRADES_OF_CONCERN):
-
+        print('Generating iabs')
+        for subject, grade in itertools.product(sbac_in_config.SUBJECTS, GRADES_OF_CONCERN):
             for year, block, offset_date in itertools.product(ASMT_YEARS,
                                                               sbac_in_config.IAB_NAMES[subject][grade],
                                                               sbac_in_config.IAB_EFFECTIVE_DATES, ):
@@ -721,7 +712,7 @@ def generate_state_data(state: SBACState,
             print('  Creating District: %s (%s District)' % (district.name, district.type_str))
 
             # Generate the district data set
-            avg_year, unique = generate_district_data(state, district, random.choice(REGISTRATION_SYSTEM_GUIDS),
+            avg_year, unique = generate_district_data(state, district, reg_sys,
                                                       assessments, asmt_skip_rates_by_subject, id_gen)
 
             # Print completion of district
@@ -761,7 +752,7 @@ if __name__ == '__main__':
     # Save output directory
     OUT_PATH_ROOT = args.out_dir
 
-    STATES = [{'name': args.state_name, 'code': args.state_code, 'type': args.state_type}]
+    state_cfg = {'name': args.state_name, 'code': args.state_code, 'type': args.state_type}
 
     # Validate at least one form of output
     if not WRITE_PG and not WRITE_STAR and not WRITE_LZ:
@@ -801,19 +792,12 @@ if __name__ == '__main__':
     prepare_output_files()
 
     # Create the registration systems
-    REGISTRATION_SYSTEMS = build_registration_systems(YEARS, idg)
-    for guid, _ in REGISTRATION_SYSTEMS.items():
-        REGISTRATION_SYSTEM_GUIDS.append(guid)
+    rs_by_year = build_registration_system(YEARS, idg)  # Create the state object
+    state = sbac_hier_gen.generate_state(state_cfg['type'], state_cfg['name'], state_cfg['code'], idg)
+    print('\nCreating State: %s' % state.name)
 
-    # Start the generation of data
-    for state_cfg in STATES:
-        # Create the state object
-        state = sbac_hier_gen.generate_state(state_cfg['type'], state_cfg['name'], state_cfg['code'], idg)
-        print()
-        print('Creating State: %s' % state.name)
-
-        # Process the state
-        generate_state_data(state, idg, generate_iabs=args.generate_iabs)
+    # Process the state
+    generate_state_data(state, idg, generate_iabs=args.generate_iabs, reg_sys=rs_by_year)
 
     # Close the open DB connection
     if WRITE_PG:

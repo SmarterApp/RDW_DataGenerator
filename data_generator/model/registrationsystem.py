@@ -1,12 +1,12 @@
 """
-Model a registration system for the SBAC project.
+Model a registration system
 
 """
 
 
-class SBACRegistrationSystem:
+class RegistrationSystem:
     """
-    Model a SBAC registration system.
+    A registration system.
     """
 
     def __init__(self):

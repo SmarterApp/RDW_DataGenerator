@@ -1,12 +1,11 @@
 """
-Model the SBAC-specific items of a teaching staff.
-
+A Student øGroup
 """
 
 
-class SBACgroup:
+class Group:
     """
-    Model a SBAC student group.
+    A student group.
     """
 
     def __init__(self):

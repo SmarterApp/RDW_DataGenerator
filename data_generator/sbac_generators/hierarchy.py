@@ -8,12 +8,12 @@ import random
 import data_generator.config.cfg as sbac_config
 import data_generator.generators.hierarchy as general_hier_gen
 import data_generator.sbac_generators.population as sbac_pop_gen
-from data_generator.sbac_model.district import SBACDistrict
-from data_generator.sbac_model.group import SBACgroup
-from data_generator.sbac_model.institutionhierarchy import InstitutionHierarchy
-from data_generator.sbac_model.registrationsystem import SBACRegistrationSystem
-from data_generator.sbac_model.school import SBACSchool
-from data_generator.sbac_model.state import SBACState
+from data_generator.model.district import District
+from data_generator.model.group import Group
+from data_generator.model.institutionhierarchy import InstitutionHierarchy
+from data_generator.model.school import School
+from data_generator.model.state import State
+from data_generator.model.registrationsystem import RegistrationSystem
 
 
 def generate_state(state_type, name, code, id_gen):
@@ -27,7 +27,7 @@ def generate_state(state_type, name, code, id_gen):
     @returns: The state
     """
     # Run the general generator
-    s = general_hier_gen.generate_state(state_type, name, code, sub_class=SBACState)
+    s = general_hier_gen.generate_state(state_type, name, code)
 
     # Set the SR guid
     s.guid_sr = id_gen.get_sr_uuid()
@@ -35,7 +35,7 @@ def generate_state(state_type, name, code, id_gen):
     return s
 
 
-def generate_district(district_type, state: SBACState, id_gen):
+def generate_district(district_type, state: State, id_gen):
     """
     Generate a district specified by the parameters.
 
@@ -45,7 +45,7 @@ def generate_district(district_type, state: SBACState, id_gen):
     @returns: The district
     """
     # Run the general generator
-    d = general_hier_gen.generate_district(district_type, state, sub_class=SBACDistrict)
+    d = general_hier_gen.generate_district(district_type, state)
 
     if random.random() < sbac_config.STUDENT_GROUPING_RATE:
         d.student_grouping = True
@@ -55,7 +55,7 @@ def generate_district(district_type, state: SBACState, id_gen):
     return d
 
 
-def generate_school(school_type, district: SBACDistrict, id_gen, interim_asmt_rate=sbac_config.INTERIM_ASMT_RATE):
+def generate_school(school_type, district: District, id_gen, interim_asmt_rate=sbac_config.INTERIM_ASMT_RATE):
     """
     Generate a school specified by the parameters.
 
@@ -66,7 +66,7 @@ def generate_school(school_type, district: SBACDistrict, id_gen, interim_asmt_ra
     @returns: The school
     """
     # Run the general generator
-    s = general_hier_gen.generate_school(school_type, district, sub_class=SBACSchool)
+    s = general_hier_gen.generate_school(school_type, district)
 
     # Set the SR guid
     s.guid_sr = id_gen.get_sr_uuid()
@@ -88,7 +88,7 @@ def generate_registration_system(year, extract_date, id_gen):
     @returns: The registration system
     """
     # Create the object
-    ars = SBACRegistrationSystem()
+    ars = RegistrationSystem()
     ars.guid = id_gen.get_uuid()
     ars.guid_sr = id_gen.get_sr_uuid()
     ars.sys_guid = id_gen.get_uuid()
@@ -99,7 +99,7 @@ def generate_registration_system(year, extract_date, id_gen):
     return ars
 
 
-def generate_institution_hierarchy(state: SBACState, district: SBACDistrict, school: SBACSchool, id_gen):
+def generate_institution_hierarchy(state: State, district: District, school: School, id_gen):
     """
     Generate a hierarchy institution object for a set of hierarchy institutions.
 
@@ -122,7 +122,7 @@ def generate_institution_hierarchy(state: SBACState, district: SBACDistrict, sch
     return ih
 
 
-def generate_group(group_type, school: SBACSchool, id_gen):
+def generate_group(group_type, school: School, id_gen):
     """
     Generate a group of given group_type and school
     @param group_type: Type of group
@@ -132,7 +132,7 @@ def generate_group(group_type, school: SBACSchool, id_gen):
     if group_type not in sbac_config.GROUP_TYPE:
         raise LookupError("Group type '" + str(group_type) + "' was not found")
 
-    g = SBACgroup()
+    g = Group()
     g.type = group_type
     g.guid_sr = id_gen.get_sr_uuid()
     g.school = school

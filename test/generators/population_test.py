@@ -6,8 +6,8 @@ Unit tests for the sbac_data_generation.generators.population module.
 import data_generator.config.cfg as sbac_config
 import data_generator.sbac_generators.hierarchy as hier_gen
 import data_generator.sbac_generators.population as pop_gen
-from data_generator.sbac_model.student import SBACStudent
-from data_generator.sbac_model.teachingstaff import SBACTeachingStaff
+from data_generator.model.student import Student
+from data_generator.model.staff import TeachingStaff
 from data_generator.util.id_gen import IDGen
 from nose.tools import assert_is_instance, assert_regexp_matches
 
@@ -25,7 +25,7 @@ def test_generate_staff():
     staff = pop_gen.generate_teaching_staff_member(school, ID_GEN)
 
     # Tests
-    assert_is_instance(staff, SBACTeachingStaff)
+    assert_is_instance(staff, TeachingStaff)
     assert_regexp_matches(staff.guid_sr, SR_GUID_REGEX)
 
 
@@ -37,7 +37,7 @@ def test_generate_student():
     student = pop_gen.generate_student(school, 11, ID_GEN, state, 2015)
 
     # Tests
-    assert_is_instance(student, SBACStudent)
+    assert_is_instance(student, Student)
     assert_regexp_matches(student.guid_sr, SR_GUID_REGEX)
     assert_regexp_matches(student.external_ssid, EXT_GUID_REGEX)
     assert_regexp_matches(student.external_ssid_sr, SR_GUID_REGEX)
