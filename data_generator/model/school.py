@@ -1,7 +1,5 @@
-"""Model the core of a school.
-
-:author: nestep
-:date: February 21, 2014
+"""
+Model the core of a school.
 """
 
 from data_generator import run_id as global_run_id
@@ -10,6 +8,7 @@ from data_generator import run_id as global_run_id
 class School:
     """The core of a school.
     """
+
     def __init__(self):
         self.run_id = global_run_id
         self.guid = None

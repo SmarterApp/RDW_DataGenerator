@@ -1,8 +1,5 @@
 """
-TODO: enter description
 
-@author: mjacob
-@date: 140321
 """
 from data_generator.util.assessment_stats import DemographicLevels, Stats
 from data_generator.util.assessment_stats import RandomLevelByDemographics, Properties, GradeLevels

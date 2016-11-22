@@ -1,7 +1,6 @@
-"""Create output filters for data values.
+"""
+Create output filters for date values.
 
-:author: nestep
-:date: March 6, 2014
 """
 
 import datetime

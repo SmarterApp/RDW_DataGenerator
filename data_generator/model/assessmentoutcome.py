@@ -1,7 +1,6 @@
-"""Model the core of an assessment outcome (an instance of a student taking an assessment).
+"""
+Model the core of an assessment outcome (an instance of a student taking an assessment).
 
-:author: nestep
-:date: February 24, 2014
 """
 
 from data_generator import run_id as global_run_id
@@ -10,6 +9,7 @@ from data_generator import run_id as global_run_id
 class AssessmentOutcome:
     """The core assessment outcome class.
     """
+
     def __init__(self):
         self.run_id = global_run_id
         self.guid = None

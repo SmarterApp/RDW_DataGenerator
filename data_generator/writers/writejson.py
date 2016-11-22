@@ -1,7 +1,5 @@
-"""This is the general JSON writer.
-
-:author: nestep
-:date: March 4, 2014
+"""
+This is the general JSON writer.
 """
 
 import copy

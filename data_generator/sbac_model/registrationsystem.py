@@ -1,8 +1,6 @@
 """
 Model a registration system for the SBAC project.
 
-@author: nestep
-@date: March 4, 2014
 """
 
 
@@ -10,6 +8,7 @@ class SBACRegistrationSystem:
     """
     Model a SBAC registration system.
     """
+
     def __init__(self):
         self.guid = None
         self.guid_sr = None

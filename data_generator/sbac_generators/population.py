@@ -1,16 +1,13 @@
 """
 Augment the generation of population elements with SBAC-specific items.
 
-@author: nestep
-@date: March 3, 2014
 """
 
 import datetime
 import random
 
-import data_generator.generators.population as general_pop_gen
 import data_generator.config.cfg as sbac_in_config
-
+import data_generator.generators.population as general_pop_gen
 from data_generator.sbac_model.school import SBACSchool
 from data_generator.sbac_model.student import SBACStudent
 from data_generator.sbac_model.teachingstaff import SBACTeachingStaff
@@ -149,53 +146,53 @@ def assign_student_groups(school, grade, grade_students, schools_with_groupings)
             setattr(grade_student, "group_%i_id" % (n,), group.id)
             setattr(grade_student, "group_%i_text" % (n,), group.name)
 
-        # for n in range(1, 11):
-        #     if random.random() < sbac_in_config.ALL_GROUP_RATE:
-        #         setattr(grade_student, "group_%i_id" % (n,), )
+            # for n in range(1, 11):
+            #     if random.random() < sbac_in_config.ALL_GROUP_RATE:
+            #         setattr(grade_student, "group_%i_id" % (n,), )
 
-    # cur_grp_idx = 0
-    # cur_stu_idx = 0
-    # students_in_group_cnt = 0
-    #
-    # while cur_stu_idx < len(grade_students):
-    #     # Case when num of students not evenly divide in groups.
-    #     # Left over students fall in last group.
-    #     if cur_grp_idx == num_tot_groups:
-    #             cur_grp_idx -= 1
-    #
-    #     while students_in_group_cnt <= num_students_per_group and cur_stu_idx < num_tot_students:
-    #         if random.random() < sbac_in_config.ALL_GROUP_RATE:
-    #             grade_students[cur_stu_idx].group_1_id = ela_groups_staff_based[cur_grp_idx].id
-    #             grade_students[cur_stu_idx].group_1_text = ela_groups_staff_based[cur_grp_idx].name
-    #             grade_students[cur_stu_idx].group_2_id = ela_groups_section_based[cur_grp_idx].id
-    #             grade_students[cur_stu_idx].group_2_text = ela_groups_section_based[cur_grp_idx].name
-    #             grade_students[cur_stu_idx].group_3_id = math_groups_staff_based[cur_grp_idx].id
-    #             grade_students[cur_stu_idx].group_3_text = math_groups_staff_based[cur_grp_idx].name
-    #             grade_students[cur_stu_idx].group_4_id = math_groups_section_based[cur_grp_idx].id
-    #             grade_students[cur_stu_idx].group_4_text = math_groups_section_based[cur_grp_idx].name
-    #
-    #         else:
-    #             if random.random() < sbac_in_config.ONE_GROUP_RATE:
-    #                 grade_students[cur_stu_idx].group_1_id = ela_groups_staff_based[cur_grp_idx].id
-    #                 grade_students[cur_stu_idx].group_1_text = ela_groups_staff_based[cur_grp_idx].name
-    #
-    #             else:
-    #                 grade_students[cur_stu_idx].group_2_id = ela_groups_section_based[cur_grp_idx].id
-    #                 grade_students[cur_stu_idx].group_2_text = ela_groups_section_based[cur_grp_idx].name
-    #
-    #             if random.random() < sbac_in_config.ONE_GROUP_RATE:
-    #                 grade_students[cur_stu_idx].group_3_id = math_groups_staff_based[cur_grp_idx].id
-    #                 grade_students[cur_stu_idx].group_3_text = math_groups_staff_based[cur_grp_idx].name
-    #
-    #             else:
-    #                 grade_students[cur_stu_idx].group_4_id = math_groups_section_based[cur_grp_idx].id
-    #                 grade_students[cur_stu_idx].group_4_text = math_groups_section_based[cur_grp_idx].name
-    #
-    #         cur_stu_idx += 1
-    #         students_in_group_cnt += 1
-    #
-    #     students_in_group_cnt = 0
-    #     cur_grp_idx += 1
+            # cur_grp_idx = 0
+            # cur_stu_idx = 0
+            # students_in_group_cnt = 0
+            #
+            # while cur_stu_idx < len(grade_students):
+            #     # Case when num of students not evenly divide in groups.
+            #     # Left over students fall in last group.
+            #     if cur_grp_idx == num_tot_groups:
+            #             cur_grp_idx -= 1
+            #
+            #     while students_in_group_cnt <= num_students_per_group and cur_stu_idx < num_tot_students:
+            #         if random.random() < sbac_in_config.ALL_GROUP_RATE:
+            #             grade_students[cur_stu_idx].group_1_id = ela_groups_staff_based[cur_grp_idx].id
+            #             grade_students[cur_stu_idx].group_1_text = ela_groups_staff_based[cur_grp_idx].name
+            #             grade_students[cur_stu_idx].group_2_id = ela_groups_section_based[cur_grp_idx].id
+            #             grade_students[cur_stu_idx].group_2_text = ela_groups_section_based[cur_grp_idx].name
+            #             grade_students[cur_stu_idx].group_3_id = math_groups_staff_based[cur_grp_idx].id
+            #             grade_students[cur_stu_idx].group_3_text = math_groups_staff_based[cur_grp_idx].name
+            #             grade_students[cur_stu_idx].group_4_id = math_groups_section_based[cur_grp_idx].id
+            #             grade_students[cur_stu_idx].group_4_text = math_groups_section_based[cur_grp_idx].name
+            #
+            #         else:
+            #             if random.random() < sbac_in_config.ONE_GROUP_RATE:
+            #                 grade_students[cur_stu_idx].group_1_id = ela_groups_staff_based[cur_grp_idx].id
+            #                 grade_students[cur_stu_idx].group_1_text = ela_groups_staff_based[cur_grp_idx].name
+            #
+            #             else:
+            #                 grade_students[cur_stu_idx].group_2_id = ela_groups_section_based[cur_grp_idx].id
+            #                 grade_students[cur_stu_idx].group_2_text = ela_groups_section_based[cur_grp_idx].name
+            #
+            #             if random.random() < sbac_in_config.ONE_GROUP_RATE:
+            #                 grade_students[cur_stu_idx].group_3_id = math_groups_staff_based[cur_grp_idx].id
+            #                 grade_students[cur_stu_idx].group_3_text = math_groups_staff_based[cur_grp_idx].name
+            #
+            #             else:
+            #                 grade_students[cur_stu_idx].group_4_id = math_groups_section_based[cur_grp_idx].id
+            #                 grade_students[cur_stu_idx].group_4_text = math_groups_section_based[cur_grp_idx].name
+            #
+            #         cur_stu_idx += 1
+            #         students_in_group_cnt += 1
+            #
+            #     students_in_group_cnt = 0
+            #     cur_grp_idx += 1
 
 
 def generate_teaching_staff_member(school: SBACSchool, id_gen):

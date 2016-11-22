@@ -1,21 +1,6 @@
 """
 The data generator for the SBAC project.
 
-Command line arguments:
-  --team TEAM_NAME: Name of team to generate data for (expects sonics or arkanoids)
-  --state_name STATE_NAME: Name of state to generate data for (defaults to 'North Carolina')
-  --state_code STATE_CODE: Code of state to generate data for (defaults to 'NC')
-  --state_type STATE_TYPE_NAME: Name of state type to generate data for (expects devel, typical_1, california)
-  --pg_out: Output data to a PostgreSQL database
-  --star_out: Output data to star schema CSV
-  --lz_out: Output data to landing zone CSV and JSON
-
-  If using PostgreSQL output:
-    --host: Host for PostgreSQL server
-    --schema: Schema for PostgreSQL database
-
-@author: nestep
-@date: March 17, 2014
 """
 
 import argparse
@@ -36,16 +21,16 @@ import data_generator.util.hiearchy as hier_util
 import data_generator.writers.writecsv as csv_writer
 import data_generator.writers.writejson as json_writer
 import data_generator.writers.writepostgres as postgres_writer
-from data_generator.sbac_model.summative_or_ica_assessmentoutcome import SBACAssessmentOutcome
 from data_generator.sbac_model.district import SBACDistrict
 from data_generator.sbac_model.institutionhierarchy import InstitutionHierarchy
 from data_generator.sbac_model.state import SBACState
 from data_generator.sbac_model.student import SBACStudent
+from data_generator.sbac_model.summative_or_ica_assessment import SBACAssessment
+from data_generator.sbac_model.summative_or_ica_assessmentoutcome import SBACAssessmentOutcome
 from data_generator.util import all_combinations
 from data_generator.util.id_gen import IDGen
 from data_generator.writers.datefilters import FILTERS as DG_FILTERS
 from data_generator.writers.filters import SBAC_FILTERS
-from data_generator.sbac_model.summative_or_ica_assessment import SBACAssessment
 
 OUT_PATH_ROOT = 'out'
 DB_CONN = None
@@ -58,9 +43,9 @@ WRITE_IL = False
 
 # See assign_team_configuration_options for these values
 STATES = []
-YEARS = []
-ASMT_YEARS = []
-INTERIM_ASMT_PERIODS = []
+YEARS = [2015, 2016, 2017]  # Student registration years, expected sorted lowest to highest
+ASMT_YEARS = [2015, 2016, 2017]  # Expected sorted lowest to highest
+INTERIM_ASMT_PERIODS = ['Fall', 'Winter', 'Spring']  # The periods for interim assessments
 NUMBER_REGISTRATION_SYSTEMS = 1
 
 # These are global regardless of team
@@ -71,51 +56,6 @@ REGISTRATION_SYSTEMS = {}
 # Register output filters
 csv_writer.register_filters(SBAC_FILTERS)
 postgres_writer.register_filters(SBAC_FILTERS)
-
-
-def assign_configuration_options(gen_type, state_name, state_code, state_type):
-    """
-    Assign configuration options that are specific for the generation type
-
-    @param gen_type: Generation run type to configure
-    @param state_name: Name of state to generate
-    @param state_code: Code of state to generate
-    @param state_type: Type of state to generate
-    """
-    global STATES, YEARS, ASMT_YEARS, INTERIM_ASMT_PERIODS, NUMBER_REGISTRATION_SYSTEMS, WRITE_LZ, WRITE_STAR, \
-        WRITE_PG, WRITE_IL, GRADES_OF_CONCERN
-
-    # Validate parameter
-    if gen_type not in ['regular', 'udl']:
-        raise ValueError("Generation type '%s' is not known" % gen_type)
-
-    # Set the state
-    STATES = [{'name': state_name, 'code': state_code, 'type': state_type}]
-
-    # Assign options
-    if gen_type == 'regular':
-        YEARS = [2015, 2016, 2017]  # Expected sorted lowest to highest
-        ASMT_YEARS = [2015, 2016, 2017]  # The years to generate summative assessments for
-        INTERIM_ASMT_PERIODS = ['Fall', 'Winter', 'Spring']  # The periods for interim assessments
-        NUMBER_REGISTRATION_SYSTEMS = 1  # Should be less than the number of expected districts
-    elif gen_type == 'udl':
-        # This is a VERY specific configuration specifically designed to generate UDL test files
-        STATES = [{'name': 'Example State', 'code': 'ES', 'type': 'udl_test'}]
-        YEARS = [2016]
-        ASMT_YEARS = [2016]
-        INTERIM_ASMT_PERIODS = []
-        NUMBER_REGISTRATION_SYSTEMS = 1
-        GRADES_OF_CONCERN = {11}
-        # sbac_in_config.SUBJECTS = ['Math']
-        sbac_in_config.INTERIM_ASMT_RATE = 0
-        sbac_in_config.ASMT_SKIP_RATE = 0
-        sbac_in_config.ASMT_RETAKE_RATE = 0
-        sbac_in_config.ASMT_DELETE_RATE = 0
-        sbac_in_config.ASMT_UPDATE_RATE = 0
-        WRITE_LZ = True
-        WRITE_STAR = False
-        WRITE_PG = False
-        WRITE_IL = False
 
 
 def connect_to_postgres(host, port, dbname, user, password):
@@ -140,27 +80,13 @@ def prepare_output_files():
         return
 
     # Prepare star-schema output files
-    csv_writer.prepare_csv_file(sbac_out_config.FAO_VW_FORMAT['name'],
-                                sbac_out_config.FAO_VW_FORMAT['columns'],
-                                root_path=OUT_PATH_ROOT)
-    csv_writer.prepare_csv_file(sbac_out_config.FAO_FORMAT['name'],
-                                sbac_out_config.FAO_FORMAT['columns'],
-                                root_path=OUT_PATH_ROOT)
-    csv_writer.prepare_csv_file(sbac_out_config.FBAO_FORMAT['name'],
-                                sbac_out_config.FBAO_FORMAT['columns'],
-                                root_path=OUT_PATH_ROOT)
-    csv_writer.prepare_csv_file(sbac_out_config.DIM_STUDENT_FORMAT['name'],
-                                sbac_out_config.DIM_STUDENT_FORMAT['columns'],
-                                root_path=OUT_PATH_ROOT)
-    csv_writer.prepare_csv_file(sbac_out_config.DIM_INST_HIER_FORMAT['name'],
-                                sbac_out_config.DIM_INST_HIER_FORMAT['columns'],
-                                root_path=OUT_PATH_ROOT)
-    csv_writer.prepare_csv_file(sbac_out_config.DIM_ASMT_FORMAT['name'],
-                                sbac_out_config.DIM_ASMT_FORMAT['columns'],
-                                root_path=OUT_PATH_ROOT)
-    csv_writer.prepare_csv_file(sbac_out_config.SR_FORMAT['name'],
-                                sbac_out_config.SR_FORMAT['columns'],
-                                root_path=OUT_PATH_ROOT)
+    csv_writer.prepare_csv_file(sbac_out_config.FAO_VW_FORMAT['name'], sbac_out_config.FAO_VW_FORMAT['columns'], root_path=OUT_PATH_ROOT)
+    csv_writer.prepare_csv_file(sbac_out_config.FAO_FORMAT['name'], sbac_out_config.FAO_FORMAT['columns'], root_path=OUT_PATH_ROOT)
+    csv_writer.prepare_csv_file(sbac_out_config.FBAO_FORMAT['name'], sbac_out_config.FBAO_FORMAT['columns'], root_path=OUT_PATH_ROOT)
+    csv_writer.prepare_csv_file(sbac_out_config.DIM_STUDENT_FORMAT['name'], sbac_out_config.DIM_STUDENT_FORMAT['columns'], root_path=OUT_PATH_ROOT)
+    csv_writer.prepare_csv_file(sbac_out_config.DIM_INST_HIER_FORMAT['name'], sbac_out_config.DIM_INST_HIER_FORMAT['columns'], root_path=OUT_PATH_ROOT)
+    csv_writer.prepare_csv_file(sbac_out_config.DIM_ASMT_FORMAT['name'], sbac_out_config.DIM_ASMT_FORMAT['columns'], root_path=OUT_PATH_ROOT)
+    csv_writer.prepare_csv_file(sbac_out_config.SR_FORMAT['name'], sbac_out_config.SR_FORMAT['columns'], root_path=OUT_PATH_ROOT)
 
 
 def build_registration_systems(years, id_gen):
@@ -812,38 +738,18 @@ if __name__ == '__main__':
     # Argument parsing for task-specific arguments
     parser = argparse.ArgumentParser(description='SBAC data generation task.')
     # udl overrides other settings
-    parser.add_argument('-t', '--type', dest='gen_type', action='store', default='regular',
-                        help='Specify the type of data generation run to perform (regular, udl)',
-                        required=False)
-    parser.add_argument('-sn', '--state_name', dest='state_name', action='store', default='California',
-                        help='Specify the name of the state to generate data for (default=California)',
-                        required=False)
-    parser.add_argument('-sc', '--state_code', dest='state_code', action='store', default='CA',
-                        help='Specify the code of the state to generate data for (default=CA)',
-                        required=False)
-    parser.add_argument('-st', '--state_type', dest='state_type', action='store', default='devel',
-                        help='Specify the type of state to generate data for (devel (default), typical_1, california, udl_test)',
-                        required=False)
-    parser.add_argument('-o', '--out_dir', dest='out_dir', action='store', default='out',
-                        help='Specify the root directory for writing output files to (default=%(default)s)',
-                        required=False)
-    parser.add_argument('-ho', '--host', dest='pg_host', action='store', default='localhost',
-                        help='The host for the PostgreSQL server to write data to')
-    parser.add_argument('-pa', '--pass', dest='pg_pass', action='store', default='',
-                        help='The password for the PostgreSQL server to write data to')
-    parser.add_argument('-s', '--schema', dest='pg_schema', action='store', default='dg_data',
-                        help='The schema for the PostgreSQL database to write data to')
-    parser.add_argument('-po', '--pg_out', dest='pg_out', action='store_true',
-                        help='Output data to PostgreSQL database', required=False)
-    parser.add_argument('-so', '--star_out', dest='star_out', action='store_true',
-                        help='Output data to star schema CSV', required=False)
-    parser.add_argument('-lo', '--lz_out', dest='lz_out', action='store_true',
-                        help='Output data to landing zone CSV and JSON', required=False)
-    parser.add_argument('-io', '--il_out', dest='il_out', action='store_true', help='Output item-level data',
-                        required=False)
-    parser.add_argument('-gia', '--generate_iabs', dest='generate_iabs',
-                        action='store_false', default=True,
-                        help='generate interim assessment blocks (default=%(default)s)')
+    parser.add_argument('-sn', '--state_name', dest='state_name', action='store', default='California', help='The name of the state (default=California)', required=False)
+    parser.add_argument('-sc', '--state_code', dest='state_code', action='store', default='CA', help='The code of the state to generate data for', required=False)
+    parser.add_argument('-st', '--state_type', dest='state_type', action='store', default='devel', help='Specify the type of state to generate data for', required=False)
+    parser.add_argument('-o', '--out_dir', dest='out_dir', action='store', default='out', help='Specify the root directory for writing output files to', required=False)
+    parser.add_argument('-ho', '--host', dest='pg_host', action='store', default='localhost', help='The host for the PostgreSQL server to write data to')
+    parser.add_argument('-pa', '--pass', dest='pg_pass', action='store', default='', help='The password for the PostgreSQL server to write data to')
+    parser.add_argument('-s', '--schema', dest='pg_schema', action='store', default='dg_data', help='The schema for the PostgreSQL database to write data to')
+    parser.add_argument('-po', '--pg_out', dest='pg_out', action='store_true', help='Output data to PostgreSQL database', required=False)
+    parser.add_argument('-so', '--star_out', dest='star_out', action='store_true', help='Output data to star schema CSV', required=False)
+    parser.add_argument('-lo', '--lz_out', dest='lz_out', action='store_true', help='Output data to landing zone CSV and JSON', required=False)
+    parser.add_argument('-io', '--il_out', dest='il_out', action='store_true', help='Output item-level data', required=False)
+    parser.add_argument('-gia', '--generate_iabs', dest='generate_iabs', action='store_false', default=True, help='generate interim assessment blocks')
     args, unknown = parser.parse_known_args()
 
     # Save output flags
@@ -855,8 +761,7 @@ if __name__ == '__main__':
     # Save output directory
     OUT_PATH_ROOT = args.out_dir
 
-    # Set team-specific configuration options
-    assign_configuration_options(args.gen_type, args.state_name, args.state_code, args.state_type)
+    STATES = [{'name': args.state_name, 'code': args.state_code, 'type': args.state_type}]
 
     # Validate at least one form of output
     if not WRITE_PG and not WRITE_STAR and not WRITE_LZ:

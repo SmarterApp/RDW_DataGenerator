@@ -1,20 +1,17 @@
 """
 Unit tests for the generate_data module.
 
-@author: nestep
-@date: March 20, 2014
 """
 
 import datetime
 import os
 
 import data_generator.config.cfg as sbac_config
+import data_generator.generate_data as generate_data
 import data_generator.generators.summative_or_ica_assessment as asmt_gen
 import data_generator.sbac_generators.hierarchy as hier_gen
 import data_generator.sbac_generators.population as pop_gen
-import data_generator.generate_data as generate_data
 from data_generator.util.id_gen import IDGen
-from nose.tools import assert_raises
 
 ID_GEN = IDGen()
 
@@ -25,25 +22,7 @@ def setup_module():
         os.makedirs(generate_data.OUT_PATH_ROOT)
 
 
-def test_set_configuration_exception():
-    assert_raises(ValueError, generate_data.assign_configuration_options, 'Unknown', 'North Carolina', 'NC',
-                  'typical_1')
-
-
-def test_set_configuration_state():
-    # Set the configuration
-    generate_data.assign_configuration_options('regular', 'North Carolina', 'NC', 'typical_1')
-
-    # Tests
-    assert generate_data.STATES[0]['name'] == 'North Carolina'
-    assert generate_data.STATES[0]['code'] == 'NC'
-    assert generate_data.STATES[0]['type'] == 'typical_1'
-
-
 def test_set_configuration_regular():
-    # Set the configuration
-    generate_data.assign_configuration_options('regular', 'North Carolina', 'NC', 'typical_1')
-
     # Tests
     assert len(generate_data.YEARS) == 3
     assert 2015 in generate_data.YEARS

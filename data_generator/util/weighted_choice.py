@@ -1,17 +1,16 @@
-"""Method for choosing an object randomly, given weights.
+"""
+Method for choosing an object randomly, given weights.
 
 If many choices are to be made using the same weights, WeightedChooser might be more efficient.
 
-:author: mjacob
-:date: February 25, 2014
 """
-import random
-import itertools
 import bisect
+import itertools
+import random
 
 
 def weighted_choice(counter: {object: float},
-                    rng: random.Random=random.Random(),
+                    rng: random.Random = random.Random(),
                     seed=None) -> object:
     """Choose a random item based on a weight.
 
@@ -21,7 +20,7 @@ def weighted_choice(counter: {object: float},
 
     elements, weights = zip(*counter.items())
 
-    assert(all(weight >= 0 for weight in weights))
+    assert (all(weight >= 0 for weight in weights))
 
     breaks = list(itertools.accumulate(weights))
     value = rng.uniform(0, breaks[-1])
@@ -36,7 +35,7 @@ def weighted_choice(counter: {object: float},
 class WeightedChooser:
     def __init__(self,
                  weights_by_object: {object: float},
-                 rng: random.Random=random.Random()):
+                 rng: random.Random = random.Random()):
         self.elements, weights = zip(*weights_by_object.items())
         self.breaks = tuple(itertools.accumulate(weights))
         self.rng = rng

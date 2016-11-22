@@ -1,9 +1,5 @@
-# -*- coding: utf-8 -*-
 """
 An assessment generator for the SBAC assessment.
-
-@author: mjacob
-@date: October 29, 2014
 """
 
 import datetime

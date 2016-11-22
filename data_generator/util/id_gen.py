@@ -1,8 +1,6 @@
 """
 Generate IDs that conform to student registration (SBAC) requirements.
 
-@author: nestep
-@date: February 22, 2014
 """
 
 import multiprocessing

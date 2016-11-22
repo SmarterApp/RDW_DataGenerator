@@ -1,11 +1,10 @@
-"""Utility functions for the general writers module.
+"""
+Utility functions for the general writers module.
 
-:author: nestep
-:date: February 24, 2014
 """
 
-from data_generator.util.id_gen import IDGen as id_gen
 from data_generator import run_id as global_run_id
+from data_generator.util.id_gen import IDGen as id_gen
 
 
 def build_csv_row_values(root_obj, columns, filters=None, tbl_name=None):

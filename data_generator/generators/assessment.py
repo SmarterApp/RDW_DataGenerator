@@ -1,10 +1,10 @@
 """Generate assessment elements.
-
 """
+
 from data_generator.model.assessment import Assessment
 from data_generator.model.assessmentoutcome import AssessmentOutcome
-from data_generator.util.id_gen import IDGen as id_gen
 from data_generator.model.student import Student
+from data_generator.util.id_gen import IDGen as id_gen
 
 
 def generate_assessment(sub_class=None):

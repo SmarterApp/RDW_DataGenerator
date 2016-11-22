@@ -1,14 +1,10 @@
-# -*- coding: utf-8 -*-
 """
 Model an interim assessment for the SBAC assessment.
 
-@author: mjacob
-@date: October 22, 2014
 """
 
-import data_generator.writers.datefilters as write_filters
 import data_generator.config.cfg as sbac_config
-
+import data_generator.writers.datefilters as write_filters
 from data_generator.model.assessment import Assessment
 
 
@@ -22,8 +18,10 @@ class SBACInterimAssessment(Assessment):
                  'rec_id', 'guid_sr', 'asmt_type', 'period', 'period_year', 'version', 'subject',
                  'claim_1_name', 'claim_2_name', 'claim_3_name', 'claim_4_name',
                  'perf_lvl_name_1', 'perf_lvl_name_2', 'perf_lvl_name_3', 'perf_lvl_name_4', 'perf_lvl_name_5',
-                 'overall_score_min', 'claim_1_score_min', 'claim_2_score_min', 'claim_3_score_min', 'claim_4_score_min',
-                 'overall_score_max', 'claim_1_score_max', 'claim_2_score_max', 'claim_3_score_max', 'claim_4_score_max',
+                 'overall_score_min', 'claim_1_score_min', 'claim_2_score_min', 'claim_3_score_min',
+                 'claim_4_score_min',
+                 'overall_score_max', 'claim_1_score_max', 'claim_2_score_max', 'claim_3_score_max',
+                 'claim_4_score_max',
                  'claim_1_score_weight', 'claim_2_score_weight', 'claim_3_score_weight', 'claim_4_score_weight',
                  'claim_perf_lvl_name_1', 'claim_perf_lvl_name_2', 'claim_perf_lvl_name_3',
                  'overall_cut_point_1', 'overall_cut_point_2', 'overall_cut_point_3', 'overall_cut_point_4',

@@ -1,7 +1,6 @@
-"""Model the core of a section.
+"""
+Model the core of a section.
 
-:author: nestep
-:date: February 24, 2014
 """
 
 from data_generator import run_id as global_run_id
@@ -10,6 +9,7 @@ from data_generator import run_id as global_run_id
 class Section:
     """The core of a section.
     """
+
     def __init__(self):
         self.run_id = global_run_id
         self.guid = None

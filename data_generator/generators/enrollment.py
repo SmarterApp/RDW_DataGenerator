@@ -1,19 +1,16 @@
 """Generate enrollment elements.
-
-:author: nestep
-:date: February 25, 2014
 """
 
 import datetime
 
 import data_generator.config.enrollment as general_enroll_config
 import data_generator.generators.population as general_pop_gen
-from data_generator.util.id_gen import IDGen as id_gen
 from data_generator.model.clss import Class
 from data_generator.model.enrollment import Enrollment
 from data_generator.model.school import School
 from data_generator.model.section import Section
 from data_generator.model.student import Student
+from data_generator.util.id_gen import IDGen as id_gen
 
 
 def generate_class(name, subject, school: School, sub_class=None):

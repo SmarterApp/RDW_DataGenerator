@@ -1,7 +1,5 @@
-"""Model the generals of a student.
-
-:author: nestep
-:date: February 22, 2014
+"""
+Model the generals of a student.
 """
 
 from data_generator import run_id as global_run_id
@@ -10,6 +8,7 @@ from data_generator import run_id as global_run_id
 class Student:
     """The core student class.
     """
+
     def __init__(self):
         self.run_id = global_run_id
         self.guid = None

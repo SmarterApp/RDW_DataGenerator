@@ -1,6 +1,7 @@
 """
 Configuration for state types
 """
+
 STATE_TYPES = {
     'california':
         {'district_types_and_counts': [('Big LA', 1),

@@ -1,17 +1,16 @@
-"""Unit tests for sbac_data_generation.model.* modules.
+"""
+Unit tests for sbac_data_generation.model.* modules.
 
-@author: nestep
-@date: March 18, 2014
 """
 
+import data_generator.generators.summative_or_ica_assessment as asmt_gen
 import data_generator.sbac_generators.hierarchy as hier_gen
 import data_generator.sbac_generators.population as pop_gen
 import data_generator.sbac_model.itemdata as item_lvl_data
-
-import data_generator.generators.summative_or_ica_assessment as asmt_gen
 from data_generator.util.id_gen import IDGen
 
 ID_GEN = IDGen()
+
 
 def test_assessment_get_object_set():
     # Create necessary objects

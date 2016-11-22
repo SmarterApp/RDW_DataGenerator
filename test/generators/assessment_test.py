@@ -1,21 +1,19 @@
 """
 Unit tests for the sbac_data_generation.generators.assessement module.
 
-@author: nestep
-@date: March 18, 2014
 """
 
 import datetime
 
-import data_generator.sbac_generators.population as pop_gen
-import data_generator.sbac_model.itemdata as item_lvl_data
-from nose.tools import assert_raises
-
 import data_generator.generators.summative_or_ica_assessment as asmt_gen
 import data_generator.sbac_generators.hierarchy as hier_gen
+import data_generator.sbac_generators.population as pop_gen
+import data_generator.sbac_model.itemdata as item_lvl_data
 from data_generator.util.id_gen import IDGen
+from nose.tools import assert_raises
 
 ID_GEN = IDGen()
+
 
 def test_generate_assessment():
     asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'Math', ID_GEN)

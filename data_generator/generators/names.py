@@ -1,7 +1,6 @@
-"""Generate name components.
+"""
+Generate name components.
 
-:author: nestep
-:date: Febraury 22, 2014
 """
 
 import os
@@ -56,7 +55,7 @@ def generate_school_name(school_type, max_name_length=None):
     """
     if school_type not in SCHOOL_SUFFIXES:
         raise KeyError("School type '" + school_type + "' not found")
-    return _generate_name_from_lists(NAMES_ANIMALS,  NAMES_ANIMALS, SCHOOL_SUFFIXES[school_type], max_name_length)
+    return _generate_name_from_lists(NAMES_ANIMALS, NAMES_ANIMALS, SCHOOL_SUFFIXES[school_type], max_name_length)
 
 
 def generate_person_name(gender):
@@ -74,8 +73,8 @@ def generate_person_name(gender):
         fm_names = random.choice([PEOPLE_NAMES.male_names, PEOPLE_NAMES.female_names])
     else:
         raise Exception("Unknown gender value '" + str(gender) + "' provided [expected 'male', 'female' or 'none']")
-    return fm_names[random.randint(0, len(fm_names) - 1)],\
-           fm_names[random.randint(0, len(fm_names) - 1)] if random.randint(1, 10) < 7 else None,\
+    return fm_names[random.randint(0, len(fm_names) - 1)], \
+           fm_names[random.randint(0, len(fm_names) - 1)] if random.randint(1, 10) < 7 else None, \
            l_names[random.randint(0, len(l_names) - 1)]
 
 

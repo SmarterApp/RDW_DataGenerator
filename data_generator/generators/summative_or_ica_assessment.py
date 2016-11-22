@@ -1,8 +1,6 @@
 """
 An assessment generator for the SBAC assessment.
 
-@author: nestep
-@date: March 3, 2014
 """
 
 import datetime
@@ -12,15 +10,15 @@ from collections import OrderedDict
 import data_generator.config.cfg as sbac_config
 import data_generator.config.hierarchy as hierarchy_config
 import data_generator.generators.assessment as gen_asmt_generator
-from data_generator.sbac_model.summative_or_ica_assessmentoutcome import SBACAssessmentOutcome
 from data_generator.sbac_model.institutionhierarchy import InstitutionHierarchy
 from data_generator.sbac_model.itemdata import SBACAssessmentOutcomeItemData
 from data_generator.sbac_model.student import SBACStudent
+from data_generator.sbac_model.summative_or_ica_assessment import SBACAssessment
+from data_generator.sbac_model.summative_or_ica_assessmentoutcome import SBACAssessmentOutcome
 from data_generator.util.assessment_stats import Properties, RandomLevelByDemographics
 from data_generator.util.assessment_stats import adjust_score
 from data_generator.util.assessment_stats import random_claims
 from data_generator.util.assessment_stats import random_score_given_level
-from data_generator.sbac_model.summative_or_ica_assessment import SBACAssessment
 
 
 def generate_assessment(asmt_type, period, asmt_year, subject, id_gen, from_date=None, to_date=None,

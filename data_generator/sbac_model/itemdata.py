@@ -1,8 +1,6 @@
 """
 Model an item data generated for an assessment outcome (an instance of a student taking an assessment) for the SBAC assessment.
 
-@author: gkathuria
-@date: May 16, 2014
 """
 
 
@@ -10,6 +8,7 @@ class SBACAssessmentOutcomeItemData:
     """
     The SBAC-specific assessment outcome Item Data class.
     """
+
     def __init__(self):
         self.student_id = None
         self.key = None

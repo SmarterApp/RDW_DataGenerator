@@ -1,7 +1,5 @@
-"""This module provides utility functions for hierarchy operations.
-
-:author: nestep
-:date: March 5, 2014
+"""
+This module provides utility functions for hierarchy operations.
 """
 
 

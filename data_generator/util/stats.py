@@ -1,4 +1,3 @@
-__author__ = 'mjacob'
 import math
 
 

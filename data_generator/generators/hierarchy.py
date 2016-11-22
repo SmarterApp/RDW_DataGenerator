@@ -1,17 +1,14 @@
 """Generate hierarchy components.
-
-:author: nestep
-:date: Febraury 21, 2014
 """
 
 import data_generator.config.hierarchy as hier_config
-import data_generator.config.state_types as state_config
 import data_generator.config.population as pop_config
+import data_generator.config.state_types as state_config
 import data_generator.generators.names as name_gen
 from data_generator.model.district import District
-from data_generator.util.id_gen import IDGen as id_gen
 from data_generator.model.school import School
 from data_generator.model.state import State
+from data_generator.util.id_gen import IDGen as id_gen
 
 
 def generate_state(state_type, name, code, state_types=state_config.STATE_TYPES, pop_demos=pop_config.DEMOGRAPHICS,

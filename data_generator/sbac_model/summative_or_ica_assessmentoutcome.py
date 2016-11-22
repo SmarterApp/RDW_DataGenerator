@@ -1,8 +1,6 @@
 """
 Model an assessment outcome (an instance of a student taking an assessment) for the SBAC assessment.
 
-@author: nestep
-@date: March 3, 2014
 """
 
 import datetime
@@ -15,6 +13,7 @@ class SBACAssessmentOutcome(AssessmentOutcome):
     """
     The SBAC-specific assessment outcome class.
     """
+
     def __init__(self):
         super().__init__()
         self.rec_id = None

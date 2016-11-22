@@ -1,8 +1,5 @@
 """
 Create output filters for data values that are specific to the SBAC project.
-
-@author: nestep
-@date: February 28, 2014
 """
 
 import random

@@ -1,8 +1,6 @@
 """
 Model an institution hierarchy as defined for SBAC.
 
-@author: nestep
-@date: February 24, 2014
 """
 
 
@@ -10,6 +8,7 @@ class InstitutionHierarchy:
     """
     Model an institution hierarchy.
     """
+
     def __init__(self):
         self.rec_id = None
         self.guid = None

@@ -1,7 +1,6 @@
-"""Define a couple helper classes for name generation.
+"""
+Define a couple helper classes for name generation.
 
-:author: swimberly
-:date: January 5, 2013
 """
 
 import random
@@ -73,9 +72,11 @@ def _read_name_files(males_first, females_first, all_last):
         last_names = _load_names(last_name_file)
         last_name_file.close()
 
-        male_first_name_frequency_dict, female_first_name_frequency_dict, last_name_frequency_dict = _generate_all_names(male_names, female_names, last_names)
+        male_first_name_frequency_dict, female_first_name_frequency_dict, last_name_frequency_dict = _generate_all_names(
+            male_names, female_names, last_names)
 
-        return _name_dict_to_list(male_first_name_frequency_dict), _name_dict_to_list(female_first_name_frequency_dict), _name_dict_to_list(last_name_frequency_dict)
+        return _name_dict_to_list(male_first_name_frequency_dict), _name_dict_to_list(
+            female_first_name_frequency_dict), _name_dict_to_list(last_name_frequency_dict)
     except:
         print('Error while reading names files')
         return False, False, False
@@ -138,7 +139,8 @@ def _generate_names(total_num, all_names, scale):
     # Fill in remaining open spaces in the array with random names already added
     if remaining_slots >= 0:
         for i in range(remaining_slots):
-            rnd_key = ks[random.randint(0, ks_size - 1)] if ks_size > 0 else all_names[random.randint(0, len(all_names) - 1)].name
+            rnd_key = ks[random.randint(0, ks_size - 1)] if ks_size > 0 else all_names[
+                random.randint(0, len(all_names) - 1)].name
 
             if rnd_key in generated_names:
                 generated_names[rnd_key] += 1

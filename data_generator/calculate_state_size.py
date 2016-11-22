@@ -1,12 +1,10 @@
 """
 Go through and calculate the average students sizes for the different state types in the system.
 
-@author: nestep
-@date: March 20, 2014
 """
 
-import data_generator.config.state_types as state_config
 import data_generator.config.hierarchy as hier_config
+import data_generator.config.state_types as state_config
 import data_generator.util.hiearchy as hier_util
 
 if __name__ == '__main__':

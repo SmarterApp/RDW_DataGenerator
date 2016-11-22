@@ -1,14 +1,12 @@
-"""This is the general CSV writer.
+"""
+This is the general CSV writer.
 
-:author: nestep
-:date: February 24, 2014
 """
 
 import csv
 
 import data_generator.writers.datefilters as writers_filters
 import data_generator.writers.util as writers_util
-
 
 available_filters = writers_filters.FILTERS
 

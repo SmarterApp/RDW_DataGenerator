@@ -59,6 +59,8 @@ First is `generate_data.py`. This generates the data in the requested output for
 > * `--pg_out`: Output data to a PostgreSQL database
 > * `--star_out`: Output data to star schema CSV
 > * `--lz_out`: Output data to landing zone CSV and JSON
+> * `--io`: Output item-level data
+> * `--gia`: Generate interim assessment blocks
 
 > If using PostgreSQL output:
 *(Note: with PostgreSQL the db schema must exists.)*

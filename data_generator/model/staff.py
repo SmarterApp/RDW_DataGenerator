@@ -1,7 +1,6 @@
-"""Model the core of different staff members.
+"""
+Model the core of different staff members.
 
-:author: nestep
-:date: February 22, 2014
 """
 
 from data_generator import run_id as global_run_id
@@ -10,6 +9,7 @@ from data_generator import run_id as global_run_id
 class Staff:
     """The core staff class.
     """
+
     def __init__(self):
         self.run_id = global_run_id
         self.guid = None
@@ -31,6 +31,7 @@ class Staff:
 class DistrictStaff(Staff):
     """Specifics for a district-level staff member.
     """
+
     def __init__(self):
         super().__init__()
         self.district = None
@@ -39,6 +40,7 @@ class DistrictStaff(Staff):
 class TeachingStaff(Staff):
     """Specifics for a teaching staff member.
     """
+
     def __init__(self):
         super().__init__()
         self.school = None

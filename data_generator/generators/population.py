@@ -1,7 +1,5 @@
-"""Generate population elements.
-
-:author: nestep
-:date: Febraury 22, 2014
+"""
+Generate population elements.
 """
 
 import calendar
@@ -11,10 +9,10 @@ import random
 import data_generator.config.population as pop_config
 import data_generator.generators.names as name_gen
 from data_generator.model.district import District
-from data_generator.model.staff import DistrictStaff, TeachingStaff
-from data_generator.util.id_gen import IDGen as id_gen
 from data_generator.model.school import School
+from data_generator.model.staff import DistrictStaff, TeachingStaff
 from data_generator.model.student import Student
+from data_generator.util.id_gen import IDGen as id_gen
 from data_generator.util.weighted_choice import weighted_choice
 
 

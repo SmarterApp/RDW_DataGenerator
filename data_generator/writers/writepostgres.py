@@ -1,14 +1,10 @@
-"""This is the general PostgreSQL writer.
-
-:author: gkathuria
-:date: March 31, 2014
 """
-
-import psycopg2
+This is the general PostgreSQL writer.
+"""
 
 import data_generator.writers.datefilters as writers_filters
 import data_generator.writers.util as writers_util
-
+import psycopg2
 
 available_filters = writers_filters.FILTERS
 
@@ -23,8 +19,8 @@ def register_filters(filters):
 
 
 def create_dbcon(host, port, dbname, user, password):
-    conn_string = "host=%s port=%s dbname=%s user=%s password=%s" %(host,port,dbname,user,password)
-    print("connecting to database %s" %conn_string)
+    conn_string = "host=%s port=%s dbname=%s user=%s password=%s" % (host, port, dbname, user, password)
+    print("connecting to database %s" % conn_string)
     conn = psycopg2.connect(conn_string)
     return conn
 
@@ -38,10 +34,10 @@ def create_table(conn, tblname, columns=None):
     """
     cursor = conn.cursor()
 
-    stmt=''
+    stmt = ''
     for c in columns:
-        colnametype = c['name']+' '+c['type']
-        stmt = stmt+colnametype+','
+        colnametype = c['name'] + ' ' + c['type']
+        stmt = stmt + colnametype + ','
 
     print("drop table if exists %s" % tblname[:-4])
     print("create table %s (%s)" % (tblname[:-4], stmt[:-1]))
@@ -74,7 +70,7 @@ def write_records_to_table(conn, tbl_name, columns, entities, entity_filter=None
     lst = ['%s' for _ in range(num_col)]
     col_list = ','.join(lst)
 
-    stmt = tbl_ins + '('+col_list+')'
+    stmt = tbl_ins + '(' + col_list + ')'
 
     # Get each row of data
     params = []

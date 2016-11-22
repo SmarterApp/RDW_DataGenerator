@@ -1,4 +1,3 @@
-__author__ = 'mjacob'
 # like sum, but with multiplication
 import math
 import random
@@ -19,6 +18,7 @@ class Properties(dict):
 
 class Stats:
     """ stats for a specific demographic value """
+
     def __init__(self, *values: [float]):
         self._values = normalize(values)
 
@@ -31,7 +31,8 @@ class Stats:
 
 class DemographicLevels(dict):
     """ an individual demographic """
-    def __init__(self, values: dict=None, **stats: {str: Stats}):
+
+    def __init__(self, values: dict = None, **stats: {str: Stats}):
         super().__init__(**stats)
         if values is not None:
             self.update(values)
@@ -39,6 +40,7 @@ class DemographicLevels(dict):
 
 class GradeLevels(dict):
     """ dictionary of demographics by name """
+
     def __init__(self, totals: [float], **demographic_levels: {str: DemographicLevels}):
         super().__init__(**demographic_levels)
         self.totals = normalize(totals)
@@ -119,7 +121,7 @@ class RandomLevelByDemographics:
 
     def random_level(self,
                      entity: dict,
-                     rng: random.Random=random.Random(),
+                     rng: random.Random = random.Random(),
                      seed=None) -> int:
         """
         Given a student, return a random level chosen according to their demographic values
@@ -198,8 +200,10 @@ def random_claims(score: int, claim_weights: [float], claim_min: int, claim_max:
     for claim_weight in claim_weights:
         remaining_weight -= claim_weight
 
-        min_ = min(claim_max, max(claim_min, math.floor((remaining_score - remaining_weight * claim_max) / claim_weight)))
-        max_ = max(claim_min, min(claim_max, math.ceil((remaining_score - remaining_weight * claim_min) / claim_weight)))
+        min_ = min(claim_max,
+                   max(claim_min, math.floor((remaining_score - remaining_weight * claim_max) / claim_weight)))
+        max_ = max(claim_min,
+                   min(claim_max, math.ceil((remaining_score - remaining_weight * claim_min) / claim_weight)))
 
         assert min_ <= max_, "%s %s" % (min_, max_)
 

@@ -1,22 +1,19 @@
 """
 Generate SBAC-specific hierarchy components.
 
-@author: nestep
-@date: Febraury 24, 2014
 """
 
 import random
 
-import data_generator.generators.hierarchy as general_hier_gen
 import data_generator.config.cfg as sbac_config
+import data_generator.generators.hierarchy as general_hier_gen
 import data_generator.sbac_generators.population as sbac_pop_gen
-
 from data_generator.sbac_model.district import SBACDistrict
+from data_generator.sbac_model.group import SBACgroup
 from data_generator.sbac_model.institutionhierarchy import InstitutionHierarchy
 from data_generator.sbac_model.registrationsystem import SBACRegistrationSystem
 from data_generator.sbac_model.school import SBACSchool
 from data_generator.sbac_model.state import SBACState
-from data_generator.sbac_model.group import SBACgroup
 
 
 def generate_state(state_type, name, code, id_gen):

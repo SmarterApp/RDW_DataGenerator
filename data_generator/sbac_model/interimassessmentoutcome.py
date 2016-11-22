@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 """
 Model an interim assessment outcome (an instance of a student taking an interim assessment) for the SBAC assessment.
 
-@author: mjacob
-@date: October 22, 2014
 """
 
 import datetime

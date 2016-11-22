@@ -1,11 +1,14 @@
-"""Model the core of an assessment.
+"""
+Model the core of an assessment.
 """
 
 from data_generator import run_id as global_run_id
 
+
 class Assessment:
     """The core assessment class.
     """
+
     def __init__(self):
         self.run_id = global_run_id
         self.guid = None

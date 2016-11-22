@@ -1,8 +1,6 @@
 """
 Model the SBAC-specific items of a student.
 
-@author: nestep
-@date: March 3, 2014
 """
 
 from data_generator.model.student import Student
@@ -12,6 +10,7 @@ class SBACStudent(Student):
     """
     The SBAC-specific student class.
     """
+
     def __init__(self):
         super().__init__()
         self.rec_id = None
