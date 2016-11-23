@@ -14,6 +14,7 @@ import data_generator.sbac_generators.population as sbac_pop_gen
 import data_generator.util.hiearchy as hier_util
 import data_generator.writers.writecsv as csv_writer
 import pyprind
+from data_generator.model.assessmentoutcome import AssessmentOutcome
 from data_generator.model.district import District
 from data_generator.model.interimassessment import InterimAssessment
 from data_generator.model.state import State
@@ -116,9 +117,9 @@ class WorkerManager(Worker):
         assessments = {}
 
         # set up a progress bar
-        progress_max = 0;
+        progress_max = 0
         for subject, grade in itertools.product(sbac_in_config.SUBJECTS, GRADES_OF_CONCERN):
-            progress_max += len(ASMT_YEARS) * len(sbac_in_config.IAB_NAMES[subject][grade]) * len(sbac_in_config.IAB_EFFECTIVE_DATES);
+            progress_max += len(ASMT_YEARS) * len(sbac_in_config.IAB_NAMES[subject][grade]) * len(sbac_in_config.IAB_EFFECTIVE_DATES)
         bar = pyprind.ProgBar(progress_max, stream=sys.stdout, title='Generating IAB assessments')
 
         # generate iabs
@@ -146,7 +147,7 @@ class WorkerManager(Worker):
         assessments = {}
 
         # set up a progress bar
-        progress_max = len(ASMT_YEARS) * len(sbac_in_config.SUBJECTS) * len(GRADES_OF_CONCERN);
+        progress_max = len(ASMT_YEARS) * len(sbac_in_config.SUBJECTS) * len(GRADES_OF_CONCERN)
         bar = pyprind.ProgBar(progress_max, stream=sys.stdout, title='Generating Summative and ICA Assessments')
 
         for year in ASMT_YEARS:
@@ -191,10 +192,6 @@ class WorkerManager(Worker):
         # Validate years
         if len(years) == 0:
             raise ValueError('Number of specified years is zero')
-
-        # Grab columns and layout for output files
-        sr_out_cols = sbac_out_config.SR_FORMAT['columns']
-        rs_out_layout = sbac_out_config.REGISTRATION_SYSTEM_FORMAT['layout']
 
         # Build the registration systems for every year
         rs_by_year = {}
@@ -268,7 +265,7 @@ class WorkerManager(Worker):
         students = {}
         student_count = 0
 
-        progress_max = len(sbac_hier_gen.set_up_schools_with_grades(schools, GRADES_OF_CONCERN)) * len(YEARS);
+        progress_max = len(sbac_hier_gen.set_up_schools_with_grades(schools, GRADES_OF_CONCERN)) * len(YEARS)
         bar = pyprind.ProgBar(progress_max, stream=sys.stdout, title='Generating assessments outcome for schools')
 
         for asmt_year in YEARS:
@@ -293,7 +290,7 @@ class WorkerManager(Worker):
             # With the students moved around, we will re-populate empty grades and create assessments with outcomes for
             # the students
             for school, grades in schools_with_grades.items():
-                bar.update();
+                bar.update()
                 # Get the institution hierarchy object
                 inst_hier = inst_hiers[school.guid]
 
@@ -404,9 +401,6 @@ class WorkerManager(Worker):
         @param state_code: state code
         @param district_id: district it
         """
-        # Set up output file names and columns
-        it_lz_out_name = sbac_out_config.LZ_ITEMDATA_FORMAT['name']
-        it_lz_out_cols = sbac_out_config.LZ_ITEMDATA_FORMAT['columns']
 
         for worker in self.workers:
             worker.write_students_dim(dim_students)
@@ -422,23 +416,24 @@ class WorkerManager(Worker):
                 # todo: this needs to be refactored
                 if self.generate_item_level:
                     for sao in results:
-                        try:
-                            asmt = sao.assessment
-                            # Only write out summative item level results
-                            if asmt.asmt_type == 'SUMMATIVE':
-                                it_dir_path = os.path.join(state_code, str(asmt.period_year), asmt.asmt_type,
-                                                           DG_FILTERS['date_Ymd'](asmt.effective_date), asmt.subject,
-                                                           str(sao.student.grade), district_id)
-                                it_file_path = os.path.join(it_dir_path, it_lz_out_name.replace('<STUDENT_ID>',
-                                                                                                sao.student.guid_sr))
-
-                                if not os.path.exists(os.path.join(self.out_path_root, it_dir_path)):
-                                    os.makedirs(os.path.join(self.out_path_root, it_dir_path))
-
-                                csv_writer.write_records_to_file(it_file_path, it_lz_out_cols, sao.item_level_data,
-                                                                 root_path=self.out_path_root)
-                        finally:
-                            pass
+                        self.__write_item_level_date(sao, state_code, district_id)
 
                 for worker in self.workers:
                     worker.write_assessment_outcome(results, guid)
+
+    def __write_item_level_date(self, sao: AssessmentOutcome, state_code, district_id):
+        try:
+            asmt = sao.assessment
+            # Only write out summative item level results
+            if asmt.asmt_type == 'SUMMATIVE':
+                it_dir_path = os.path.join(state_code, str(asmt.period_year), asmt.asmt_type, DG_FILTERS['date_Ymd'](asmt.effective_date), asmt.subject,
+                                           str(sao.student.grade), district_id)
+                it_file_path = os.path.join(it_dir_path, sbac_out_config.LZ_ITEMDATA_FORMAT['name'].replace('<STUDENT_ID>', sao.student.guid_sr))
+
+                if not os.path.exists(os.path.join(self.out_path_root, it_dir_path)):
+                    os.makedirs(os.path.join(self.out_path_root, it_dir_path))
+
+                csv_writer.write_records_to_file(it_file_path, sbac_out_config.LZ_ITEMDATA_FORMAT['columns'], sao.item_level_data, root_path=self.out_path_root)
+
+        finally:
+            pass
