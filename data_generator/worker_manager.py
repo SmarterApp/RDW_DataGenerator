@@ -4,6 +4,7 @@ import itertools
 import os
 import random
 import shutil
+import sys
 
 import data_generator.config.cfg as sbac_in_config
 import data_generator.config.out as sbac_out_config
@@ -13,6 +14,8 @@ import data_generator.sbac_generators.hierarchy as sbac_hier_gen
 import data_generator.sbac_generators.population as sbac_pop_gen
 import data_generator.util.hiearchy as hier_util
 import data_generator.writers.writecsv as csv_writer
+import pyprind
+
 from data_generator.model.district import District
 from data_generator.model.interimassessment import InterimAssessment
 from data_generator.model.state import State
@@ -110,7 +113,11 @@ class WorkerManager(Worker):
         assessments = {}
 
         if generate_iabs:
-            print('Generating iabs')
+            progress_max = 0;
+            for subject, grade in itertools.product(sbac_in_config.SUBJECTS, GRADES_OF_CONCERN):
+                progress_max += len(ASMT_YEARS) * len(sbac_in_config.IAB_NAMES[subject][grade]) * len(sbac_in_config.IAB_EFFECTIVE_DATES);
+
+            bar = pyprind.ProgBar(progress_max, stream=sys.stdout, title='Generating IAB assessments')
             for subject, grade in itertools.product(sbac_in_config.SUBJECTS, GRADES_OF_CONCERN):
                 for year, block, offset_date in itertools.product(ASMT_YEARS,
                                                                   sbac_in_config.IAB_NAMES[subject][grade],
@@ -119,6 +126,10 @@ class WorkerManager(Worker):
                     key = sbac_interim_asmt_gen.get_iab_key(date, grade, subject, block)
 
                     assessments[key] = self.__create_and_write_iab_assessment(date, year, subject, block, grade)
+                    bar.update()
+
+        progress_max = len(ASMT_YEARS) * len(sbac_in_config.SUBJECTS) * len(GRADES_OF_CONCERN);
+        bar = pyprind.ProgBar(progress_max, stream=sys.stdout, title='Generating Summative and ICA Assessments')
 
         for year in ASMT_YEARS:
             for subject in sbac_in_config.SUBJECTS:
@@ -132,6 +143,7 @@ class WorkerManager(Worker):
                         asmt_key_intrm = str(year) + 'interim' + period + str(grade) + subject
                         asmt_intrm = self.__create_and_write_assessment('INTERIM COMPREHENSIVE', period, year, subject)
                         assessments[asmt_key_intrm] = asmt_intrm
+                    bar.update()
 
         # Build the districts
         student_avg_count = 0
@@ -140,13 +152,13 @@ class WorkerManager(Worker):
             for _ in range(dist_type_count):
                 # Create the district
                 district = sbac_hier_gen.generate_district(district_type, state, id_gen)
-                print('  Creating District: %s (%s District)' % (district.name, district.type_str))
+                print('\nCreating District: %s (%s District)' % (district.name, district.type_str))
 
                 # Generate the district data set
                 avg_year, unique = self.__generate_district_data(state, district, reg_sys, assessments, asmt_skip_rates_by_subject)
 
                 # Print completion of district
-                print('    District created with average of %i students/year and %i total unique' % (avg_year, unique))
+                print('District created with average of %i students/year and %i total unique' % (avg_year, unique))
                 student_avg_count += avg_year
                 student_unique_count += unique
 
@@ -290,6 +302,10 @@ class WorkerManager(Worker):
         unique_students = {}
         students = {}
         student_count = 0
+
+        progress_max = len(sbac_hier_gen.set_up_schools_with_grades(schools, GRADES_OF_CONCERN)) * len(YEARS);
+        bar = pyprind.ProgBar(progress_max, stream=sys.stdout, title='Generating assessments outcome for schools')
+
         for asmt_year in YEARS:
             # Prepare output file names
             rg_sys_year = reg_sys[asmt_year]
@@ -312,6 +328,7 @@ class WorkerManager(Worker):
             # With the students moved around, we will re-populate empty grades and create assessments with outcomes for
             # the students
             for school, grades in schools_with_grades.items():
+                bar.update();
                 # Get the institution hierarchy object
                 inst_hier = inst_hiers[school.guid]
 
