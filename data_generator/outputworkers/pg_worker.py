@@ -6,11 +6,6 @@ from data_generator.model.institutionhierarchy import InstitutionHierarchy
 from data_generator.model.interimassessmentoutcome import InterimAssessmentOutcome
 from data_generator.model.student import Student
 from data_generator.outputworkers.worker import Worker
-from data_generator.writers.datefilters import FILTERS as DATE_TIME_FILTERS
-from data_generator.writers.filters import SBAC_FILTERS
-
-postgres_writer.register_filters(SBAC_FILTERS)
-postgres_writer.register_filters(DATE_TIME_FILTERS)
 
 
 class PgWorker(Worker):

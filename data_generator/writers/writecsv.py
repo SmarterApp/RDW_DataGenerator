@@ -4,19 +4,32 @@ This is the general CSV writer.
 """
 
 import csv
+import os
+import shutil
 
 import data_generator.writers.util as writers_util
+from data_generator.writers.datefilters import FILTERS as DATE_TIME_FILTERS
+from data_generator.writers.filters import SBAC_FILTERS as FILTERS
 
-available_filters = {}
+available_filters = DATE_TIME_FILTERS.copy();
+available_filters.update(FILTERS);
 
 
-def register_filters(filters):
-    """Add custom filters to the CSV writer filtering register.
+def clean_dir(out_path_root):
+    # Verify output directory exists
+    if not os.path.exists(out_path_root):
+        os.makedirs(out_path_root)
 
-    :param filters: A dictionary of filters to register
-    """
-    global available_filters
-    available_filters = dict(list(available_filters.items()) + list(filters.items()))
+    # Clean output directory
+    for file in os.listdir(out_path_root):
+        file_path = os.path.join(out_path_root, file)
+        try:
+            if os.path.isfile(file_path):
+                os.unlink(file_path)
+            if os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except:
+            pass
 
 
 def prepare_csv_file(path, columns=None, root_path='out'):

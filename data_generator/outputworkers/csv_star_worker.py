@@ -6,11 +6,6 @@ from data_generator.model.institutionhierarchy import InstitutionHierarchy
 from data_generator.model.interimassessmentoutcome import InterimAssessmentOutcome
 from data_generator.model.student import Student
 from data_generator.outputworkers.worker import Worker
-from data_generator.writers.datefilters import FILTERS as DATE_TIME_FILTERS
-from data_generator.writers.filters import SBAC_FILTERS as FILTERS
-
-csv_writer.register_filters(FILTERS)
-csv_writer.register_filters(DATE_TIME_FILTERS)
 
 
 class CSVStarWorker(Worker):
@@ -18,6 +13,7 @@ class CSVStarWorker(Worker):
         self.root_path = root_path
 
     def prepare(self):
+        csv_writer.clean_dir(self.root_path)
         # Prepare star-schema output files
         csv_writer.prepare_csv_file(sbac_out_config.FAO_VW_FORMAT['name'], sbac_out_config.FAO_VW_FORMAT['columns'], self.root_path)
         csv_writer.prepare_csv_file(sbac_out_config.FAO_FORMAT['name'], sbac_out_config.FAO_FORMAT['columns'], self.root_path)

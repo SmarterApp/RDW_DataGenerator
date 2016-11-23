@@ -4,17 +4,11 @@ This is the general PostgreSQL writer.
 
 import data_generator.writers.util as writers_util
 import psycopg2
+from data_generator.writers.datefilters import FILTERS as DATE_TIME_FILTERS
+from data_generator.writers.filters import SBAC_FILTERS as FILTERS
 
-available_filters = {}
-
-def register_filters(filters):
-    """Add custom filters to the CSV writer filtering register.
-
-    :param filters: A dictionary of filters to register
-    """
-    global available_filters
-    available_filters = dict(list(available_filters.items()) + list(filters.items()))
-
+available_filters = DATE_TIME_FILTERS.copy();
+available_filters.update(FILTERS);
 
 def create_dbcon(host, port, dbname, user, password):
     conn_string = "host=%s port=%s dbname=%s user=%s password=%s" % (host, port, dbname, user, password)

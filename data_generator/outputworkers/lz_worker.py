@@ -7,16 +7,14 @@ from data_generator.model.interimassessmentoutcome import InterimAssessmentOutco
 from data_generator.model.registrationsystem import RegistrationSystem
 from data_generator.model.student import Student
 from data_generator.outputworkers.worker import Worker
-from data_generator.writers.datefilters import FILTERS as DATE_TIME_FILTERS
-from data_generator.writers.filters import SBAC_FILTERS as FILTERS
-
-csv_writer.register_filters(FILTERS)
-csv_writer.register_filters(DATE_TIME_FILTERS)
 
 
 class LzWorker(Worker):
     def __init__(self, root_path: str):
         self.root_path = root_path
+
+    def prepare(self):
+        csv_writer.clean_dir(self.root_path)
 
     def write_student_registration_config(self, year: int, rs: RegistrationSystem):
         # Create the JSON file

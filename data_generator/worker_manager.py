@@ -3,7 +3,6 @@ import datetime
 import itertools
 import os
 import random
-import shutil
 import sys
 
 import data_generator.config.cfg as sbac_in_config
@@ -15,7 +14,6 @@ import data_generator.sbac_generators.population as sbac_pop_gen
 import data_generator.util.hiearchy as hier_util
 import data_generator.writers.writecsv as csv_writer
 import pyprind
-
 from data_generator.model.district import District
 from data_generator.model.interimassessment import InterimAssessment
 from data_generator.model.state import State
@@ -25,11 +23,6 @@ from data_generator.outputworkers.pg_worker import PgWorker
 from data_generator.outputworkers.worker import Worker
 from data_generator.util.id_gen import IDGen
 from data_generator.writers.datefilters import FILTERS as DG_FILTERS
-from data_generator.writers.datefilters import FILTERS as DATE_TIME_FILTERS
-from data_generator.writers.filters import SBAC_FILTERS as FILTERS
-
-# todo this is used in test only - need to be fixed
-OUT_PATH_ROOT = 'out'
 
 YEARS = [2015, 2016, 2017]  # Student registration years, expected sorted lowest to highest
 ASMT_YEARS = [2015, 2016, 2017]  # Expected sorted lowest to highest
@@ -38,17 +31,13 @@ INTERIM_ASMT_PERIODS = ['Fall', 'Winter', 'Spring']  # The periods for interim a
 # These are global regardless of team
 GRADES_OF_CONCERN = {3, 4, 5, 6, 7, 8, 11}  # Made as a set for intersection later
 
-# TODO: this needs to be removed from there
-csv_writer.register_filters(FILTERS)
-csv_writer.register_filters(DATE_TIME_FILTERS)
-
 
 class WorkerManager(Worker):
     def __init__(self, args):
         self._args = args
 
         # Save output directory
-        self.OUT_PATH_ROOT = args.out_dir
+        self.out_path_root = args.out_dir
         self.state_cfg = {'name': args.state_name, 'code': args.state_code, 'type': args.state_type}
 
         # Save output flags
@@ -56,30 +45,13 @@ class WorkerManager(Worker):
         if args.pg_out:
             self.workers.append(PgWorker(args.pg_host, 5432, 'edware', 'edware', args.pg_pass, args.pg_schema))
         if args.star_out:
-            self.workers.append(CSVStarWorker(self.OUT_PATH_ROOT))
+            self.workers.append(CSVStarWorker(self.out_path_root))
         if args.lz_out:
-            self.workers.append(LzWorker(self.OUT_PATH_ROOT))
+            self.workers.append(LzWorker(self.out_path_root))
 
         self.generate_iabs = args.generate_iabs
-
         self.generate_item_level = args.il_out
-
         self.id_gen = IDGen()
-
-        # Verify output directory exists
-        if not os.path.exists(self.OUT_PATH_ROOT):
-            os.makedirs(self.OUT_PATH_ROOT)
-
-        # Clean output directory
-        for file in os.listdir(self.OUT_PATH_ROOT):
-            file_path = os.path.join(self.OUT_PATH_ROOT, file)
-            try:
-                if os.path.isfile(file_path):
-                    os.unlink(file_path)
-                if os.path.isdir(file_path):
-                    shutil.rmtree(file_path)
-            except:
-                pass
 
         for worker in self.workers:
             worker.prepare()
@@ -89,45 +61,91 @@ class WorkerManager(Worker):
             worker.cleanup()
 
     def run(self):
-        rs_by_year = self.__build_registration_system()
         state = sbac_hier_gen.generate_state(self.state_cfg['type'], self.state_cfg['name'], self.state_cfg['code'], self.id_gen)
-        print('\nCreating State: %s' % state.name)
+        print('Creating State: %s' % state.name)
 
         # Process the state
-        self.__generate_state_data(state, self.id_gen, generate_iabs=self.generate_iabs, reg_sys=rs_by_year)
+        self.__generate_state_data(state)
 
-    def __generate_state_data(self, state: State,
-                              id_gen: IDGen,
-                              generate_iabs: bool.bit_length,
-                              reg_sys):
+    def __generate_state_data(self, state: State):
         """
         Generate an entire data set for a single state.
 
         @param state: State to generate data for
-        @param id_gen: ID generator
         """
+
+        # build registration system by years
+        rs_by_year = self.__build_registration_system()
+
         # Grab the assessment rates by subjects
         asmt_skip_rates_by_subject = state.config['subject_skip_percentages']
 
         # Create the assessment objects
         assessments = {}
 
-        if generate_iabs:
-            progress_max = 0;
-            for subject, grade in itertools.product(sbac_in_config.SUBJECTS, GRADES_OF_CONCERN):
-                progress_max += len(ASMT_YEARS) * len(sbac_in_config.IAB_NAMES[subject][grade]) * len(sbac_in_config.IAB_EFFECTIVE_DATES);
+        if self.generate_iabs:
+            assessments.update(self.__generate_iabs())
 
-            bar = pyprind.ProgBar(progress_max, stream=sys.stdout, title='Generating IAB assessments')
-            for subject, grade in itertools.product(sbac_in_config.SUBJECTS, GRADES_OF_CONCERN):
-                for year, block, offset_date in itertools.product(ASMT_YEARS,
-                                                                  sbac_in_config.IAB_NAMES[subject][grade],
-                                                                  sbac_in_config.IAB_EFFECTIVE_DATES, ):
-                    date = datetime.date(year + offset_date.year - 2, offset_date.month, offset_date.day)
-                    key = sbac_interim_asmt_gen.get_iab_key(date, grade, subject, block)
+        assessments.update(self.__generate_assessments())
 
-                    assessments[key] = self.__create_and_write_iab_assessment(date, year, subject, block, grade)
-                    bar.update()
+        # Build the districts
+        student_avg_count = 0
+        student_unique_count = 0
+        for district_type, dist_type_count in state.config['district_types_and_counts']:
+            for _ in range(dist_type_count):
+                # Create the district
+                district = sbac_hier_gen.generate_district(district_type, state, self.id_gen)
+                print('\nCreating District: %s (%s District)' % (district.name, district.type_str))
 
+                # Generate the district data set
+                avg_year, unique = self.__generate_district_data(state, district, rs_by_year, assessments, asmt_skip_rates_by_subject)
+
+                # Print completion of district
+                print('District created with average of %i students/year and %i total unique' % (avg_year, unique))
+                student_avg_count += avg_year
+                student_unique_count += unique
+
+        # Print completion of state
+        print('State %s created with average of %i students/year and %i total unique' % (state.name, student_avg_count, student_unique_count))
+
+    def __generate_iabs(self):
+        """
+        generate iab assessment objects
+        :return: generate assessments
+        """
+        assessments = {}
+
+        # set up a progress bar
+        progress_max = 0;
+        for subject, grade in itertools.product(sbac_in_config.SUBJECTS, GRADES_OF_CONCERN):
+            progress_max += len(ASMT_YEARS) * len(sbac_in_config.IAB_NAMES[subject][grade]) * len(sbac_in_config.IAB_EFFECTIVE_DATES);
+        bar = pyprind.ProgBar(progress_max, stream=sys.stdout, title='Generating IAB assessments')
+
+        # generate iabs
+        for subject, grade in itertools.product(sbac_in_config.SUBJECTS, GRADES_OF_CONCERN):
+            for year, block, offset_date in itertools.product(ASMT_YEARS,
+                                                              sbac_in_config.IAB_NAMES[subject][grade],
+                                                              sbac_in_config.IAB_EFFECTIVE_DATES, ):
+                date = datetime.date(year + offset_date.year - 2, offset_date.month, offset_date.day)
+                key = sbac_interim_asmt_gen.get_iab_key(date, grade, subject, block)
+
+                assessments[key] = sbac_interim_asmt_gen.generate_interim_assessment(date, year, subject, block, grade, self.id_gen,
+                                                                                     generate_item_level=self.generate_item_level)
+                # Output to requested mediums
+                for worker in self.workers:
+                    worker.write_iab(assessments[key])
+                bar.update()
+
+        return assessments
+
+    def __generate_assessments(self):
+        """
+        generate summative and ica assessment objects
+        :return: generate assessments
+        """
+        assessments = {}
+
+        # set up a progress bar
         progress_max = len(ASMT_YEARS) * len(sbac_in_config.SUBJECTS) * len(GRADES_OF_CONCERN);
         bar = pyprind.ProgBar(progress_max, stream=sys.stdout, title='Generating Summative and ICA Assessments')
 
@@ -144,33 +162,30 @@ class WorkerManager(Worker):
                         asmt_intrm = self.__create_and_write_assessment('INTERIM COMPREHENSIVE', period, year, subject)
                         assessments[asmt_key_intrm] = asmt_intrm
                     bar.update()
+        return assessments
 
-        # Build the districts
-        student_avg_count = 0
-        student_unique_count = 0
-        for district_type, dist_type_count in state.config['district_types_and_counts']:
-            for _ in range(dist_type_count):
-                # Create the district
-                district = sbac_hier_gen.generate_district(district_type, state, id_gen)
-                print('\nCreating District: %s (%s District)' % (district.name, district.type_str))
+    def __create_and_write_assessment(self, asmt_type, period, year, subject):
+        """
+        Create a new assessment object and write it out
 
-                # Generate the district data set
-                avg_year, unique = self.__generate_district_data(state, district, reg_sys, assessments, asmt_skip_rates_by_subject)
+        @param asmt_type: Type of assessment to create
+        @param period: Period (month) of assessment to create
+        @param year: Year of assessment to create
+        @param subject: Subject of assessment to create
+        @returns: New assessment object
+        """
+        # Create assessment
+        asmt = sbac_asmt_gen.generate_assessment(asmt_type, period, year, subject, self.id_gen, generate_item_level=self.generate_item_level)
 
-                # Print completion of district
-                print('District created with average of %i students/year and %i total unique' % (avg_year, unique))
-                student_avg_count += avg_year
-                student_unique_count += unique
-
-        # Print completion of state
-        print('State %s created with average of %i students/year and %i total unique' % (state.name, student_avg_count, student_unique_count))
+        for worker in self.workers:
+            worker.write_assessment(asmt)
+        return asmt
 
     def __build_registration_system(self, years=YEARS):
         """"
         Build the registration system that will be used during the data generation run.
 
         @param years: The years for which data will be generated
-        @param id_gen: ID generator
         @returns: A list of year for the registration systems that was created
         """
         # Validate years
@@ -200,56 +215,7 @@ class WorkerManager(Worker):
         # Return the generated GUIDs
         return rs_by_year
 
-    def __create_and_write_iab_assessment(self, date: datetime.date,
-                                          asmt_year: int,
-                                          subject: str,
-                                          block: str,
-                                          grade: int):
-        """
-        Create a new assessment object and write it out to JSON.
-
-        @:param date: date of the test
-        @param asmt_year: Year of assessment to create
-        @param subject: Subject of assessment to create
-        @param block: block
-        @param id_gen: ID generator
-        @param generate_item_level: If sshould generate item-level data
-        @returns: New assessment object
-        """
-        # Create assessment
-        asmt = sbac_interim_asmt_gen.generate_interim_assessment(date, asmt_year, subject, block, grade, self.id_gen, generate_item_level=self.generate_item_level)
-
-        # Output to requested mediums
-        for worker in self.workers:
-            worker.write_iab(asmt)
-
-        # Return the object
-        return asmt
-
-    def __create_and_write_assessment(self, asmt_type, period, year, subject):
-        """
-        Create a new assessment object and write it out to JSON.
-
-        @param asmt_type: Type of assessment to create
-        @param period: Period (month) of assessment to create
-        @param year: Year of assessment to create
-        @param subject: Subject of assessment to create
-        @param id_gen: ID generator
-        @param generate_item_level: If sshould generate item-level data
-        @returns: New assessment object
-        """
-        # Create assessment
-        asmt = sbac_asmt_gen.generate_assessment(asmt_type, period, year, subject, self.id_gen, generate_item_level=self.generate_item_level)
-
-        for worker in self.workers:
-            worker.write_assessment(asmt)
-        return asmt
-
-    def __generate_district_data(self, state: State,
-                                 district: District,
-                                 reg_sys,
-                                 assessments: {str: InterimAssessment},
-                                 asmt_skip_rates_by_subject: {str: float}):
+    def __generate_district_data(self, state: State, district: District, reg_sys, assessments: {str: InterimAssessment}, asmt_skip_rates_by_subject: {str: float}):
         """
         Generate an entire data set for a single district.
 
@@ -258,7 +224,6 @@ class WorkerManager(Worker):
         @param reg_sys:
         @param assessments: Dictionary of all assessment objects
         @param asmt_skip_rates_by_subject: The rate that students skip a given assessment
-        @param id_gen: ID generator
         """
 
         # Decide how many schools to make
@@ -426,8 +391,7 @@ class WorkerManager(Worker):
         # Return the average student count
         return int(student_count // len(ASMT_YEARS)), unique_student_count
 
-    def __write_school_data(self, asmt_year, sr_out_name, dim_students, sr_students, assessment_results, iab_results, state_code,
-                            district_id):
+    def __write_school_data(self, asmt_year, sr_out_name, dim_students, sr_students, assessment_results, iab_results, state_code, district_id):
         """
         Write student and assessment data for a school to one or more output formats.
 
@@ -436,6 +400,9 @@ class WorkerManager(Worker):
         @param dim_students: Students to write to dim_student star-schema CSVs/postgres tables
         @param sr_students: Students to write to registration landing zone/star-schema CSV/postgres table
         @param assessment_results: Assessment outcomes to write to landing zone/star-schema CSV/postgres table
+        @param iab_results: IAB assessment outcomes
+        @param state_code: state code
+        @param district_id: district it
         """
         # Set up output file names and columns
         it_lz_out_name = sbac_out_config.LZ_ITEMDATA_FORMAT['name']
@@ -465,11 +432,11 @@ class WorkerManager(Worker):
                                 it_file_path = os.path.join(it_dir_path, it_lz_out_name.replace('<STUDENT_ID>',
                                                                                                 sao.student.guid_sr))
 
-                                if not os.path.exists(os.path.join(self.OUT_PATH_ROOT, it_dir_path)):
-                                    os.makedirs(os.path.join(self.OUT_PATH_ROOT, it_dir_path))
+                                if not os.path.exists(os.path.join(self.out_path_root, it_dir_path)):
+                                    os.makedirs(os.path.join(self.out_path_root, it_dir_path))
 
                                 csv_writer.write_records_to_file(it_file_path, it_lz_out_cols, sao.item_level_data,
-                                                                 root_path=self.OUT_PATH_ROOT)
+                                                                 root_path=self.out_path_root)
                         finally:
                             pass
 
