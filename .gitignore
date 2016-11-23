@@ -22,7 +22,7 @@ __pycache__
 data_generator/cover
 data_generator/coverage.xml
 data_generator/nosetests.xml
-data_generator/out*
+data_generator/out
 
 nosetests.xml
 coverage.xml

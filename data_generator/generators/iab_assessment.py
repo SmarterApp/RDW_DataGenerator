@@ -6,15 +6,84 @@ import datetime
 import random
 from collections import OrderedDict
 
+import data_generator.config.cfg as sbac_in_config
 import data_generator.config.cfg as sbac_config
 import data_generator.generators.assessment as gen_asmt_generator
-from data_generator.sbac_generators.hierarchy import InstitutionHierarchy
-from data_generator.model.itemdata import AssessmentOutcomeItemData
-from data_generator.model.student import Student
 from data_generator.model.assessment import Assessment
 from data_generator.model.assessmentoutcome import AssessmentOutcome
+from data_generator.model.interimassessment import InterimAssessment
+from data_generator.model.interimassessmentoutcome import InterimAssessmentOutcome
+from data_generator.model.itemdata import AssessmentOutcomeItemData
+from data_generator.model.student import Student
+from data_generator.sbac_generators.hierarchy import InstitutionHierarchy
+from data_generator.util import all_combinations
 from data_generator.util.assessment_stats import Properties, RandomLevelByDemographics
 from data_generator.util.id_gen import IDGen
+
+
+def create_iab_outcome_object(student: Student,
+                              iab_asmt: InterimAssessment,
+                              inst_hier: InstitutionHierarchy,
+                              id_gen: IDGen,
+                              iab_results: {str: InterimAssessmentOutcome},
+                              generate_item_level=True):
+    """
+
+    :param student:
+    :param iab_asmt:
+    :param inst_hier:
+    :param id_gen:
+    :param iab_results:
+    :param generate_item_level:
+    :return:
+    """
+    # Make sure the assessment is known in the results
+    if iab_asmt.guid_sr not in iab_results:
+        iab_results[iab_asmt.guid_sr] = []
+
+    # Create the original outcome object
+    ao = generate_interim_assessment_outcome(student, iab_asmt, inst_hier, id_gen,
+                                             generate_item_level=generate_item_level)
+    iab_results[iab_asmt.guid_sr].append(ao)
+
+
+def create_iab_outcome_objects(student: Student,
+                               asmt_year: int,
+                               grade: int,
+                               subject: str,
+                               asmts: {str: InterimAssessment},
+                               inst_hier: InstitutionHierarchy,
+                               id_gen: IDGen,
+                               iab_results: {str: InterimAssessmentOutcome},
+                               generate_item_level=True):
+    """
+    Create a set of interim assessment outcome objects for a student.
+
+    :param student: The student to create outcomes for
+    :param asmt_year:
+    :param grade:
+    :param subject:
+    :param asmts: Relevant IAB assessments
+    :param inst_hier: The institution hierarchy these assessments relate to
+    :param id_gen: ID generator
+    :param iab_results: Dictionary of iab results to update
+    :param generate_item_level: If should generate item-level data
+    :return: None
+    """
+    # for randomly selecting a subset of dates on which a student took the test
+    date_combos = tuple(all_combinations(sbac_in_config.IAB_EFFECTIVE_DATES))
+
+    for block in sbac_in_config.IAB_NAMES[subject][grade]:
+        for offset_date in random.choice(date_combos):
+            date = datetime.date(asmt_year + offset_date.year - 2, offset_date.month, offset_date.day)
+            key = get_iab_key(date, grade, subject, block)
+            iab_asmt = asmts[key]
+            create_iab_outcome_object(student, iab_asmt, inst_hier, id_gen, iab_results,
+                                      generate_item_level=generate_item_level)
+
+
+def get_iab_key(date, grade, subject, block):
+    return "%i-%i-%i IAB %i %s %s" % (date.year, date.month, date.day, grade, subject, block)
 
 
 def generate_interim_assessment(date: datetime.date,
@@ -100,7 +169,8 @@ def generate_interim_assessment(date: datetime.date,
 
     return sa
 
-#TODO why summative is here?
+
+# TODO why summative is here?
 
 def generate_interim_assessment_outcome(student: Student,
                                         assessment: Assessment,

@@ -5,10 +5,9 @@ This is the general CSV writer.
 
 import csv
 
-import data_generator.writers.datefilters as writers_filters
 import data_generator.writers.util as writers_util
 
-available_filters = writers_filters.FILTERS
+available_filters = {}
 
 
 def register_filters(filters):
