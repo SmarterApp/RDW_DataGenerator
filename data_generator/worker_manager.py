@@ -17,6 +17,7 @@ import pyprind
 from data_generator.model.assessmentoutcome import AssessmentOutcome
 from data_generator.model.district import District
 from data_generator.model.interimassessment import InterimAssessment
+from data_generator.model.registrationsystem import RegistrationSystem
 from data_generator.model.state import State
 from data_generator.outputworkers.csv_star_worker import CSVStarWorker
 from data_generator.outputworkers.lz_worker import LzWorker
@@ -78,9 +79,6 @@ class WorkerManager(Worker):
         # build registration system by years
         rs_by_year = self.__build_registration_system()
 
-        # Grab the assessment rates by subjects
-        asmt_skip_rates_by_subject = state.config['subject_skip_percentages']
-
         # Create the assessment objects
         assessments = {}
 
@@ -99,7 +97,7 @@ class WorkerManager(Worker):
                 print('\nCreating District: %s (%s District)' % (district.name, district.type_str))
 
                 # Generate the district data set
-                avg_year, unique = self.__generate_district_data(state, district, rs_by_year, assessments, asmt_skip_rates_by_subject)
+                avg_year, unique = self.__generate_district_data(state, district, rs_by_year, assessments)
 
                 # Print completion of district
                 print('District created with average of %i students/year and %i total unique' % (avg_year, unique))
@@ -212,18 +210,7 @@ class WorkerManager(Worker):
         # Return the generated GUIDs
         return rs_by_year
 
-    def __generate_district_data(self, state: State, district: District, reg_sys, assessments: {str: InterimAssessment}, asmt_skip_rates_by_subject: {str: float}):
-        """
-        Generate an entire data set for a single district.
-
-        @param state: State the district belongs to
-        @param district: District to generate data for
-        @param reg_sys:
-        @param assessments: Dictionary of all assessment objects
-        @param asmt_skip_rates_by_subject: The rate that students skip a given assessment
-        """
-
-        # Decide how many schools to make
+    def __generate_institution_hierarchy(self, state: State, district: District, inst_hiers, schools):
         school_count = random.triangular(district.config['school_counts']['min'],
                                          district.config['school_counts']['max'],
                                          district.config['school_counts']['avg'])
@@ -233,8 +220,6 @@ class WorkerManager(Worker):
 
         # Make the schools
         hierarchies = []
-        inst_hiers = {}
-        schools = []
 
         for school_type, school_type_ratio in district.config['school_types_and_ratios'].items():
             # Decide how many of this school type we need
@@ -252,9 +237,26 @@ class WorkerManager(Worker):
         for worker in self.workers:
             worker.write_hierarchies(hierarchies)
 
+        # Some explicit garbage collection
+        del hierarchies
+
+    def __generate_district_data(self, state: State, district: District, reg_sys_by_year: {str: RegistrationSystem}, assessments: {str: InterimAssessment}):
+        """
+        Generate an entire data set for a single district.
+
+        @param state: State the district belongs to
+        @param district: District to generate data for
+        @param assessments: Dictionary of all assessment objects
+        """
+        inst_hiers = {}
+        schools = []
+        # Make the schools
+        self.__generate_institution_hierarchy(state, district, inst_hiers, schools)
+
         # Sort the schools
         schools_by_grade = sbac_hier_gen.sort_schools_by_grade(schools)
 
+        pop_schools_with_groupings = {}
         # Student grouping is enabled for district using Student_grouping_rate
         if district.student_grouping:
             schools_with_groupings = sbac_hier_gen.set_up_schools_with_groupings(schools, GRADES_OF_CONCERN)
@@ -265,14 +267,13 @@ class WorkerManager(Worker):
         students = {}
         student_count = 0
 
+        # calculate the progress bar max and start the progress
         progress_max = len(sbac_hier_gen.set_up_schools_with_grades(schools, GRADES_OF_CONCERN)) * len(YEARS)
         bar = pyprind.ProgBar(progress_max, stream=sys.stdout, title='Generating assessments outcome for schools')
 
         for asmt_year in YEARS:
             # Prepare output file names
-            rg_sys_year = reg_sys[asmt_year]
-            rg_guid = rg_sys_year.guid_sr
-            sr_out_name = sbac_out_config.SR_FORMAT['name'].replace('<YEAR>', str(asmt_year)).replace('<GUID>', rg_guid)
+            reg_system = reg_sys_by_year[asmt_year]
 
             # Set up a dictionary of schools and their grades
             schools_with_grades = sbac_hier_gen.set_up_schools_with_grades(schools, GRADES_OF_CONCERN)
@@ -280,7 +281,7 @@ class WorkerManager(Worker):
             # Advance the students forward in the grades
             for guid, student in students.items():
                 # Assign the registration system and bump up the record ID
-                student.reg_sys = rg_sys_year
+                student.reg_sys = reg_system
                 student.rec_id_sr = self.id_gen.get_rec_id('sr_student')
 
                 # Move the student forward (false from the advance method means the student disappears)
@@ -290,95 +291,15 @@ class WorkerManager(Worker):
             # With the students moved around, we will re-populate empty grades and create assessments with outcomes for
             # the students
             for school, grades in schools_with_grades.items():
-                bar.update()
-                # Get the institution hierarchy object
-                inst_hier = inst_hiers[school.guid]
-
                 # Process the whole school
-                assessment_results = {}
-                iab_results = {}
-                sr_students = []
-                dim_students = []
-                for grade, grade_students in grades.items():
-                    # Potentially re-populate the student population
-                    sbac_pop_gen.repopulate_school_grade(school, grade, grade_students, self.id_gen, state, rg_sys_year,
-                                                         asmt_year)
-                    student_count += len(grade_students)
-
-                    if district.student_grouping:
-                        sbac_pop_gen.assign_student_groups(school, grade, grade_students, pop_schools_with_groupings)
-
-                    # Create assessment results for this year if requested
-                    if asmt_year in ASMT_YEARS:
-                        first_subject = True
-                        for subject in sbac_in_config.SUBJECTS:
-                            # Get the subject skip rate
-                            skip_rate = asmt_skip_rates_by_subject[subject]
-
-                            # Grab the summative assessment object
-                            asmt_summ = assessments[str(asmt_year) + 'summative' + str(grade) + subject]
-
-                            # Grab the interim assessment objects
-                            interim_asmts = []
-                            if school.takes_interim_asmts:
-                                for period in INTERIM_ASMT_PERIODS:
-                                    key = str(asmt_year) + 'interim' + period + str(grade) + subject
-                                    interim_asmts.append(assessments[key])
-
-                            for student in grade_students:
-                                # Create the outcome(s)
-                                sbac_asmt_gen.create_assessment_outcome_objects(student, asmt_summ, interim_asmts, inst_hier, self.id_gen,
-                                                                                assessment_results, skip_rate,
-                                                                                generate_item_level=self.generate_item_level)
-
-                                if not student.skip_iab:
-                                    sbac_interim_asmt_gen.create_iab_outcome_objects(student,
-                                                                                     asmt_year,
-                                                                                     grade,
-                                                                                     subject,
-                                                                                     assessments,
-                                                                                     inst_hier,
-                                                                                     self.id_gen,
-                                                                                     iab_results,
-                                                                                     generate_item_level=self.generate_item_level)
-
-                                # Determine if this student should be in the SR file
-                                if random.random() < sbac_in_config.HAS_ASMT_RESULT_IN_SR_FILE_RATE and first_subject:
-                                    sr_students.append(student)
-
-                                # Make sure we have the student for the next run
-                                if student.guid not in students:
-                                    students[student.guid] = student
-                                    dim_students.append(student)
-
-                                if student.guid not in unique_students:
-                                    unique_students[student.guid] = True
-
-                            first_subject = False
-
-                    else:
-                        # We're not doing assessment results, so put all of the students into the list
-                        sr_students.extend(grade_students)
-                        for student in grade_students:
-                            if student.guid not in students:
-                                students[student.guid] = student
-                                dim_students.append(student)
-                            if student.guid not in unique_students:
-                                unique_students[student.guid] = True
-
-                # Write out the school
-                self.__write_school_data(asmt_year, sr_out_name, dim_students, sr_students, assessment_results, iab_results,
-                                         state.code, district.guid)
-
-                del dim_students
-                del sr_students
-                del assessment_results
-                del iab_results
+                student_count += self.__process_school(grades, school, students, unique_students, state, district,
+                                                       reg_system, asmt_year, inst_hiers[school.guid], assessments,
+                                                       pop_schools_with_groupings)
+                bar.update()
 
         unique_student_count = len(unique_students)
 
         # Some explicit garbage collection
-        del hierarchies
         del inst_hiers
         del schools
         del schools_by_grade
@@ -388,12 +309,100 @@ class WorkerManager(Worker):
         # Return the average student count
         return int(student_count // len(ASMT_YEARS)), unique_student_count
 
-    def __write_school_data(self, asmt_year, sr_out_name, dim_students, sr_students, assessment_results, iab_results, state_code, district_id):
+    def __process_school(self, grades, school, students, unique_students, state, district, reg_system: RegistrationSystem,
+                         asmt_year, inst_hier, assessments, pop_schools_with_groupings):
+
+        # Grab the assessment rates by subjects
+        asmt_skip_rates_by_subject = state.config['subject_skip_percentages']
+
+        # Process the whole school
+        assessment_results = {}
+        iab_results = {}
+        sr_students = []
+        dim_students = []
+        student_count = 0
+
+        for grade, grade_students in grades.items():
+            # Potentially re-populate the student population
+            sbac_pop_gen.repopulate_school_grade(school, grade, grade_students, self.id_gen, state, reg_system, asmt_year)
+            student_count += len(grade_students)
+
+            if district.student_grouping:
+                sbac_pop_gen.assign_student_groups(school, grade, grade_students, pop_schools_with_groupings)
+
+            # Create assessment results for this year if requested
+            if asmt_year in ASMT_YEARS:
+                first_subject = True
+                for subject in sbac_in_config.SUBJECTS:
+                    # Get the subject skip rate
+                    skip_rate = asmt_skip_rates_by_subject[subject]
+
+                    # Grab the summative assessment object
+                    asmt_summ = assessments[str(asmt_year) + 'summative' + str(grade) + subject]
+
+                    # Grab the interim assessment objects
+                    interim_asmts = []
+                    if school.takes_interim_asmts:
+                        for period in INTERIM_ASMT_PERIODS:
+                            key = str(asmt_year) + 'interim' + period + str(grade) + subject
+                            interim_asmts.append(assessments[key])
+
+                    for student in grade_students:
+                        # Create the outcome(s)
+                        sbac_asmt_gen.create_assessment_outcome_objects(student, asmt_summ, interim_asmts, inst_hier, self.id_gen,
+                                                                        assessment_results, skip_rate,
+                                                                        generate_item_level=self.generate_item_level)
+
+                        if not student.skip_iab:
+                            sbac_interim_asmt_gen.create_iab_outcome_objects(student,
+                                                                             asmt_year,
+                                                                             grade,
+                                                                             subject,
+                                                                             assessments,
+                                                                             inst_hier,
+                                                                             self.id_gen,
+                                                                             iab_results,
+                                                                             generate_item_level=self.generate_item_level)
+
+                        # Determine if this student should be in the SR file
+                        if random.random() < sbac_in_config.HAS_ASMT_RESULT_IN_SR_FILE_RATE and first_subject:
+                            sr_students.append(student)
+
+                        # Make sure we have the student for the next run
+                        if student.guid not in students:
+                            students[student.guid] = student
+                            dim_students.append(student)
+
+                        if student.guid not in unique_students:
+                            unique_students[student.guid] = True
+
+                    first_subject = False
+
+            else:
+                # We're not doing assessment results, so put all of the students into the list
+                sr_students.extend(grade_students)
+                for student in grade_students:
+                    if student.guid not in students:
+                        students[student.guid] = student
+                        dim_students.append(student)
+                    if student.guid not in unique_students:
+                        unique_students[student.guid] = True
+
+        # Write out the school
+        self.__write_school_data(asmt_year, reg_system.guid_sr, dim_students, sr_students, assessment_results, iab_results,
+                                 state.code, district.guid)
+        del dim_students
+        del sr_students
+        del assessment_results
+        del iab_results
+
+        return student_count
+
+    def __write_school_data(self, asmt_year, rs_guid, dim_students, sr_students, assessment_results, iab_results, state_code, district_id):
         """
         Write student and assessment data for a school to one or more output formats.
 
         @param asmt_year: Current academic year
-        @param sr_out_name: Name of student registration landing zone CSV file to potentially write to
         @param dim_students: Students to write to dim_student star-schema CSVs/postgres tables
         @param sr_students: Students to write to registration landing zone/star-schema CSV/postgres table
         @param assessment_results: Assessment outcomes to write to landing zone/star-schema CSV/postgres table
@@ -404,7 +413,7 @@ class WorkerManager(Worker):
 
         for worker in self.workers:
             worker.write_students_dim(dim_students)
-            worker.write_students_reg(sr_students, sr_out_name)
+            worker.write_students_reg(sr_students, rs_guid, asmt_year)
 
         # Write assessment results if we have them; also optionally to landing zone CSV, star-schema CSV, and/or to postgres
         if asmt_year in ASMT_YEARS:

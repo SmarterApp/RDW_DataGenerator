@@ -40,8 +40,9 @@ class LzWorker(Worker):
         file_name = sbac_out_config.LZ_REALDATA_FORMAT['name'].replace('<GUID>', asmt.guid_sr)
         csv_writer.prepare_csv_file(file_name, sbac_out_config.LZ_REALDATA_FORMAT['columns'], root_path=self.root_path)
 
-    def write_students_reg(self, students: [Student], out_name):
-        csv_writer.write_records_to_file(out_name, sbac_out_config.SR_FORMAT['columns'], students, root_path=self.root_path)
+    def write_students_reg(self, students: [Student], rs_guid, asmt_year):
+        csv_writer.write_records_to_file(sbac_out_config.SR_FORMAT['name'].replace('<YEAR>', str(asmt_year)).replace('<GUID>', rs_guid)
+                                         , sbac_out_config.SR_FORMAT['columns'], students, root_path=self.root_path)
 
     def write_iab_outcome(self, results: [InterimAssessmentOutcome], guid):
         csv_writer.write_records_to_file(sbac_out_config.LZ_REALDATA_FORMAT['name'].replace('<GUID>', guid),

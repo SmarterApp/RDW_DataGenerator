@@ -53,7 +53,7 @@ class Worker:
         """
         pass
 
-    def write_students_reg(self, students: [Student], out_name=None):
+    def write_students_reg(self, students: [Student], rs_guid, asmt_year):
         """
         write student registration
         """

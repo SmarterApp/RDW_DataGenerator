@@ -42,7 +42,7 @@ class CSVStarWorker(Worker):
                                          entity_filter=('held_back', False), tbl_name='dim_student',
                                          root_path=self.root_path)
 
-    def write_students_reg(self, students: [Student], out_name=None):
+    def write_students_reg(self, students: [Student], rs_guid, asmt_year):
         csv_writer.write_records_to_file(sbac_out_config.STUDENT_REG_FORMAT['name'],
                                          sbac_out_config.STUDENT_REG_FORMAT['columns'],
                                          students, tbl_name='student_reg',

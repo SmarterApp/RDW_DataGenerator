@@ -38,7 +38,7 @@ class PgWorker(Worker):
         postgres_writer.write_records_to_table(self.db_connection, self.schema + '.dim_student', sbac_out_config.DIM_STUDENT_FORMAT['columns'], students,
                                                entity_filter=('held_back', False))
 
-    def write_students_reg(self, students: [Student], out_name=None):
+    def write_students_reg(self, students: [Student], rs_guid, asmt_year):
         postgres_writer.write_records_to_table(self.db_connection, self.schema + '.student_reg', sbac_out_config.STUDENT_REG_FORMAT['columns'], students)
 
     def write_iab_outcome(self, results: [InterimAssessmentOutcome], guid):
