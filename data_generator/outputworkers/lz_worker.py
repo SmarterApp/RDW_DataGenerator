@@ -51,7 +51,7 @@ class LzWorker(Worker):
                                          root_path=self.root_path,
                                          entity_filter=('result_status', 'C'))
 
-    def write_assessment_outcome(self, results: [AssessmentOutcome], guid):
+    def write_assessment_outcome(self, results: [AssessmentOutcome], guid, state_code, district_id):
         csv_writer.write_records_to_file(sbac_out_config.LZ_REALDATA_FORMAT['name'].replace('<GUID>', guid),
                                          sbac_out_config.LZ_REALDATA_FORMAT['columns'], results, root_path=self.root_path,
                                          entity_filter=('result_status', 'C'))

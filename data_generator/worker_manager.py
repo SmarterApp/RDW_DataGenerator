@@ -1,30 +1,26 @@
 import copy
 import datetime
 import itertools
-import os
 import random
 import sys
 
 import data_generator.config.cfg as sbac_in_config
-import data_generator.config.out as sbac_out_config
 import data_generator.generators.iab_assessment as sbac_interim_asmt_gen
 import data_generator.generators.summative_or_ica_assessment as sbac_asmt_gen
 import data_generator.sbac_generators.hierarchy as sbac_hier_gen
 import data_generator.sbac_generators.population as sbac_pop_gen
 import data_generator.util.hiearchy as hier_util
-import data_generator.writers.writecsv as csv_writer
 import pyprind
-from data_generator.model.assessmentoutcome import AssessmentOutcome
 from data_generator.model.district import District
 from data_generator.model.interimassessment import InterimAssessment
 from data_generator.model.registrationsystem import RegistrationSystem
 from data_generator.model.state import State
+from data_generator.outputworkers.csv_item_level_data_worker import CSVItemLevelDataWorker
 from data_generator.outputworkers.csv_star_worker import CSVStarWorker
 from data_generator.outputworkers.lz_worker import LzWorker
 from data_generator.outputworkers.pg_worker import PgWorker
 from data_generator.outputworkers.worker import Worker
 from data_generator.util.id_gen import IDGen
-from data_generator.writers.datefilters import FILTERS as DG_FILTERS
 
 YEARS = [2015, 2016, 2017]  # Student registration years, expected sorted lowest to highest
 ASMT_YEARS = [2015, 2016, 2017]  # Expected sorted lowest to highest
@@ -32,7 +28,6 @@ INTERIM_ASMT_PERIODS = ['Fall', 'Winter', 'Spring']  # The periods for interim a
 
 # These are global regardless of team
 GRADES_OF_CONCERN = {3, 4, 5, 6, 7, 8, 11}  # Made as a set for intersection later
-
 
 class WorkerManager(Worker):
     def __init__(self, args):
@@ -53,6 +48,9 @@ class WorkerManager(Worker):
 
         self.generate_iabs = args.generate_iabs
         self.generate_item_level = args.il_out
+        if self.generate_item_level:
+            self.workers.append(CSVItemLevelDataWorker(self.out_path_root))
+
         self.id_gen = IDGen()
 
         for worker in self.workers:
@@ -422,27 +420,5 @@ class WorkerManager(Worker):
                     worker.write_iab_outcome(iab_result, guid)
 
             for guid, results in assessment_results.items():
-                # todo: this needs to be refactored
-                if self.generate_item_level:
-                    for sao in results:
-                        self.__write_item_level_date(sao, state_code, district_id)
-
                 for worker in self.workers:
-                    worker.write_assessment_outcome(results, guid)
-
-    def __write_item_level_date(self, sao: AssessmentOutcome, state_code, district_id):
-        try:
-            asmt = sao.assessment
-            # Only write out summative item level results
-            if asmt.asmt_type == 'SUMMATIVE':
-                it_dir_path = os.path.join(state_code, str(asmt.period_year), asmt.asmt_type, DG_FILTERS['date_Ymd'](asmt.effective_date), asmt.subject,
-                                           str(sao.student.grade), district_id)
-                it_file_path = os.path.join(it_dir_path, sbac_out_config.LZ_ITEMDATA_FORMAT['name'].replace('<STUDENT_ID>', sao.student.guid_sr))
-
-                if not os.path.exists(os.path.join(self.out_path_root, it_dir_path)):
-                    os.makedirs(os.path.join(self.out_path_root, it_dir_path))
-
-                csv_writer.write_records_to_file(it_file_path, sbac_out_config.LZ_ITEMDATA_FORMAT['columns'], sao.item_level_data, root_path=self.out_path_root)
-
-        finally:
-            pass
+                    worker.write_assessment_outcome(results, guid, state_code, district_id)

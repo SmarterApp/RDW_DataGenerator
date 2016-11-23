@@ -52,7 +52,7 @@ class CSVStarWorker(Worker):
         csv_writer.write_records_to_file(sbac_out_config.FBAO_FORMAT['name'], sbac_out_config.FBAO_FORMAT['columns'], results,
                                          tbl_name='fact_block_asmt_outcome', root_path=self.root_path)
 
-    def write_assessment_outcome(self, results: [AssessmentOutcome], guid):
+    def write_assessment_outcome(self, results: [AssessmentOutcome], guid, state_code, district_id):
         csv_writer.write_records_to_file(sbac_out_config.FAO_VW_FORMAT['name'], sbac_out_config.FAO_VW_FORMAT['columns'], results,
                                          tbl_name='fact_asmt_outcome_vw', root_path=self.root_path)
         csv_writer.write_records_to_file(sbac_out_config.FAO_FORMAT['name'], sbac_out_config.FAO_FORMAT['columns'], results,

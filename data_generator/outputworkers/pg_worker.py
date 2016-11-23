@@ -47,7 +47,7 @@ class PgWorker(Worker):
         except Exception as e:
             print('PostgreSQL EXCEPTION ::: %s' % str(e))
 
-    def write_assessment_outcome(self, results: [AssessmentOutcome], guid):
+    def write_assessment_outcome(self, results: [AssessmentOutcome], guid, state_code, district_id):
         try:
             postgres_writer.write_records_to_table(self.db_connection, self.schema + '.fact_asmt_outcome_vw',
                                                    sbac_out_config.FAO_VW_FORMAT['columns'], results)

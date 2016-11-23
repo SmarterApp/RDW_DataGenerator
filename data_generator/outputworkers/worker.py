@@ -65,8 +65,8 @@ class Worker:
         """
         pass
 
-    def write_assessment_outcome(self, results: [AssessmentOutcome], assessment_guid):
+    def write_assessment_outcome(self, results: [AssessmentOutcome], assessment_guid, state_code, district_id):
         """
-        write assessment outcome for the given assessment id
+        write assessment outcome
         """
         pass
