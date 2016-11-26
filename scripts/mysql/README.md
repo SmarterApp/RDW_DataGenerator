@@ -17,6 +17,7 @@ Connect to the database using `--local-infile` option:
     mysql --local-infile edware
 
 First create tables (replace the path with the appropriate path for your environment):
+
     mysql> source /Users/allagorina/development/edware.mysql.sql
 
 Edit mysql.dataload.sql by replacing the path with he appropriate path for your environment.
