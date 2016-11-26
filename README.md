@@ -49,7 +49,7 @@ confidence that comes with it.
 
 There are two scripts you can choose to run.
 
-First is `generate_data.py`. This generates the data in the requested output formats (can generate multiple formats at once).
+First script is `generate_data.py`. This generates the data in the requested output formats (can generate multiple formats at once).
 
 > The following arguments apply:
 
@@ -63,10 +63,10 @@ First is `generate_data.py`. This generates the data in the requested output for
 > * `--gia`: Generate interim assessment blocks
 
 > If using PostgreSQL output:
-*(Note: with PostgreSQL the db schema must exists.)*
+*(Note: with PostgreSQL the db schema must exists. Please refer to scripts/postgresql for more into)*
 
 > * `--host`: Host for PostgreSQL server
 > * `--schema`: Schema for PostgreSQL database
 
-The second is `calculate_state_size.py`.
+The second script is `calculate_state_size.py`.
 This will print out all the configured 'state_type's (from data_generator/state_type.py) and the stats for them.
