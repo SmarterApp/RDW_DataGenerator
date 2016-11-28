@@ -70,3 +70,15 @@ First script is `generate_data.py`. This generates the data in the requested out
 
 The second script is `calculate_state_size.py`.
 This will print out all the configured 'state_type's (from data_generator/state_type.py) and the stats for them.
+
+### Outstanding open items  ###
+1. Model: understand the concepts of Section and Staff. Do we need it? Also I do not like how InterimAssessment re-uses Assessment.
+2. Understand if/how student groups are being generated.
+3. Generators and sbac_generators: need to be combined and cleaned up, and better understood.
+4. Config: most of it is self descriptive, but would be good to review and comment what each configuration means and how it is used.
+5. WorkerManager - could be improved.
+6. IDGen: need to remove the multithreading support. Also the whole concept of IDs generation could be cleaned up. 
+7. When pointing to DB, it fails if you re-run it (with duplicate id constraint violation).It would be nice to be able to load the data incrementally.
+8. There are some places with the explicit memory clean-up calls. Not sure if there is a problem with the memory utilization.
+9. TODO in the code. 
+10. By design, District/School names are random. That means that re-running the app generates different data (while the data volume is comparable).
