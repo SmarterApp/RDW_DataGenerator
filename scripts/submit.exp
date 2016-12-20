@@ -1,0 +1,12 @@
+#!/usr/bin/expect -f
+
+spawn ftp ca_user@localhost 2121
+expect "assword:"
+send "ca_user\n"
+expect "ftp>"
+send "binary\n"
+expect "ftp>"
+send "put [lindex $argv 0]\n"
+expect "ftp>"
+send "exit\n"
+interact
