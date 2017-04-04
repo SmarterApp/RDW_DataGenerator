@@ -3,6 +3,7 @@ The input configuration for the SBAC RDW project.
 """
 
 import datetime
+
 from data_generator.util.assessment_stats import Properties, Stats, GradeLevels, DemographicLevels
 
 HIERARCHY_FROM_DATE = datetime.date(2014, 9, 1)
@@ -41,6 +42,8 @@ ASMT_ITEM_BANK_SIZE = 130
 IAB_ITEM_BANK_SIZE = 20
 ASMT_ITEM_BANK_FORMAT = ['MC', 'EQ', 'MS', 'GI']
 ITEMS_PER_ASMT = 100
+ITEM_ANSWER_RATE = 0.95
+ANSWER_CORRECT_RATE = 0.80
 
 INTERIM_ASMT_RATE = .85
 ASMT_SKIP_RATE = .05

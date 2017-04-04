@@ -382,6 +382,7 @@ class WorkerManager(Worker):
             for student in grade_students:
                 for asmt in asmts:
                     if 'block' in asmt.type.lower():
+                        # TODO - there used to be student.skip_iab option; add something like that back in?
                         sbac_interim_asmt_gen.create_iab_outcome_object(student, asmt, inst_hier, self.id_gen,
                             iab_results, gen_item=self.gen_item)
                     else:

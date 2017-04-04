@@ -1,9 +1,9 @@
 """Generate assessment elements.
 """
 from datetime import timedelta, datetime, time
-from random import choice, randrange
+from random import choice, randrange, random
 
-from data_generator.config.cfg import ASMT_ITEM_BANK_FORMAT
+from data_generator.config.cfg import ASMT_ITEM_BANK_FORMAT, ITEM_ANSWER_RATE, ANSWER_CORRECT_RATE
 from data_generator.model.assessment import Assessment
 from data_generator.model.assessmentoutcome import AssessmentOutcome
 from data_generator.model.item import AssessmentItem
@@ -72,7 +72,10 @@ def generate_item_data(items: [AssessmentItem], student_id, date_taken):
 
     # TODO - emit only a subset of the items in the item bank?
 
-    resp_date = datetime.combine(date_taken, time(hour=randrange(7, 14)))
+    # TODO - score should be more complex than 1 or 0
+
+    admin_date = datetime.combine(date_taken, time(hour=randrange(7, 14)))
+    resp_date = admin_date
     for item in items:
         aid = AssessmentOutcomeItemData()
         aid.item = item
@@ -81,7 +84,7 @@ def generate_item_data(items: [AssessmentItem], student_id, date_taken):
         aid.page_number = 1
         aid.page_visits = 1
         aid.dropped = '0'
-        aid.admin_date = date_taken
+        aid.admin_date = admin_date
 
         if item.type == 'MC':
             aid.page_time = randrange(1000, 15000)
@@ -95,6 +98,13 @@ def generate_item_data(items: [AssessmentItem], student_id, date_taken):
         elif item.type == 'GI':
             aid.page_time = randrange(2000, 60000)
             aid.response_value = 'GI response'
+
+        aid.score_status = 'SCORED'
+        if random() < ITEM_ANSWER_RATE:
+            aid.score = 1 if random() < ANSWER_CORRECT_RATE else 0
+        else:
+            aid.score = 0
+            aid.response_value = None
 
         resp_date += timedelta(milliseconds=aid.page_time)
         aid.response_date = resp_date
