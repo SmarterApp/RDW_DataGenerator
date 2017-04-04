@@ -3,24 +3,25 @@ Unit tests for the sbac_data_generation.generators.assessement module.
 
 """
 
-import data_generator.config.cfg as sbac_config
 import datetime
 
+from nose.tools import assert_raises
+
+import data_generator.config.cfg as sbac_config
 import data_generator.generators.summative_or_ica_assessment as asmt_gen
+import data_generator.model.itemdata as item_lvl_data
 import data_generator.sbac_generators.hierarchy as hier_gen
 import data_generator.sbac_generators.population as pop_gen
-import data_generator.model.itemdata as item_lvl_data
 from data_generator.util.id_gen import IDGen
-from nose.tools import assert_raises
 
 ID_GEN = IDGen()
 
 
 def test_generate_assessment():
-    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'Math', ID_GEN)
-    assert asmt.asmt_type == 'SUMMATIVE'
+    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'Math', 8, ID_GEN)
+    assert asmt.type == 'SUMMATIVE'
     assert asmt.period == 'Spring 2015'
-    assert asmt.period_year == 2015
+    assert asmt.year == 2015
     assert asmt.version == 'V1'
     assert asmt.subject == 'Math'
     assert asmt.from_date == datetime.date(2015, 5, 15)
@@ -43,12 +44,12 @@ def test_generate_item_data():
 
 
 def test_generate_assessment_invalid_subject():
-    assert_raises(KeyError, asmt_gen.generate_assessment, 'SUMMATIVE', 'Spring', 2015, 'Subject', ID_GEN,
+    assert_raises(KeyError, asmt_gen.generate_assessment, 'SUMMATIVE', 'Spring', 2015, 'Subject', 8, ID_GEN,
                   claim_definitions={})
 
 
 def test_generate_assessment_claims_ela():
-    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', ID_GEN)
+    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', 8, ID_GEN)
     assert asmt.claim_1_name == 'Reading'
     assert asmt.claim_1_score_min == 1200
     assert asmt.claim_1_score_max == 2400
@@ -68,7 +69,7 @@ def test_generate_assessment_claims_ela():
 
 
 def test_generate_assessment_claims_math():
-    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'Math', ID_GEN)
+    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'Math', 8, ID_GEN)
     assert asmt.claim_1_name == 'Concepts & Procedures'
     assert asmt.claim_1_score_min == 1200
     assert asmt.claim_1_score_max == 2400
@@ -88,7 +89,7 @@ def test_generate_assessment_claims_math():
 
 
 def test_generate_assessment_perf_lvl_names():
-    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'Math', ID_GEN)
+    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'Math', 8, ID_GEN)
     assert asmt.perf_lvl_name_1 == 'Minimal Understanding'
     assert asmt.perf_lvl_name_2 == 'Partial Understanding'
     assert asmt.perf_lvl_name_3 == 'Adequate Understanding'
@@ -97,14 +98,14 @@ def test_generate_assessment_perf_lvl_names():
 
 
 def test_generate_assessment_claim_perf_lvl_names():
-    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'Math', ID_GEN)
+    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'Math', 8, ID_GEN)
     assert asmt.claim_perf_lvl_name_1 == 'Below Standard'
     assert asmt.claim_perf_lvl_name_2 == 'At/Near Standard'
     assert asmt.claim_perf_lvl_name_3 == 'Above Standard'
 
 
 def test_generate_assessment_cut_points():
-    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'Math', ID_GEN)
+    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'Math', 8, ID_GEN)
     assert asmt.overall_cut_point_1 == 1400
     assert asmt.overall_cut_point_2 == 1800
     assert asmt.overall_cut_point_3 == 2100
@@ -112,7 +113,7 @@ def test_generate_assessment_cut_points():
 
 
 def test_generate_assessment_overall_scores():
-    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'Math', ID_GEN)
+    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'Math', 8, ID_GEN)
     assert asmt.overall_score_min == 1200
     assert asmt.overall_score_max == 2400
     assert asmt.overall_cut_point_2 == 1800
@@ -121,32 +122,32 @@ def test_generate_assessment_overall_scores():
 
 
 def test_generate_assessment_summative_effective_date():
-    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'Math', ID_GEN)
-    assert asmt.period_year == 2015
+    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'Math', 8, ID_GEN)
+    assert asmt.year == 2015
     assert asmt.effective_date == datetime.date(2015, 5, 15)
 
 
 def test_generate_assessment_interim_fall_effective_date():
-    asmt = asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Fall', 2015, 'Math', ID_GEN)
-    assert asmt.period_year == 2015
+    asmt = asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Fall', 2015, 'Math', 8, ID_GEN)
+    assert asmt.year == 2015
     assert asmt.effective_date == datetime.date(2014, 9, 15)
 
 
 def test_generate_assessment_interim_winter_effective_date():
-    asmt = asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Winter', 2015, 'Math', ID_GEN)
-    assert asmt.period_year == 2015
+    asmt = asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Winter', 2015, 'Math', 8, ID_GEN)
+    assert asmt.year == 2015
     assert asmt.effective_date == datetime.date(2014, 12, 15)
 
 
 def test_generate_assessment_interim_spring_effective_date():
-    asmt = asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Spring', 2015, 'Math', ID_GEN)
-    assert asmt.period_year == 2015
+    asmt = asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Spring', 2015, 'Math', 8, ID_GEN)
+    assert asmt.year == 2015
     assert asmt.effective_date == datetime.date(2015, 3, 15)
 
 
 def test_generate_assessment_outcome_default_status():
     # Create objects
-    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', ID_GEN)
+    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', 3, ID_GEN)
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
@@ -160,7 +161,7 @@ def test_generate_assessment_outcome_default_status():
 
 def test_generate_assessment_outcome_scores():
     # Create objects
-    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', ID_GEN)
+    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', 3, ID_GEN)
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
@@ -185,7 +186,7 @@ def test_generate_assessment_outcome_scores():
 
 def test_generate_assessment_outcome_summative_taken_date():
     # Create objects
-    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'Math', ID_GEN)
+    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'Math', 3, ID_GEN)
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
@@ -199,7 +200,7 @@ def test_generate_assessment_outcome_summative_taken_date():
 
 def test_generate_assessment_outcome_interim_fall_taken_date():
     # Create objects
-    asmt = asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Fall', 2015, 'Math', ID_GEN)
+    asmt = asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Fall', 2015, 'Math', 3, ID_GEN)
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
@@ -213,7 +214,7 @@ def test_generate_assessment_outcome_interim_fall_taken_date():
 
 def test_generate_assessment_outcome_interim_winter_taken_date():
     # Create objects
-    asmt = asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Winter', 2015, 'Math', ID_GEN)
+    asmt = asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Winter', 2015, 'Math', 3, ID_GEN)
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
@@ -227,7 +228,7 @@ def test_generate_assessment_outcome_interim_winter_taken_date():
 
 def test_generate_assessment_outcome_interim_spring_taken_date():
     # Create objects
-    asmt = asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Spring', 2015, 'Math', ID_GEN)
+    asmt = asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Spring', 2015, 'Math', 3, ID_GEN)
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
@@ -241,7 +242,7 @@ def test_generate_assessment_outcome_interim_spring_taken_date():
 
 def test_generate_assessment_outcome_accommodations_ela():
     # Create objects
-    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', ID_GEN)
+    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', 3, ID_GEN)
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
@@ -269,7 +270,7 @@ def test_generate_assessment_outcome_accommodations_ela():
 
 def test_generate_assessment_outcome_accommodations_math():
     # Create objects
-    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'Math', ID_GEN)
+    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'Math', 3, ID_GEN)
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
@@ -328,14 +329,14 @@ def test_pick_default_accommodation_code_four():
 
 
 def test_create_assessment_object():
-    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', ID_GEN, generate_item_level=False)
-    assert asmt.asmt_type == 'SUMMATIVE'
+    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', 8, ID_GEN, generate_item_level=False)
+    assert asmt.type == 'SUMMATIVE'
     assert asmt.subject == 'ELA'
 
 
 def test_create_assessment_object_summative():
-    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', ID_GEN, generate_item_level=False)
-    assert asmt.period_year == 2015
+    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', 8, ID_GEN, generate_item_level=False)
+    assert asmt.year == 2015
     assert asmt.period == 'Spring 2015'
     assert asmt.effective_date == datetime.date(2015, 5, 15)
     assert asmt.from_date == datetime.date(2015, 5, 15)
@@ -343,9 +344,8 @@ def test_create_assessment_object_summative():
 
 
 def test_create_assessment_object_interim_fall():
-    asmt = asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Fall', 2015, 'ELA', ID_GEN,
-                                                  generate_item_level=False)
-    assert asmt.period_year == 2015
+    asmt = asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Fall', 2015, 'ELA', 8, ID_GEN, generate_item_level=False)
+    assert asmt.year == 2015
     assert asmt.period == 'Fall 2014'
     assert asmt.effective_date == datetime.date(2014, 9, 15)
     assert asmt.from_date == datetime.date(2014, 9, 15)
@@ -353,9 +353,8 @@ def test_create_assessment_object_interim_fall():
 
 
 def test_create_assessment_object_interim_winter():
-    asmt = asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Winter', 2015, 'ELA', ID_GEN,
-                                                  generate_item_level=False)
-    assert asmt.period_year == 2015
+    asmt = asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Winter', 2015, 'ELA', 8, ID_GEN, generate_item_level=False)
+    assert asmt.year == 2015
     assert asmt.period == 'Winter 2014'
     assert asmt.effective_date == datetime.date(2014, 12, 15)
     assert asmt.from_date == datetime.date(2014, 12, 15)
@@ -363,9 +362,8 @@ def test_create_assessment_object_interim_winter():
 
 
 def test_create_assessment_object_interim_spring():
-    asmt = asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Spring', 2015, 'ELA', ID_GEN,
-                                                  generate_item_level=False)
-    assert asmt.period_year == 2015
+    asmt = asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Spring', 2015, 'ELA', 8, ID_GEN, generate_item_level=False)
+    assert asmt.year == 2015
     assert asmt.period == 'Spring 2015'
     assert asmt.effective_date == datetime.date(2015, 3, 15)
     assert asmt.from_date == datetime.date(2015, 3, 15)
@@ -373,20 +371,18 @@ def test_create_assessment_object_interim_spring():
 
 
 def test_create_assessment_object_item_data():
-    asmt = asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Spring', 2015, 'ELA', ID_GEN,
-                                                  generate_item_level=True)
+    asmt = asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Spring', 2015, 'ELA', 8, ID_GEN, generate_item_level=True)
     assert len(asmt.item_bank) == sbac_config.ASMT_ITEM_BANK_SIZE
 
 
 def test_create_assessment_object_no_item_data():
-    asmt = asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Spring', 2015, 'ELA', ID_GEN,
-                                                  generate_item_level=False)
+    asmt = asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Spring', 2015, 'ELA', 8, ID_GEN, generate_item_level=False)
     assert len(asmt.item_bank) == 0
 
 
 def test_create_assessment_outcome_object_item_data():
     # Create objects
-    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', ID_GEN)
+    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', 3, ID_GEN)
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
@@ -406,7 +402,7 @@ def test_create_assessment_outcome_object_item_data():
 
 def test_create_assessment_outcome_object_skipped():
     # Create objects
-    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', ID_GEN)
+    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', 3, ID_GEN)
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
@@ -425,7 +421,7 @@ def test_create_assessment_outcome_object_skipped():
 
 def test_create_assessment_outcome_object_one_active_result():
     # Create objects
-    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', ID_GEN)
+    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', 3, ID_GEN)
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
@@ -445,7 +441,7 @@ def test_create_assessment_outcome_object_one_active_result():
 
 def test_create_assessment_outcome_object_retake_results():
     # Create objects
-    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', ID_GEN)
+    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', 3, ID_GEN)
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
@@ -467,7 +463,7 @@ def test_create_assessment_outcome_object_retake_results():
 
 def test_create_assessment_outcome_object_one_deleted_result():
     # Create objects
-    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', ID_GEN)
+    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', 3, ID_GEN)
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
@@ -487,7 +483,7 @@ def test_create_assessment_outcome_object_one_deleted_result():
 
 def test_create_assessment_outcome_object_update_no_second_delete_results():
     # Create objects
-    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', ID_GEN)
+    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', 3, ID_GEN)
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
@@ -509,7 +505,7 @@ def test_create_assessment_outcome_object_update_no_second_delete_results():
 
 def test_create_assessment_outcome_object_update_second_delete_results():
     # Create objects
-    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', ID_GEN)
+    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', 3, ID_GEN)
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
@@ -531,7 +527,7 @@ def test_create_assessment_outcome_object_update_second_delete_results():
 
 def test_create_assessment_outcome_objects_no_interims_skipped():
     # Create objects
-    asmt_summ = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', ID_GEN)
+    asmt_summ = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', 3, ID_GEN)
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
@@ -550,7 +546,7 @@ def test_create_assessment_outcome_objects_no_interims_skipped():
 
 def test_create_assessment_outcome_objects_no_interims_one_active_result():
     # Create objects
-    asmt_summ = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', ID_GEN)
+    asmt_summ = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', 3, ID_GEN)
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
@@ -571,7 +567,7 @@ def test_create_assessment_outcome_objects_no_interims_one_active_result():
 
 def test_create_assessment_outcome_objects_no_interims_retake_results():
     # Create objects
-    asmt_summ = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', ID_GEN)
+    asmt_summ = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', 3, ID_GEN)
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
@@ -594,7 +590,7 @@ def test_create_assessment_outcome_objects_no_interims_retake_results():
 
 def test_create_assessment_outcome_objects_no_interim_one_deleted_result():
     # Create objects
-    asmt_summ = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', ID_GEN)
+    asmt_summ = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', 3, ID_GEN)
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
@@ -615,7 +611,7 @@ def test_create_assessment_outcome_objects_no_interim_one_deleted_result():
 
 def test_create_assessment_outcome_objects_no_interim_update_no_second_delete_results():
     # Create objects
-    asmt_summ = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', ID_GEN)
+    asmt_summ = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', 3, ID_GEN)
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
@@ -638,7 +634,7 @@ def test_create_assessment_outcome_objects_no_interim_update_no_second_delete_re
 
 def test_create_assessment_outcome_objects_no_interim_update_second_delete_results():
     # Create objects
-    asmt_summ = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', ID_GEN)
+    asmt_summ = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', 3, ID_GEN)
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
@@ -661,10 +657,10 @@ def test_create_assessment_outcome_objects_no_interim_update_second_delete_resul
 
 def test_create_assessment_outcome_objects_interims_skipped():
     # Create objects
-    asmt_summ = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', ID_GEN)
-    interim_asmts = [asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Fall', 2015, 'ELA', ID_GEN),
-                     asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Winter', 2015, 'ELA', ID_GEN),
-                     asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Spring', 2015, 'ELA', ID_GEN)]
+    asmt_summ = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', 3, ID_GEN)
+    interim_asmts = [asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Fall', 2015, 'ELA', 3, ID_GEN),
+                     asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Winter', 2015, 'ELA', 3, ID_GEN),
+                     asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Spring', 2015, 'ELA', 3, ID_GEN)]
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
@@ -683,10 +679,10 @@ def test_create_assessment_outcome_objects_interims_skipped():
 
 def test_create_assessment_outcome_objects_interims_one_active_result():
     # Create objects
-    asmt_summ = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', ID_GEN)
-    interim_asmts = [asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Fall', 2015, 'ELA', ID_GEN),
-                     asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Winter', 2015, 'ELA', ID_GEN),
-                     asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Spring', 2015, 'ELA', ID_GEN)]
+    asmt_summ = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', 3, ID_GEN)
+    interim_asmts = [asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Fall', 2015, 'ELA', 3, ID_GEN),
+                     asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Winter', 2015, 'ELA', 3, ID_GEN),
+                     asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Spring', 2015, 'ELA', 3, ID_GEN)]
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
@@ -701,26 +697,26 @@ def test_create_assessment_outcome_objects_interims_one_active_result():
 
     # Tests
     assert len(outcomes) == 4
-    assert outcomes[asmt_summ.guid_sr][0].assessment.asmt_type == 'SUMMATIVE'
+    assert outcomes[asmt_summ.guid_sr][0].assessment.type == 'SUMMATIVE'
     assert outcomes[asmt_summ.guid_sr][0].result_status == 'C'
     assert outcomes[asmt_summ.guid_sr][0].date_taken == datetime.date(2015, 5, 15)
-    assert outcomes[interim_asmts[0].guid_sr][0].assessment.asmt_type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[0].guid_sr][0].assessment.type == 'INTERIM COMPREHENSIVE'
     assert outcomes[interim_asmts[0].guid_sr][0].result_status == 'C'
     assert outcomes[interim_asmts[0].guid_sr][0].date_taken == datetime.date(2014, 9, 15)
-    assert outcomes[interim_asmts[1].guid_sr][0].assessment.asmt_type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[1].guid_sr][0].assessment.type == 'INTERIM COMPREHENSIVE'
     assert outcomes[interim_asmts[1].guid_sr][0].result_status == 'C'
     assert outcomes[interim_asmts[1].guid_sr][0].date_taken == datetime.date(2014, 12, 15)
-    assert outcomes[interim_asmts[2].guid_sr][0].assessment.asmt_type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[2].guid_sr][0].assessment.type == 'INTERIM COMPREHENSIVE'
     assert outcomes[interim_asmts[2].guid_sr][0].result_status == 'C'
     assert outcomes[interim_asmts[2].guid_sr][0].date_taken == datetime.date(2015, 3, 15)
 
 
 def test_create_assessment_outcome_objects_interims_retake_results():
     # Create objects
-    asmt_summ = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', ID_GEN)
-    interim_asmts = [asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Fall', 2015, 'ELA', ID_GEN),
-                     asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Winter', 2015, 'ELA', ID_GEN),
-                     asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Spring', 2015, 'ELA', ID_GEN)]
+    asmt_summ = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', 3, ID_GEN)
+    interim_asmts = [asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Fall', 2015, 'ELA', 3, ID_GEN),
+                     asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Winter', 2015, 'ELA', 3, ID_GEN),
+                     asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Spring', 2015, 'ELA', 3, ID_GEN)]
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
@@ -735,38 +731,38 @@ def test_create_assessment_outcome_objects_interims_retake_results():
 
     # Tests
     assert len(outcomes) == 4
-    assert outcomes[asmt_summ.guid_sr][0].assessment.asmt_type == 'SUMMATIVE'
+    assert outcomes[asmt_summ.guid_sr][0].assessment.type == 'SUMMATIVE'
     assert outcomes[asmt_summ.guid_sr][0].result_status == 'I'
     assert outcomes[asmt_summ.guid_sr][0].date_taken == datetime.date(2015, 5, 15)
-    assert outcomes[asmt_summ.guid_sr][1].assessment.asmt_type == 'SUMMATIVE'
+    assert outcomes[asmt_summ.guid_sr][1].assessment.type == 'SUMMATIVE'
     assert outcomes[asmt_summ.guid_sr][1].result_status == 'C'
     assert outcomes[asmt_summ.guid_sr][1].date_taken == datetime.date(2015, 5, 20)
-    assert outcomes[interim_asmts[0].guid_sr][0].assessment.asmt_type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[0].guid_sr][0].assessment.type == 'INTERIM COMPREHENSIVE'
     assert outcomes[interim_asmts[0].guid_sr][0].result_status == 'I'
     assert outcomes[interim_asmts[0].guid_sr][0].date_taken == datetime.date(2014, 9, 15)
-    assert outcomes[interim_asmts[0].guid_sr][1].assessment.asmt_type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[0].guid_sr][1].assessment.type == 'INTERIM COMPREHENSIVE'
     assert outcomes[interim_asmts[0].guid_sr][1].result_status == 'C'
     assert outcomes[interim_asmts[0].guid_sr][1].date_taken == datetime.date(2014, 9, 20)
-    assert outcomes[interim_asmts[1].guid_sr][0].assessment.asmt_type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[1].guid_sr][0].assessment.type == 'INTERIM COMPREHENSIVE'
     assert outcomes[interim_asmts[1].guid_sr][0].result_status == 'I'
     assert outcomes[interim_asmts[1].guid_sr][0].date_taken == datetime.date(2014, 12, 15)
-    assert outcomes[interim_asmts[1].guid_sr][1].assessment.asmt_type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[1].guid_sr][1].assessment.type == 'INTERIM COMPREHENSIVE'
     assert outcomes[interim_asmts[1].guid_sr][1].result_status == 'C'
     assert outcomes[interim_asmts[1].guid_sr][1].date_taken == datetime.date(2014, 12, 20)
-    assert outcomes[interim_asmts[2].guid_sr][0].assessment.asmt_type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[2].guid_sr][0].assessment.type == 'INTERIM COMPREHENSIVE'
     assert outcomes[interim_asmts[2].guid_sr][0].result_status == 'I'
     assert outcomes[interim_asmts[2].guid_sr][0].date_taken == datetime.date(2015, 3, 15)
-    assert outcomes[interim_asmts[2].guid_sr][1].assessment.asmt_type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[2].guid_sr][1].assessment.type == 'INTERIM COMPREHENSIVE'
     assert outcomes[interim_asmts[2].guid_sr][1].result_status == 'C'
     assert outcomes[interim_asmts[2].guid_sr][1].date_taken == datetime.date(2015, 3, 20)
 
 
 def test_create_assessment_outcome_objects_interim_one_deleted_result():
     # Create objects
-    asmt_summ = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', ID_GEN)
-    interim_asmts = [asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Fall', 2015, 'ELA', ID_GEN),
-                     asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Winter', 2015, 'ELA', ID_GEN),
-                     asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Spring', 2015, 'ELA', ID_GEN)]
+    asmt_summ = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', 3, ID_GEN)
+    interim_asmts = [asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Fall', 2015, 'ELA', 3, ID_GEN),
+                     asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Winter', 2015, 'ELA', 3, ID_GEN),
+                     asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Spring', 2015, 'ELA', 3, ID_GEN)]
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
@@ -780,26 +776,26 @@ def test_create_assessment_outcome_objects_interim_one_deleted_result():
 
     # Tests
     assert len(outcomes) == 4
-    assert outcomes[asmt_summ.guid_sr][0].assessment.asmt_type == 'SUMMATIVE'
+    assert outcomes[asmt_summ.guid_sr][0].assessment.type == 'SUMMATIVE'
     assert outcomes[asmt_summ.guid_sr][0].result_status == 'D'
     assert outcomes[asmt_summ.guid_sr][0].date_taken == datetime.date(2015, 5, 15)
-    assert outcomes[interim_asmts[0].guid_sr][0].assessment.asmt_type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[0].guid_sr][0].assessment.type == 'INTERIM COMPREHENSIVE'
     assert outcomes[interim_asmts[0].guid_sr][0].result_status == 'D'
     assert outcomes[interim_asmts[0].guid_sr][0].date_taken == datetime.date(2014, 9, 15)
-    assert outcomes[interim_asmts[1].guid_sr][0].assessment.asmt_type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[1].guid_sr][0].assessment.type == 'INTERIM COMPREHENSIVE'
     assert outcomes[interim_asmts[1].guid_sr][0].result_status == 'D'
     assert outcomes[interim_asmts[1].guid_sr][0].date_taken == datetime.date(2014, 12, 15)
-    assert outcomes[interim_asmts[2].guid_sr][0].assessment.asmt_type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[2].guid_sr][0].assessment.type == 'INTERIM COMPREHENSIVE'
     assert outcomes[interim_asmts[2].guid_sr][0].result_status == 'D'
     assert outcomes[interim_asmts[2].guid_sr][0].date_taken == datetime.date(2015, 3, 15)
 
 
 def test_create_assessment_outcome_objects_interim_update_no_second_delete_results():
     # Create objects
-    asmt_summ = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', ID_GEN)
-    interim_asmts = [asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Fall', 2015, 'ELA', ID_GEN),
-                     asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Winter', 2015, 'ELA', ID_GEN),
-                     asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Spring', 2015, 'ELA', ID_GEN)]
+    asmt_summ = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', 3, ID_GEN)
+    interim_asmts = [asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Fall', 2015, 'ELA', 3, ID_GEN),
+                     asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Winter', 2015, 'ELA', 3, ID_GEN),
+                     asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Spring', 2015, 'ELA', 3, ID_GEN)]
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
@@ -814,38 +810,38 @@ def test_create_assessment_outcome_objects_interim_update_no_second_delete_resul
 
     # Tests
     assert len(outcomes) == 4
-    assert outcomes[asmt_summ.guid_sr][0].assessment.asmt_type == 'SUMMATIVE'
+    assert outcomes[asmt_summ.guid_sr][0].assessment.type == 'SUMMATIVE'
     assert outcomes[asmt_summ.guid_sr][0].result_status == 'D'
     assert outcomes[asmt_summ.guid_sr][0].date_taken == datetime.date(2015, 5, 15)
-    assert outcomes[asmt_summ.guid_sr][1].assessment.asmt_type == 'SUMMATIVE'
+    assert outcomes[asmt_summ.guid_sr][1].assessment.type == 'SUMMATIVE'
     assert outcomes[asmt_summ.guid_sr][1].result_status == 'C'
     assert outcomes[asmt_summ.guid_sr][1].date_taken == datetime.date(2015, 5, 15)
-    assert outcomes[interim_asmts[0].guid_sr][0].assessment.asmt_type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[0].guid_sr][0].assessment.type == 'INTERIM COMPREHENSIVE'
     assert outcomes[interim_asmts[0].guid_sr][0].result_status == 'D'
     assert outcomes[interim_asmts[0].guid_sr][0].date_taken == datetime.date(2014, 9, 15)
-    assert outcomes[interim_asmts[0].guid_sr][1].assessment.asmt_type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[0].guid_sr][1].assessment.type == 'INTERIM COMPREHENSIVE'
     assert outcomes[interim_asmts[0].guid_sr][1].result_status == 'C'
     assert outcomes[interim_asmts[0].guid_sr][1].date_taken == datetime.date(2014, 9, 15)
-    assert outcomes[interim_asmts[1].guid_sr][0].assessment.asmt_type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[1].guid_sr][0].assessment.type == 'INTERIM COMPREHENSIVE'
     assert outcomes[interim_asmts[1].guid_sr][0].result_status == 'D'
     assert outcomes[interim_asmts[1].guid_sr][0].date_taken == datetime.date(2014, 12, 15)
-    assert outcomes[interim_asmts[1].guid_sr][1].assessment.asmt_type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[1].guid_sr][1].assessment.type == 'INTERIM COMPREHENSIVE'
     assert outcomes[interim_asmts[1].guid_sr][1].result_status == 'C'
     assert outcomes[interim_asmts[1].guid_sr][1].date_taken == datetime.date(2014, 12, 15)
-    assert outcomes[interim_asmts[2].guid_sr][0].assessment.asmt_type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[2].guid_sr][0].assessment.type == 'INTERIM COMPREHENSIVE'
     assert outcomes[interim_asmts[2].guid_sr][0].result_status == 'D'
     assert outcomes[interim_asmts[2].guid_sr][0].date_taken == datetime.date(2015, 3, 15)
-    assert outcomes[interim_asmts[2].guid_sr][1].assessment.asmt_type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[2].guid_sr][1].assessment.type == 'INTERIM COMPREHENSIVE'
     assert outcomes[interim_asmts[2].guid_sr][1].result_status == 'C'
     assert outcomes[interim_asmts[2].guid_sr][1].date_taken == datetime.date(2015, 3, 15)
 
 
 def test_create_assessment_outcome_objects_interim_update_second_delete_results():
     # Create objects
-    asmt_summ = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', ID_GEN)
-    interim_asmts = [asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Fall', 2015, 'ELA', ID_GEN),
-                     asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Winter', 2015, 'ELA', ID_GEN),
-                     asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Spring', 2015, 'ELA', ID_GEN)]
+    asmt_summ = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', 3, ID_GEN)
+    interim_asmts = [asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Fall', 2015, 'ELA', 3, ID_GEN),
+                     asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Winter', 2015, 'ELA', 3, ID_GEN),
+                     asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Spring', 2015, 'ELA', 3, ID_GEN)]
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
@@ -860,27 +856,27 @@ def test_create_assessment_outcome_objects_interim_update_second_delete_results(
 
     # Tests
     assert len(outcomes) == 4
-    assert outcomes[asmt_summ.guid_sr][0].assessment.asmt_type == 'SUMMATIVE'
+    assert outcomes[asmt_summ.guid_sr][0].assessment.type == 'SUMMATIVE'
     assert outcomes[asmt_summ.guid_sr][0].result_status == 'D'
     assert outcomes[asmt_summ.guid_sr][0].date_taken == datetime.date(2015, 5, 15)
-    assert outcomes[asmt_summ.guid_sr][1].assessment.asmt_type == 'SUMMATIVE'
+    assert outcomes[asmt_summ.guid_sr][1].assessment.type == 'SUMMATIVE'
     assert outcomes[asmt_summ.guid_sr][1].result_status == 'D'
     assert outcomes[asmt_summ.guid_sr][1].date_taken == datetime.date(2015, 5, 15)
-    assert outcomes[interim_asmts[0].guid_sr][0].assessment.asmt_type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[0].guid_sr][0].assessment.type == 'INTERIM COMPREHENSIVE'
     assert outcomes[interim_asmts[0].guid_sr][0].result_status == 'D'
     assert outcomes[interim_asmts[0].guid_sr][0].date_taken == datetime.date(2014, 9, 15)
-    assert outcomes[interim_asmts[0].guid_sr][1].assessment.asmt_type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[0].guid_sr][1].assessment.type == 'INTERIM COMPREHENSIVE'
     assert outcomes[interim_asmts[0].guid_sr][1].result_status == 'D'
     assert outcomes[interim_asmts[0].guid_sr][1].date_taken == datetime.date(2014, 9, 15)
-    assert outcomes[interim_asmts[1].guid_sr][0].assessment.asmt_type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[1].guid_sr][0].assessment.type == 'INTERIM COMPREHENSIVE'
     assert outcomes[interim_asmts[1].guid_sr][0].result_status == 'D'
     assert outcomes[interim_asmts[1].guid_sr][0].date_taken == datetime.date(2014, 12, 15)
-    assert outcomes[interim_asmts[1].guid_sr][1].assessment.asmt_type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[1].guid_sr][1].assessment.type == 'INTERIM COMPREHENSIVE'
     assert outcomes[interim_asmts[1].guid_sr][1].result_status == 'D'
     assert outcomes[interim_asmts[1].guid_sr][1].date_taken == datetime.date(2014, 12, 15)
-    assert outcomes[interim_asmts[2].guid_sr][0].assessment.asmt_type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[2].guid_sr][0].assessment.type == 'INTERIM COMPREHENSIVE'
     assert outcomes[interim_asmts[2].guid_sr][0].result_status == 'D'
     assert outcomes[interim_asmts[2].guid_sr][0].date_taken == datetime.date(2015, 3, 15)
-    assert outcomes[interim_asmts[2].guid_sr][1].assessment.asmt_type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[2].guid_sr][1].assessment.type == 'INTERIM COMPREHENSIVE'
     assert outcomes[interim_asmts[2].guid_sr][1].result_status == 'D'
     assert outcomes[interim_asmts[2].guid_sr][1].date_taken == datetime.date(2015, 3, 15)

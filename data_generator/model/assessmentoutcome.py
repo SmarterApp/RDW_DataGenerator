@@ -13,8 +13,9 @@ class AssessmentOutcome:
     """
 
     # using slots here only to avoid bugs due to typos etc.
-    __slots__ = ('guid student assessment date_taken '
+    __slots__ = ('guid student assessment date_taken start_date status_date submit_date '
                  'rec_id inst_hierarchy result_status '
+                 'server database client_name status completeness admin_condition '
                  'overall_score overall_score_range_min overall_score_range_max overall_perf_lvl '
                  'claim_1_score claim_1_score_range_min claim_1_score_range_max claim_1_perf_lvl '
                  'claim_2_score claim_2_score_range_min claim_2_score_range_max claim_2_perf_lvl '
@@ -28,12 +29,22 @@ class AssessmentOutcome:
                  'from_date to_date item_level_data'.split())
 
     def __init__(self):
-        self.guid = None
+        self.guid = None  # aka oppId? or key?
         self.student = None
         self.assessment = None
+        self.date_taken = None
+        self.start_date = None
+        self.status_date = None
+        self.submit_date = None
         self.rec_id = None
         self.inst_hierarchy = None
         self.result_status = sbac_config.ASMT_STATUS_ACTIVE
+        self.server = 'ip-10-113-148-45'    # TODO - randomly generate?
+        self.database = 'session'           # TODO - ?
+        self.client_name = 'SBAC'
+        self.status = 'scored'              # TODO - should we randomly not score a teeny fraction of them?
+        self.completeness = 'Complete'      # TODO - should we have forceComplete, invalid, etc.?
+        self.admin_condition = None
         self.overall_score = None
         self.overall_score_range_min = None
         self.overall_score_range_max = None
@@ -71,6 +82,7 @@ class AssessmentOutcome:
         self.acc_streamline_mode = 0
         self.from_date = sbac_config.HIERARCHY_FROM_DATE
         self.to_date = datetime.date(9999, 12, 31)
+        # TODO - segments?
         self.item_level_data = []
 
     def get_object_set(self):

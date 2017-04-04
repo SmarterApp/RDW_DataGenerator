@@ -5,7 +5,7 @@ The input configuration for the SBAC RDW project.
 import datetime
 from data_generator.util.assessment_stats import Properties, Stats, GradeLevels, DemographicLevels
 
-HIERARCHY_FROM_DATE = datetime.date(2012, 9, 1)
+HIERARCHY_FROM_DATE = datetime.date(2014, 9, 1)
 HIERARCHY_TO_DATE = datetime.date(9999, 12, 31)
 
 LEP_LANGUAGE_CODES = ['fre', 'ben', 'ger', 'chi', 'kor', 'jpn', 'rus']

@@ -10,9 +10,9 @@ class Assessment:
     """The core assessment class.
     """
 
-    #using slots here only to avoid bugs due to typos etc.
-    __slots__ = ('guid',
-                 'rec_id', 'guid_sr', 'asmt_type', 'period', 'period_year', 'version', 'subject',
+    # using slots here only to avoid bugs due to typos etc.
+    __slots__ = ('guid', 'id', 'name', 'subject', 'grade', 'contract', 'mode',
+                 'rec_id', 'guid_sr', 'type', 'period', 'year', 'version', 'bank_key',
                  'claim_1_name', 'claim_2_name', 'claim_3_name', 'claim_4_name',
                  'perf_lvl_name_1', 'perf_lvl_name_2', 'perf_lvl_name_3', 'perf_lvl_name_4', 'perf_lvl_name_5',
                  'overall_score_min', 'claim_1_score_min', 'claim_2_score_min', 'claim_3_score_min',
@@ -27,13 +27,19 @@ class Assessment:
 
     def __init__(self):
         self.guid = None
+        self.id = None          # conventional SBAC assessment id, e.g. (SBAC)SBAC-Math-8-Fall-2016-2017
+        self.name = None        # conventional SBAC assessment name, e.g. SBAC-Math-8
+        self.subject = None
+        self.grade = None
+        self.contract = 'SBAC'
+        self.mode = 'online'
         self.rec_id = None
         self.guid_sr = None
-        self.asmt_type = None
+        self.type = None
         self.period = None
-        self.period_year = None
+        self.year = None
         self.version = None
-        self.subject = None
+        self.bank_key = None
         self.claim_1_name = None
         self.claim_2_name = None
         self.claim_3_name = None

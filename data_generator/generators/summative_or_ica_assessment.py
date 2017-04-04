@@ -5,10 +5,11 @@ An assessment generator for the SBAC assessment.
 
 import datetime
 import random
+
 from collections import OrderedDict
 
-import data_generator.config.cfg as sbac_in_config
 import data_generator.config.cfg as sbac_config
+import data_generator.config.cfg as sbac_in_config
 import data_generator.config.hierarchy as hierarchy_config
 import data_generator.generators.assessment as gen_asmt_generator
 from data_generator.model.assessment import Assessment
@@ -20,6 +21,15 @@ from data_generator.util.assessment_stats import Properties, RandomLevelByDemogr
 from data_generator.util.assessment_stats import adjust_score
 from data_generator.util.assessment_stats import random_claims
 from data_generator.util.assessment_stats import random_score_given_level
+
+
+def get_sum_key(year, grade, subject):
+    return str(year) + 'summative' + str(grade) + subject
+
+
+def get_ica_key(year, period, grade, subject):
+    return str(year) + 'interim' + period + str(grade) + subject
+
 
 def create_assessment_outcome_object(student, asmt, inst_hier, id_gen, assessment_results,
                                      skip_rate=sbac_in_config.ASMT_SKIP_RATE,
@@ -118,16 +128,17 @@ def create_assessment_outcome_objects(student, asmt_summ, interim_asmts, inst_hi
                                          retake_rate, delete_rate, update_rate, generate_item_level)
 
 
-def generate_assessment(asmt_type, period, asmt_year, subject, id_gen, from_date=None, to_date=None,
+def generate_assessment(type, period, asmt_year, subject, grade, id_gen, from_date=None, to_date=None,
                         claim_definitions=sbac_config.CLAIM_DEFINITIONS,
                         generate_item_level=True):
     """
     Generate an assessment object.
 
-    @param asmt_type: Assessment type
+    @param type: Assessment type
     @param period: Period within assessment year
     @param asmt_year: Assessment year
     @param subject: Assessment subject
+    @param grade: Assessment grade
     @param id_gen: ID generator
     @param from_date: Assessment from date
     @param to_date: Assessment to date
@@ -147,7 +158,7 @@ def generate_assessment(asmt_type, period, asmt_year, subject, id_gen, from_date
     # Determine the period month
     year_adj = 1
     period_month = 9
-    if asmt_type == 'SUMMATIVE':
+    if type == 'SUMMATIVE':
         year_adj = 0
         period_month = 5
     elif 'Winter' in period:
@@ -163,13 +174,18 @@ def generate_assessment(asmt_type, period, asmt_year, subject, id_gen, from_date
             item_bank[i] = id_gen.get_rec_id('assmt_item_id')
 
     # Set other specifics
+    sa.id = '(SBAC)SBAC-' + subject + '-' + str(grade) + '-' + period + '-' + str(asmt_year-1) + '-' + str(asmt_year)
+    sa.name = 'SBAC-' + subject + '-' + str(grade)
+    sa.subject = subject
+    sa.grade = grade
     sa.rec_id = id_gen.get_rec_id('assessment')
     sa.guid_sr = id_gen.get_sr_uuid()
-    sa.asmt_type = asmt_type
+    sa.type = type
     sa.period = period + ' ' + str((asmt_year - year_adj))
-    sa.period_year = asmt_year
+    sa.year = asmt_year
     sa.version = sbac_config.ASMT_VERSION
     sa.subject = subject
+    sa.bank_key = '1'   # TODO - handle properly
     sa.claim_1_name = claims[0]['name']
     sa.claim_2_name = claims[1]['name']
     sa.claim_3_name = claims[2]['name']
@@ -249,7 +265,7 @@ def generate_assessment_outcome(student: Student, assessment: Assessment, inst_h
         od = OrderedDict(sorted(item_data_dict.items()))
 
         segment_id = '(SBAC)SBAC-MG110PT-S2-' + assessment.subject + '-' + str(student.grade) + '-' + \
-                     assessment.period[0:-5] + '-' + str(assessment.period_year - 1) + '-' + str(assessment.period_year)
+                     assessment.period[0:-5] + '-' + str(assessment.year - 1) + '-' + str(assessment.year)
 
         for pos in od:
             item_format = random.choice(sbac_config.ASMT_ITEM_BANK_FORMAT)
@@ -264,7 +280,7 @@ def generate_assessment_outcome(student: Student, assessment: Assessment, inst_h
     # Create the date taken
     year_adj = 1
     period_month = 9
-    if assessment.asmt_type == 'SUMMATIVE':
+    if assessment.type == 'SUMMATIVE':
         year_adj = 0
         period_month = 5
     elif 'Winter' in assessment.period:
@@ -272,7 +288,7 @@ def generate_assessment_outcome(student: Student, assessment: Assessment, inst_h
     elif 'Spring' in assessment.period:
         year_adj = 0
         period_month = 3
-    sao.date_taken = datetime.date(assessment.period_year - year_adj, period_month, 15)
+    sao.date_taken = datetime.date(assessment.year - year_adj, period_month, 15)
 
     demographics = sbac_config.DEMOGRAPHICS_BY_GRADE[student.grade]
     level_breakdowns = sbac_config.LEVELS_BY_GRADE_BY_SUBJ[assessment.subject][student.grade]

@@ -4,10 +4,11 @@ An assessment generator
 
 import datetime
 import random
+
 from collections import OrderedDict
 
-import data_generator.config.cfg as sbac_in_config
 import data_generator.config.cfg as sbac_config
+import data_generator.config.cfg as sbac_in_config
 import data_generator.generators.assessment as gen_asmt_generator
 from data_generator.model.assessment import Assessment
 from data_generator.model.assessmentoutcome import AssessmentOutcome
@@ -77,8 +78,8 @@ def create_iab_outcome_objects(student: Student,
         for offset_date in random.choice(date_combos):
             date = datetime.date(asmt_year + offset_date.year - 2, offset_date.month, offset_date.day)
             key = get_iab_key(date, grade, subject, block)
-            iab_asmt = asmts[key]
-            create_iab_outcome_object(student, iab_asmt, inst_hier, id_gen, iab_results,
+            if key in asmts:
+                create_iab_outcome_object(student, asmts[key], inst_hier, id_gen, iab_results,
                                       generate_item_level=generate_item_level)
 
 
@@ -125,11 +126,12 @@ def generate_interim_assessment(date: datetime.date,
     # Set other specifics
     sa.rec_id = id_gen.get_rec_id('assessment')
     sa.guid_sr = id_gen.get_sr_uuid()
-    sa.asmt_type = "INTERIM ASSESSMENT BLOCKS"
+    sa.type = "INTERIM ASSESSMENT BLOCKS"
     sa.period = str(date)
-    sa.period_year = asmt_year
+    sa.year = asmt_year
     sa.version = sbac_config.ASMT_VERSION
     sa.subject = subject
+    sa.bank_key = '1'       # TODO - handle properly
     sa.claim_1_name = block
     sa.claim_2_name = "Grade %s" % grade
     sa.claim_3_name = None
@@ -210,7 +212,7 @@ def generate_interim_assessment_outcome(student: Student,
         od = OrderedDict(sorted(item_data_dict.items()))
 
         segment_id = '(SBAC)SBAC-MG110PT-S2-' + assessment.subject + '-' + str(student.grade) + '-' + \
-                     assessment.period[0:-5] + '-' + str(assessment.period_year - 1) + '-' + str(assessment.period_year)
+                     assessment.period[0:-5] + '-' + str(assessment.year - 1) + '-' + str(assessment.year)
 
         for pos in od:
             item_format = random.choice(sbac_config.ASMT_ITEM_BANK_FORMAT)

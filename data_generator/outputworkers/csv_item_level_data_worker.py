@@ -17,8 +17,8 @@ class CSVItemLevelDataWorker(Worker):
                 asmt = sao.assessment
                 # Only write out summative item level results
                 # TODO: not sure why it is written for summative only
-                if asmt.asmt_type == 'SUMMATIVE':
-                    it_dir_path = os.path.join(state_code, str(asmt.period_year), asmt.asmt_type, DG_FILTERS['date_Ymd'](asmt.effective_date), asmt.subject,
+                if asmt.type == 'SUMMATIVE':
+                    it_dir_path = os.path.join(state_code, str(asmt.year), asmt.type, DG_FILTERS['date_Ymd'](asmt.effective_date), asmt.subject,
                                                str(sao.student.grade), district_id)
                     it_file_path = os.path.join(it_dir_path, sbac_out_config.LZ_ITEMDATA_FORMAT['name'].replace('<STUDENT_ID>', sao.student.guid_sr))
 

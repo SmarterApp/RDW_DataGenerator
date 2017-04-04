@@ -4,13 +4,14 @@ import itertools
 import random
 import sys
 
+import pyprind
+
 import data_generator.config.cfg as sbac_in_config
 import data_generator.generators.iab_assessment as sbac_interim_asmt_gen
 import data_generator.generators.summative_or_ica_assessment as sbac_asmt_gen
 import data_generator.sbac_generators.hierarchy as sbac_hier_gen
 import data_generator.sbac_generators.population as sbac_pop_gen
 import data_generator.util.hiearchy as hier_util
-import pyprind
 from data_generator.model.district import District
 from data_generator.model.interimassessment import InterimAssessment
 from data_generator.model.registrationsystem import RegistrationSystem
@@ -20,14 +21,16 @@ from data_generator.outputworkers.csv_star_worker import CSVStarWorker
 from data_generator.outputworkers.lz_worker import LzWorker
 from data_generator.outputworkers.pg_worker import PgWorker
 from data_generator.outputworkers.worker import Worker
+from data_generator.outputworkers.xml_worker import XmlWorker
 from data_generator.util.id_gen import IDGen
 
-YEARS = [2015, 2016, 2017]  # Student registration years, expected sorted lowest to highest
+# constants used when generating assessment packages
 ASMT_YEARS = [2015, 2016, 2017]  # Expected sorted lowest to highest
 INTERIM_ASMT_PERIODS = ['Fall', 'Winter', 'Spring']  # The periods for interim assessments
 
 # These are global regardless of team
 GRADES_OF_CONCERN = {3, 4, 5, 6, 7, 8, 11}  # Made as a set for intersection later
+
 
 class WorkerManager(Worker):
     def __init__(self, args):
@@ -45,29 +48,69 @@ class WorkerManager(Worker):
             self.workers.append(CSVStarWorker(self.out_path_root))
         if args.lz_out:
             self.workers.append(LzWorker(self.out_path_root))
+        if args.xml_out:
+            self.workers.append(XmlWorker(self.out_path_root))
 
-        self.generate_iabs = args.generate_iabs
-        self.generate_item_level = args.il_out
-        if self.generate_item_level:
+        # assessment package settings
+        self.pkg_source = args.pkg_source
+        self.sum_pkg = args.sum_pkg
+        self.ica_pkg = args.ica_pkg
+        self.iab_pkg = args.iab_pkg
+        self.gen_sum = args.gen_sum
+        self.gen_ica = args.gen_ica
+        self.gen_iab = args.gen_iab
+        self.gen_item = args.gen_item
+
+        if self.gen_item:
             self.workers.append(CSVItemLevelDataWorker(self.out_path_root))
 
         self.id_gen = IDGen()
-
-        for worker in self.workers:
-            worker.prepare()
 
     def cleanup(self):
         for worker in self.workers:
             worker.cleanup()
 
+    def prepare(self):
+        for worker in self.workers:
+            worker.prepare()
+
     def run(self):
         state = sbac_hier_gen.generate_state(self.state_cfg['type'], self.state_cfg['name'], self.state_cfg['code'], self.id_gen)
         print('Creating State: %s' % state.name)
 
-        # Process the state
-        self.__generate_state_data(state)
+        assessments = self.__assessment_packages()
 
-    def __generate_state_data(self, state: State):
+        # Process the state
+        self.__generate_state_data(state, assessments)
+
+    def __assessment_packages(self):
+        """
+        Generate or load assessment packages based on settings
+        
+        :return: {str: InterimAssessment}
+        """
+        assessments = {}
+
+        if self.pkg_source != "generate":
+            print("loading assessment packages isn't implemented yet!")
+            exit()
+
+        # TODO - branch, either generate assessments or load assessments
+        if self.iab_pkg:
+            assessments.update(self.__generate_iabs())
+        assessments.update(self.__generate_assessments())
+
+        return assessments
+
+    def __years(self, assessments: {str: InterimAssessment}):
+        """
+        Return the sorted list of years represented by assessment packages.
+        :param assessments: assessments 
+        :return: sorted list of years, e.g. [2015, 2016, 2017]
+        """
+        return sorted(set(map(lambda asmt: asmt.year, assessments.values())))
+
+    def __generate_state_data(self, state: State, assessments: {str: InterimAssessment}):
         """
         Generate an entire data set for a single state.
 
@@ -75,15 +118,7 @@ class WorkerManager(Worker):
         """
 
         # build registration system by years
-        rs_by_year = self.__build_registration_system()
-
-        # Create the assessment objects
-        assessments = {}
-
-        if self.generate_iabs:
-            assessments.update(self.__generate_iabs())
-
-        assessments.update(self.__generate_assessments())
+        rs_by_year = self.__build_registration_system(self.__years(assessments))
 
         # Build the districts
         student_avg_count = 0
@@ -127,7 +162,7 @@ class WorkerManager(Worker):
                 key = sbac_interim_asmt_gen.get_iab_key(date, grade, subject, block)
 
                 assessments[key] = sbac_interim_asmt_gen.generate_interim_assessment(date, year, subject, block, grade, self.id_gen,
-                                                                                     generate_item_level=self.generate_item_level)
+                                                                                     generate_item_level=self.gen_item)
                 # Output to requested mediums
                 for worker in self.workers:
                     worker.write_iab(assessments[key])
@@ -151,34 +186,37 @@ class WorkerManager(Worker):
                 for grade in GRADES_OF_CONCERN:
                     # Create the summative assessment
                     asmt_key_summ = str(year) + 'summative' + str(grade) + subject
-                    assessments[asmt_key_summ] = self.__create_and_write_assessment('SUMMATIVE', 'Spring', year, subject)
+                    assessments[asmt_key_summ] = self.__create_and_write_assessment('SUMMATIVE', 'Spring', year, subject, grade)
 
-                    # Create the interim assessments
-                    for period in INTERIM_ASMT_PERIODS:
-                        asmt_key_intrm = str(year) + 'interim' + period + str(grade) + subject
-                        asmt_intrm = self.__create_and_write_assessment('INTERIM COMPREHENSIVE', period, year, subject)
-                        assessments[asmt_key_intrm] = asmt_intrm
+                    if self.ica_pkg:
+                        # Create the interim assessments
+                        for period in INTERIM_ASMT_PERIODS:
+                            asmt_key_intrm = str(year) + 'interim' + period + str(grade) + subject
+                            asmt_intrm = self.__create_and_write_assessment('INTERIM COMPREHENSIVE', period, year, subject, grade)
+                            assessments[asmt_key_intrm] = asmt_intrm
+
                     bar.update()
         return assessments
 
-    def __create_and_write_assessment(self, asmt_type, period, year, subject):
+    def __create_and_write_assessment(self, type, period, year, subject, grade):
         """
         Create a new assessment object and write it out
 
-        @param asmt_type: Type of assessment to create
+        @param type: Type of assessment to create
         @param period: Period (month) of assessment to create
         @param year: Year of assessment to create
         @param subject: Subject of assessment to create
+        @param grade: Grade of assessment to create
         @returns: New assessment object
         """
         # Create assessment
-        asmt = sbac_asmt_gen.generate_assessment(asmt_type, period, year, subject, self.id_gen, generate_item_level=self.generate_item_level)
+        asmt = sbac_asmt_gen.generate_assessment(type, period, year, subject, grade, self.id_gen, generate_item_level=self.gen_item)
 
         for worker in self.workers:
             worker.write_assessment(asmt)
         return asmt
 
-    def __build_registration_system(self, years=YEARS):
+    def __build_registration_system(self, years):
         """"
         Build the registration system that will be used during the data generation run.
 
@@ -196,7 +234,7 @@ class WorkerManager(Worker):
         rs = sbac_hier_gen.generate_registration_system(start_year, str(start_year - 1) + '-02-25', self.id_gen)
 
         # Update it over every year
-        for year in YEARS:
+        for year in years:
             # Update the system
             rs.academic_year = year
             rs.extract_date = str(year - 1) + '-02-27'
@@ -265,13 +303,16 @@ class WorkerManager(Worker):
         students = {}
         student_count = 0
 
+        # get range of years from assessment packages
+        years = self.__years(assessments)
+
         # calculate the progress bar max and start the progress
-        progress_max = len(sbac_hier_gen.set_up_schools_with_grades(schools, GRADES_OF_CONCERN)) * len(YEARS)
+        progress_max = len(sbac_hier_gen.set_up_schools_with_grades(schools, GRADES_OF_CONCERN)) * len(years)
         bar = pyprind.ProgBar(progress_max, stream=sys.stdout, title='Generating assessments outcome for schools')
 
-        for asmt_year in YEARS:
+        for year in years:
             # Prepare output file names
-            reg_system = reg_sys_by_year[asmt_year]
+            reg_system = reg_sys_by_year[year]
 
             # Set up a dictionary of schools and their grades
             schools_with_grades = sbac_hier_gen.set_up_schools_with_grades(schools, GRADES_OF_CONCERN)
@@ -291,7 +332,7 @@ class WorkerManager(Worker):
             for school, grades in schools_with_grades.items():
                 # Process the whole school
                 student_count += self.__process_school(grades, school, students, unique_students, state, district,
-                                                       reg_system, asmt_year, inst_hiers[school.guid], assessments,
+                                                       reg_system, year, inst_hiers[school.guid], assessments,
                                                        pop_schools_with_groupings)
                 bar.update()
 
@@ -305,10 +346,10 @@ class WorkerManager(Worker):
         del unique_students
 
         # Return the average student count
-        return int(student_count // len(ASMT_YEARS)), unique_student_count
+        return int(student_count // len(years)), unique_student_count
 
     def __process_school(self, grades, school, students, unique_students, state, district, reg_system: RegistrationSystem,
-                         asmt_year, inst_hier, assessments, pop_schools_with_groupings):
+                         year, inst_hier, assessments, pop_schools_with_groupings):
 
         # Grab the assessment rates by subjects
         asmt_skip_rates_by_subject = state.config['subject_skip_percentages']
@@ -322,73 +363,40 @@ class WorkerManager(Worker):
 
         for grade, grade_students in grades.items():
             # Potentially re-populate the student population
-            sbac_pop_gen.repopulate_school_grade(school, grade, grade_students, self.id_gen, state, reg_system, asmt_year)
+            sbac_pop_gen.repopulate_school_grade(school, grade, grade_students, self.id_gen, state, reg_system, year)
             student_count += len(grade_students)
 
             if district.student_grouping:
                 sbac_pop_gen.assign_student_groups(school, grade, grade_students, pop_schools_with_groupings)
 
-            # Create assessment results for this year if requested
-            if asmt_year in ASMT_YEARS:
-                first_subject = True
+            # collect any assessments for this year and grade
+            asmts = list(filter(lambda asmt: asmt.year == year and asmt.grade == grade, assessments.values()))
+
+            # collect students, generating assessments as appropriate
+            for student in grade_students:
+                for asmt in asmts:
+                    sbac_asmt_gen.create_assessment_outcome_object(student, asmt, inst_hier, self.id_gen,
+                        assessment_results, asmt_skip_rates_by_subject[asmt.subject], generate_item_level=self.gen_item)
+
+                # TODO - make IAB handling more like SUM/ICA handling? i.e. collect iab packages outside loop
                 for subject in sbac_in_config.SUBJECTS:
-                    # Get the subject skip rate
-                    skip_rate = asmt_skip_rates_by_subject[subject]
+                    if self.gen_iab and not student.skip_iab:
+                        sbac_interim_asmt_gen.create_iab_outcome_objects(student, year, grade, subject,
+                            assessments, inst_hier, self.id_gen, iab_results, generate_item_level=self.gen_item)
 
-                    # Grab the summative assessment object
-                    asmt_summ = assessments[str(asmt_year) + 'summative' + str(grade) + subject]
-
-                    # Grab the interim assessment objects
-                    interim_asmts = []
-                    if school.takes_interim_asmts:
-                        for period in INTERIM_ASMT_PERIODS:
-                            key = str(asmt_year) + 'interim' + period + str(grade) + subject
-                            interim_asmts.append(assessments[key])
-
-                    for student in grade_students:
-                        # Create the outcome(s)
-                        sbac_asmt_gen.create_assessment_outcome_objects(student, asmt_summ, interim_asmts, inst_hier, self.id_gen,
-                                                                        assessment_results, skip_rate,
-                                                                        generate_item_level=self.generate_item_level)
-
-                        if not student.skip_iab:
-                            sbac_interim_asmt_gen.create_iab_outcome_objects(student,
-                                                                             asmt_year,
-                                                                             grade,
-                                                                             subject,
-                                                                             assessments,
-                                                                             inst_hier,
-                                                                             self.id_gen,
-                                                                             iab_results,
-                                                                             generate_item_level=self.generate_item_level)
-
-                        # Determine if this student should be in the SR file
-                        if random.random() < sbac_in_config.HAS_ASMT_RESULT_IN_SR_FILE_RATE and first_subject:
-                            sr_students.append(student)
-
-                        # Make sure we have the student for the next run
-                        if student.guid not in students:
-                            students[student.guid] = student
-                            dim_students.append(student)
-
-                        if student.guid not in unique_students:
-                            unique_students[student.guid] = True
-
-                    first_subject = False
-
-            else:
-                # We're not doing assessment results, so put all of the students into the list
-                sr_students.extend(grade_students)
-                for student in grade_students:
-                    if student.guid not in students:
-                        students[student.guid] = student
-                        dim_students.append(student)
-                    if student.guid not in unique_students:
-                        unique_students[student.guid] = True
+                if student.guid not in students:
+                    students[student.guid] = student
+                    dim_students.append(student)
+                if student.guid not in unique_students:
+                    unique_students[student.guid] = True
+                # if no assessments were generated for this student, always add to SR file
+                # otherwise, randomly allow some students to not be added (not really sure why this logic)
+                if len(asmts) == 0 or (random.random() < sbac_in_config.HAS_ASMT_RESULT_IN_SR_FILE_RATE):
+                    sr_students.append(student)
 
         # Write out the school
-        self.__write_school_data(asmt_year, reg_system.guid_sr, dim_students, sr_students, assessment_results, iab_results,
-                                 state.code, district.guid)
+        self.__write_school_data(year, reg_system.guid_sr, dim_students, sr_students, assessment_results, iab_results, state.code, district.guid)
+
         del dim_students
         del sr_students
         del assessment_results
@@ -396,11 +404,11 @@ class WorkerManager(Worker):
 
         return student_count
 
-    def __write_school_data(self, asmt_year, rs_guid, dim_students, sr_students, assessment_results, iab_results, state_code, district_id):
+    def __write_school_data(self, year, rs_guid, dim_students, sr_students, assessment_results, iab_results, state_code, district_id):
         """
         Write student and assessment data for a school to one or more output formats.
 
-        @param asmt_year: Current academic year
+        @param year: Current academic year
         @param dim_students: Students to write to dim_student star-schema CSVs/postgres tables
         @param sr_students: Students to write to registration landing zone/star-schema CSV/postgres table
         @param assessment_results: Assessment outcomes to write to landing zone/star-schema CSV/postgres table
@@ -411,14 +419,12 @@ class WorkerManager(Worker):
 
         for worker in self.workers:
             worker.write_students_dim(dim_students)
-            worker.write_students_reg(sr_students, rs_guid, asmt_year)
+            worker.write_students_reg(sr_students, rs_guid, year)
 
-        # Write assessment results if we have them; also optionally to landing zone CSV, star-schema CSV, and/or to postgres
-        if asmt_year in ASMT_YEARS:
-            for guid, iab_result in iab_results.items():
-                for worker in self.workers:
-                    worker.write_iab_outcome(iab_result, guid)
-
-            for guid, results in assessment_results.items():
-                for worker in self.workers:
-                    worker.write_assessment_outcome(results, guid, state_code, district_id)
+        # Write assessment results if we have them
+        for guid, iab_result in iab_results.items():
+            for worker in self.workers:
+                worker.write_iab_outcome(iab_result, guid)
+        for guid, results in assessment_results.items():
+            for worker in self.workers:
+                worker.write_assessment_outcome(results, guid, state_code, district_id)
