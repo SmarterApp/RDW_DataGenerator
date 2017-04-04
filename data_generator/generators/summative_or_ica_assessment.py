@@ -6,8 +6,6 @@ An assessment generator for the SBAC assessment.
 import datetime
 import random
 
-from collections import OrderedDict
-
 import data_generator.config.cfg as sbac_config
 import data_generator.config.cfg as sbac_in_config
 import data_generator.config.hierarchy as hierarchy_config
@@ -15,7 +13,6 @@ import data_generator.generators.assessment as gen_asmt_generator
 from data_generator.model.assessment import Assessment
 from data_generator.model.assessmentoutcome import AssessmentOutcome
 from data_generator.model.institutionhierarchy import InstitutionHierarchy
-from data_generator.model.itemdata import AssessmentOutcomeItemData
 from data_generator.model.student import Student
 from data_generator.util.assessment_stats import Properties, RandomLevelByDemographics
 from data_generator.util.assessment_stats import adjust_score
@@ -36,7 +33,7 @@ def create_assessment_outcome_object(student, asmt, inst_hier, id_gen, assessmen
                                      retake_rate=sbac_in_config.ASMT_RETAKE_RATE,
                                      delete_rate=sbac_in_config.ASMT_DELETE_RATE,
                                      update_rate=sbac_in_config.ASMT_UPDATE_RATE,
-                                     generate_item_level=True):
+                                     gen_item=True):
     """
     Create the outcome(s) for a single assessment for a student. If the student is determined to have skipped the
     assessment, the resulting array will be empty. Otherwise, one outcome will be created with the chance that a second
@@ -52,7 +49,7 @@ def create_assessment_outcome_object(student, asmt, inst_hier, id_gen, assessmen
     @param retake_rate: The rate (chance) that this student will re-take the assessment
     @param delete_rate: The rate (chance) that this student's result will be deleted
     @param update_rate: The rate (chance) that this student's result will be updated (deleted and re-added)
-    @param generate_item_level: If should generate item-level data
+    @param gen_item: If should generate item-level data
     @returns: Array of outcomes
     """
     # Make sure they are taking the assessment
@@ -65,7 +62,7 @@ def create_assessment_outcome_object(student, asmt, inst_hier, id_gen, assessmen
 
     # Create the original outcome object
     ao = generate_assessment_outcome(student, asmt, inst_hier, id_gen,
-                                     generate_item_level=generate_item_level)
+                                     gen_item=gen_item)
     assessment_results[asmt.guid_sr].append(ao)
 
     # Decide if something special is happening
@@ -74,14 +71,14 @@ def create_assessment_outcome_object(student, asmt, inst_hier, id_gen, assessmen
         # Set the original outcome object to inactive, create a new outcome (with an advanced date take), and return
         ao.result_status = sbac_in_config.ASMT_STATUS_INACTIVE
         ao2 = generate_assessment_outcome(student, asmt, inst_hier, id_gen,
-                                          generate_item_level=generate_item_level)
+                                          gen_item=gen_item)
         assessment_results[asmt.guid_sr].append(ao2)
         ao2.date_taken += datetime.timedelta(days=5)
     elif special_random < update_rate:
         # Set the original outcome object to deleted and create a new outcome
         ao.result_status = sbac_in_config.ASMT_STATUS_DELETED
         ao2 = generate_assessment_outcome(student, asmt, inst_hier, id_gen,
-                                          generate_item_level=generate_item_level)
+                                          gen_item=gen_item)
         assessment_results[asmt.guid_sr].append(ao2)
 
         # See if the updated record should be deleted
@@ -92,45 +89,9 @@ def create_assessment_outcome_object(student, asmt, inst_hier, id_gen, assessmen
         ao.result_status = sbac_in_config.ASMT_STATUS_DELETED
 
 
-def create_assessment_outcome_objects(student, asmt_summ, interim_asmts, inst_hier, id_gen, assessment_results,
-                                      skip_rate=sbac_in_config.ASMT_SKIP_RATE,
-                                      retake_rate=sbac_in_config.ASMT_RETAKE_RATE,
-                                      delete_rate=sbac_in_config.ASMT_DELETE_RATE,
-                                      update_rate=sbac_in_config.ASMT_UPDATE_RATE,
-                                      generate_item_level=True):
-    """
-    Create a set of assessment outcome object(s) for a student. If the student is determined to have skipped the
-    assessment, the resulting array will be empty. Otherwise, one outcome will be created with the chance that a second
-    outcome is also created. A second outcome will be created if the assessment is re-taken or updated. If the
-    assessment is determined to have been deleted, no second record will be created.
-
-    @param student: The student to create outcomes for
-    @param asmt_summ: The summative assessment object
-    @param interim_asmts: The interim assessment objects
-    @param inst_hier: The institution hierarchy these assessments relate to
-    @param id_gen: ID generator
-    @param assessment_results: Dictionary of assessment results to update
-    @param skip_rate: The rate (chance) that this student skips an assessment
-    @param retake_rate: The rate (chance) that this student will re-take an assessment
-    @param delete_rate: The rate (chance) that this student's result will be deleted
-    @param update_rate: The rate (chance) that this student's result will be updated (deleted and re-added)
-    @param generate_item_level: If should generate item-level data
-    """
-    # Create the summative assessment outcome
-    create_assessment_outcome_object(student, asmt_summ, inst_hier, id_gen, assessment_results, skip_rate,
-                                     retake_rate, delete_rate, update_rate, generate_item_level)
-
-    # Generate interim assessment results (list will be empty if school does not perform
-    # interim assessments)
-    for asmt in interim_asmts:
-        # Create the interim assessment outcome
-        create_assessment_outcome_object(student, asmt, inst_hier, id_gen, assessment_results, skip_rate,
-                                         retake_rate, delete_rate, update_rate, generate_item_level)
-
-
 def generate_assessment(type, period, asmt_year, subject, grade, id_gen, from_date=None, to_date=None,
                         claim_definitions=sbac_config.CLAIM_DEFINITIONS,
-                        generate_item_level=True):
+                        gen_item=True):
     """
     Generate an assessment object.
 
@@ -143,7 +104,7 @@ def generate_assessment(type, period, asmt_year, subject, grade, id_gen, from_da
     @param from_date: Assessment from date
     @param to_date: Assessment to date
     @param claim_definitions: Definitions for claims to generate
-    @param generate_item_level: If should create item-level item bank
+    @param gen_item: If should create item-level item bank
     @returns: The assessment object
     """
     # Get the claim definitions for this subject
@@ -167,15 +128,9 @@ def generate_assessment(type, period, asmt_year, subject, grade, id_gen, from_da
         year_adj = 0
         period_month = 3
 
-    # Generate Assessment Item Bank
-    item_bank = {}
-    if generate_item_level:
-        for i in range(1, sbac_config.ASMT_ITEM_BANK_SIZE + 1):
-            item_bank[i] = id_gen.get_rec_id('assmt_item_id')
-
     # Set other specifics
-    sa.id = '(SBAC)SBAC-' + subject + '-' + str(grade) + '-' + period + '-' + str(asmt_year-1) + '-' + str(asmt_year)
-    sa.name = 'SBAC-' + subject + '-' + str(grade)
+    sa.name = 'SBAC-{}-{}'.format(subject, grade)
+    sa.id = '(SBAC){}-{}-{}-{}'.format(sa.name, period, asmt_year-1, asmt_year)
     sa.subject = subject
     sa.grade = grade
     sa.rec_id = id_gen.get_rec_id('assessment')
@@ -185,7 +140,7 @@ def generate_assessment(type, period, asmt_year, subject, grade, id_gen, from_da
     sa.year = asmt_year
     sa.version = sbac_config.ASMT_VERSION
     sa.subject = subject
-    sa.bank_key = '1'   # TODO - handle properly
+    sa.bank_key = '200'   # TODO - handle properly
     sa.claim_1_name = claims[0]['name']
     sa.claim_2_name = claims[1]['name']
     sa.claim_3_name = claims[2]['name']
@@ -221,13 +176,13 @@ def generate_assessment(type, period, asmt_year, subject, grade, id_gen, from_da
     sa.effective_date = datetime.date(asmt_year - year_adj, period_month, 15)
     sa.from_date = from_date if from_date is not None else sa.effective_date
     sa.to_date = to_date if to_date is not None else sbac_config.ASMT_TO_DATE
-    sa.item_bank = item_bank
+    sa.segment, sa.item_bank = gen_asmt_generator.generate_segment_and_item_bank(gen_item, sbac_config.ASMT_ITEM_BANK_SIZE, id_gen)
 
     return sa
 
 
 def generate_assessment_outcome(student: Student, assessment: Assessment, inst_hier: InstitutionHierarchy,
-                                id_gen, generate_item_level=True):
+                                id_gen, gen_item=True):
     """
     Generate an assessment outcome for a given student.
 
@@ -235,7 +190,7 @@ def generate_assessment_outcome(student: Student, assessment: Assessment, inst_h
     @param assessment: The assessment to create the outcome for
     @param inst_hier: The institution hierarchy this student belongs to
     @param id_gen: ID generator
-    @param generate_item_level: If should create item-level responses
+    @param gen_item: If should create item-level responses
     @returns: The assessment outcome
     """
     # Create cut-point lists
@@ -252,31 +207,6 @@ def generate_assessment_outcome(student: Student, assessment: Assessment, inst_h
     sao.rec_id = id_gen.get_rec_id('assessment_outcome')
     sao.inst_hierarchy = inst_hier
 
-    # Generate assessment outcome Item-level data
-    if generate_item_level:
-        item_data_dict = {}
-        for i in range(1, sbac_config.ITEMS_PER_ASMT + 1):
-            pos_item = random.choice(list(assessment.item_bank.keys()))
-            while pos_item in item_data_dict:
-                pos_item = random.choice(list(assessment.item_bank.keys()))
-            item_id = assessment.item_bank[pos_item]
-            item_data_dict[pos_item] = item_id
-
-        od = OrderedDict(sorted(item_data_dict.items()))
-
-        segment_id = '(SBAC)SBAC-MG110PT-S2-' + assessment.subject + '-' + str(student.grade) + '-' + \
-                     assessment.period[0:-5] + '-' + str(assessment.year - 1) + '-' + str(assessment.year)
-
-        for pos in od:
-            item_format = random.choice(sbac_config.ASMT_ITEM_BANK_FORMAT)
-            item_level_data = AssessmentOutcomeItemData()
-            item_level_data.student_id = student.guid_sr
-            item_level_data.key = od[pos]
-            item_level_data.segment_id = segment_id
-            item_level_data.position = pos
-            item_level_data.format = item_format
-            sao.item_level_data.append(item_level_data)
-
     # Create the date taken
     year_adj = 1
     period_month = 9
@@ -289,6 +219,13 @@ def generate_assessment_outcome(student: Student, assessment: Assessment, inst_h
         year_adj = 0
         period_month = 3
     sao.date_taken = datetime.date(assessment.year - year_adj, period_month, 15)
+
+    # Generate assessment outcome Item-level data
+    sao.item_data = [] if not gen_item else \
+        gen_asmt_generator.generate_item_data(assessment.item_bank, student.guid_sr, sao.date_taken)
+
+    # set timestamps for the opportunity
+    gen_asmt_generator.set_opportunity_dates(sao)
 
     demographics = sbac_config.DEMOGRAPHICS_BY_GRADE[student.grade]
     level_breakdowns = sbac_config.LEVELS_BY_GRADE_BY_SUBJ[assessment.subject][student.grade]

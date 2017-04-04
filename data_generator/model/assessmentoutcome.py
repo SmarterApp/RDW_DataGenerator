@@ -26,7 +26,7 @@ class AssessmentOutcome:
                  'acc_alternate_response_options_nonembed acc_calculator_nonembed acc_multiplication_table_nonembed '
                  'acc_print_on_demand_nonembed acc_read_aloud_nonembed acc_scribe_nonembed acc_speech_to_text_nonembed '
                  'acc_streamline_mode '
-                 'from_date to_date item_level_data'.split())
+                 'from_date to_date item_data'.split())
 
     def __init__(self):
         self.guid = None  # aka oppId? or key?
@@ -82,8 +82,7 @@ class AssessmentOutcome:
         self.acc_streamline_mode = 0
         self.from_date = sbac_config.HIERARCHY_FROM_DATE
         self.to_date = datetime.date(9999, 12, 31)
-        # TODO - segments?
-        self.item_level_data = []
+        self.item_data = []
 
     def get_object_set(self):
         """

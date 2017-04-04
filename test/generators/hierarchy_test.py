@@ -131,7 +131,7 @@ def test_generate_institution_hierarchy():
     assert ih.state == state
     assert ih.district == district
     assert ih.school == school
-    assert ih.from_date == datetime.date(2012, 9, 1)
+    assert ih.from_date == datetime.date(2014, 9, 1)
     assert ih.to_date == datetime.date(9999, 12, 31)
 
 

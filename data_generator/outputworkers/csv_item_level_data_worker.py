@@ -25,6 +25,6 @@ class CSVItemLevelDataWorker(Worker):
                     if not os.path.exists(os.path.join(self.root_path, it_dir_path)):
                         os.makedirs(os.path.join(self.root_path, it_dir_path))
 
-                    csv_writer.write_records_to_file(it_file_path, sbac_out_config.LZ_ITEMDATA_FORMAT['columns'], sao.item_level_data, root_path=self.root_path)
+                    csv_writer.write_records_to_file(it_file_path, sbac_out_config.LZ_ITEMDATA_FORMAT['columns'], sao.item_data, root_path=self.root_path)
             except Exception as e:
                 print('Exception in CSVItemLevelDataWorker ::: %s' % str(e))

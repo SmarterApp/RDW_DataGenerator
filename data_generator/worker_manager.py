@@ -96,8 +96,8 @@ class WorkerManager(Worker):
             exit()
 
         # TODO - branch, either generate assessments or load assessments
-        if self.iab_pkg:
-            assessments.update(self.__generate_iabs())
+
+        assessments.update(self.__generate_iabs())
         assessments.update(self.__generate_assessments())
 
         return assessments
@@ -147,6 +147,9 @@ class WorkerManager(Worker):
         """
         assessments = {}
 
+        if not self.iab_pkg:
+            return assessments
+
         # set up a progress bar
         progress_max = 0
         for subject, grade in itertools.product(sbac_in_config.SUBJECTS, GRADES_OF_CONCERN):
@@ -162,7 +165,7 @@ class WorkerManager(Worker):
                 key = sbac_interim_asmt_gen.get_iab_key(date, grade, subject, block)
 
                 assessments[key] = sbac_interim_asmt_gen.generate_interim_assessment(date, year, subject, block, grade, self.id_gen,
-                                                                                     generate_item_level=self.gen_item)
+                                                                                     gen_item=self.gen_item)
                 # Output to requested mediums
                 for worker in self.workers:
                     worker.write_iab(assessments[key])
@@ -177,6 +180,9 @@ class WorkerManager(Worker):
         """
         assessments = {}
 
+        if not (self.sum_pkg or self.ica_pkg):
+            return assessments
+
         # set up a progress bar
         progress_max = len(ASMT_YEARS) * len(sbac_in_config.SUBJECTS) * len(GRADES_OF_CONCERN)
         bar = pyprind.ProgBar(progress_max, stream=sys.stdout, title='Generating Summative and ICA Assessments')
@@ -184,16 +190,16 @@ class WorkerManager(Worker):
         for year in ASMT_YEARS:
             for subject in sbac_in_config.SUBJECTS:
                 for grade in GRADES_OF_CONCERN:
-                    # Create the summative assessment
-                    asmt_key_summ = str(year) + 'summative' + str(grade) + subject
-                    assessments[asmt_key_summ] = self.__create_and_write_assessment('SUMMATIVE', 'Spring', year, subject, grade)
+                    if self.sum_pkg:
+                        # Create the summative assessment
+                        assessments[sbac_asmt_gen.get_sum_key(year, grade, subject)] = \
+                            self.__create_and_write_assessment('SUMMATIVE', 'Spring', year, subject, grade)
 
                     if self.ica_pkg:
                         # Create the interim assessments
                         for period in INTERIM_ASMT_PERIODS:
-                            asmt_key_intrm = str(year) + 'interim' + period + str(grade) + subject
-                            asmt_intrm = self.__create_and_write_assessment('INTERIM COMPREHENSIVE', period, year, subject, grade)
-                            assessments[asmt_key_intrm] = asmt_intrm
+                            assessments[sbac_asmt_gen.get_ica_key(year, period, grade, subject)] = \
+                                self.__create_and_write_assessment('INTERIM COMPREHENSIVE', period, year, subject, grade)
 
                     bar.update()
         return assessments
@@ -210,7 +216,7 @@ class WorkerManager(Worker):
         @returns: New assessment object
         """
         # Create assessment
-        asmt = sbac_asmt_gen.generate_assessment(type, period, year, subject, grade, self.id_gen, generate_item_level=self.gen_item)
+        asmt = sbac_asmt_gen.generate_assessment(type, period, year, subject, grade, self.id_gen, gen_item=self.gen_item)
 
         for worker in self.workers:
             worker.write_assessment(asmt)
@@ -375,14 +381,12 @@ class WorkerManager(Worker):
             # collect students, generating assessments as appropriate
             for student in grade_students:
                 for asmt in asmts:
-                    sbac_asmt_gen.create_assessment_outcome_object(student, asmt, inst_hier, self.id_gen,
-                        assessment_results, asmt_skip_rates_by_subject[asmt.subject], generate_item_level=self.gen_item)
-
-                # TODO - make IAB handling more like SUM/ICA handling? i.e. collect iab packages outside loop
-                for subject in sbac_in_config.SUBJECTS:
-                    if self.gen_iab and not student.skip_iab:
-                        sbac_interim_asmt_gen.create_iab_outcome_objects(student, year, grade, subject,
-                            assessments, inst_hier, self.id_gen, iab_results, generate_item_level=self.gen_item)
+                    if 'block' in asmt.type.lower():
+                        sbac_interim_asmt_gen.create_iab_outcome_object(student, asmt, inst_hier, self.id_gen,
+                            iab_results, gen_item=self.gen_item)
+                    else:
+                        sbac_asmt_gen.create_assessment_outcome_object(student, asmt, inst_hier, self.id_gen,
+                           assessment_results, asmt_skip_rates_by_subject[asmt.subject], gen_item=self.gen_item)
 
                 if student.guid not in students:
                     students[student.guid] = student

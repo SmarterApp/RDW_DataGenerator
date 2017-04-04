@@ -329,13 +329,13 @@ def test_pick_default_accommodation_code_four():
 
 
 def test_create_assessment_object():
-    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', 8, ID_GEN, generate_item_level=False)
+    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', 8, ID_GEN, gen_item=False)
     assert asmt.type == 'SUMMATIVE'
     assert asmt.subject == 'ELA'
 
 
 def test_create_assessment_object_summative():
-    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', 8, ID_GEN, generate_item_level=False)
+    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', 8, ID_GEN, gen_item=False)
     assert asmt.year == 2015
     assert asmt.period == 'Spring 2015'
     assert asmt.effective_date == datetime.date(2015, 5, 15)
@@ -344,7 +344,7 @@ def test_create_assessment_object_summative():
 
 
 def test_create_assessment_object_interim_fall():
-    asmt = asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Fall', 2015, 'ELA', 8, ID_GEN, generate_item_level=False)
+    asmt = asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Fall', 2015, 'ELA', 8, ID_GEN, gen_item=False)
     assert asmt.year == 2015
     assert asmt.period == 'Fall 2014'
     assert asmt.effective_date == datetime.date(2014, 9, 15)
@@ -353,7 +353,7 @@ def test_create_assessment_object_interim_fall():
 
 
 def test_create_assessment_object_interim_winter():
-    asmt = asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Winter', 2015, 'ELA', 8, ID_GEN, generate_item_level=False)
+    asmt = asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Winter', 2015, 'ELA', 8, ID_GEN, gen_item=False)
     assert asmt.year == 2015
     assert asmt.period == 'Winter 2014'
     assert asmt.effective_date == datetime.date(2014, 12, 15)
@@ -362,7 +362,7 @@ def test_create_assessment_object_interim_winter():
 
 
 def test_create_assessment_object_interim_spring():
-    asmt = asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Spring', 2015, 'ELA', 8, ID_GEN, generate_item_level=False)
+    asmt = asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Spring', 2015, 'ELA', 8, ID_GEN, gen_item=False)
     assert asmt.year == 2015
     assert asmt.period == 'Spring 2015'
     assert asmt.effective_date == datetime.date(2015, 3, 15)
@@ -371,12 +371,12 @@ def test_create_assessment_object_interim_spring():
 
 
 def test_create_assessment_object_item_data():
-    asmt = asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Spring', 2015, 'ELA', 8, ID_GEN, generate_item_level=True)
+    asmt = asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Spring', 2015, 'ELA', 8, ID_GEN, gen_item=True)
     assert len(asmt.item_bank) == sbac_config.ASMT_ITEM_BANK_SIZE
 
 
 def test_create_assessment_object_no_item_data():
-    asmt = asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Spring', 2015, 'ELA', 8, ID_GEN, generate_item_level=False)
+    asmt = asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Spring', 2015, 'ELA', 8, ID_GEN, gen_item=False)
     assert len(asmt.item_bank) == 0
 
 
@@ -392,12 +392,12 @@ def test_create_assessment_outcome_object_item_data():
 
     # Create outcomes
     asmt_gen.create_assessment_outcome_object(student, asmt, inst_hier, ID_GEN, outcomes, skip_rate=0,
-                                                   retake_rate=0, delete_rate=0, update_rate=0,
-                                                   generate_item_level=True)
+                                              retake_rate=0, delete_rate=0, update_rate=0,
+                                              gen_item=True)
 
     # Tests
     assert len(outcomes) == 1
-    assert len(outcomes[asmt.guid_sr][0].item_level_data) == sbac_config.ITEMS_PER_ASMT
+    assert len(outcomes[asmt.guid_sr][0].item_data) == sbac_config.ASMT_ITEM_BANK_SIZE
 
 
 def test_create_assessment_outcome_object_skipped():
@@ -412,8 +412,8 @@ def test_create_assessment_outcome_object_skipped():
 
     # Create outcomes
     asmt_gen.create_assessment_outcome_object(student, asmt, inst_hier, ID_GEN, outcomes, skip_rate=1,
-                                                   retake_rate=0, delete_rate=0, update_rate=0,
-                                                   generate_item_level=False)
+                                              retake_rate=0, delete_rate=0, update_rate=0,
+                                              gen_item=False)
 
     # Tests
     assert len(outcomes) == 0
@@ -536,9 +536,8 @@ def test_create_assessment_outcome_objects_no_interims_skipped():
     outcomes = {}
 
     # Create outcomes
-    asmt_gen.create_assessment_outcome_objects(student, asmt_summ, [], inst_hier, ID_GEN, outcomes,
-                                                    skip_rate=1, retake_rate=0, delete_rate=0, update_rate=0,
-                                                    generate_item_level=False)
+    __create_assessment_outcome_objects(student, asmt_summ, [], inst_hier, ID_GEN, outcomes,
+                                               skip_rate=1, retake_rate=0, delete_rate=0, update_rate=0)
 
     # Tests
     assert len(outcomes) == 0
@@ -555,9 +554,8 @@ def test_create_assessment_outcome_objects_no_interims_one_active_result():
     outcomes = {}
 
     # Create outcomes
-    asmt_gen.create_assessment_outcome_objects(student, asmt_summ, [], inst_hier, ID_GEN, outcomes,
-                                                    skip_rate=0, retake_rate=0, delete_rate=0, update_rate=0,
-                                                    generate_item_level=False)
+    __create_assessment_outcome_objects(student, asmt_summ, [], inst_hier, ID_GEN, outcomes,
+                                        skip_rate=0, retake_rate=0, delete_rate=0, update_rate=0)
 
     # Tests
     assert len(outcomes) == 1
@@ -576,9 +574,8 @@ def test_create_assessment_outcome_objects_no_interims_retake_results():
     outcomes = {}
 
     # Create outcomes
-    asmt_gen.create_assessment_outcome_objects(student, asmt_summ, [], inst_hier, ID_GEN, outcomes,
-                                                    skip_rate=0, retake_rate=1, delete_rate=0, update_rate=0,
-                                                    generate_item_level=False)
+    __create_assessment_outcome_objects(student, asmt_summ, [], inst_hier, ID_GEN, outcomes,
+                                        skip_rate=0, retake_rate=1, delete_rate=0, update_rate=0)
 
     # Tests
     assert len(outcomes) == 1
@@ -599,9 +596,8 @@ def test_create_assessment_outcome_objects_no_interim_one_deleted_result():
     outcomes = {}
 
     # Create outcomes
-    asmt_gen.create_assessment_outcome_objects(student, asmt_summ, [], inst_hier, ID_GEN, outcomes,
-                                                    skip_rate=0, retake_rate=0, delete_rate=1, update_rate=0,
-                                                    generate_item_level=False)
+    __create_assessment_outcome_objects(student, asmt_summ, [], inst_hier, ID_GEN, outcomes,
+                                        skip_rate=0, retake_rate=0, delete_rate=1, update_rate=0)
 
     # Tests
     assert len(outcomes) == 1
@@ -620,9 +616,8 @@ def test_create_assessment_outcome_objects_no_interim_update_no_second_delete_re
     outcomes = {}
 
     # Create outcomes
-    asmt_gen.create_assessment_outcome_objects(student, asmt_summ, [], inst_hier, ID_GEN, outcomes,
-                                                    skip_rate=0, retake_rate=0, delete_rate=0, update_rate=1,
-                                                    generate_item_level=False)
+    __create_assessment_outcome_objects(student, asmt_summ, [], inst_hier, ID_GEN, outcomes,
+                                        skip_rate=0, retake_rate=0, delete_rate=0, update_rate=1)
 
     # Tests
     assert len(outcomes) == 1
@@ -643,9 +638,8 @@ def test_create_assessment_outcome_objects_no_interim_update_second_delete_resul
     outcomes = {}
 
     # Create outcomes
-    asmt_gen.create_assessment_outcome_objects(student, asmt_summ, [], inst_hier, ID_GEN, outcomes,
-                                                    skip_rate=0, retake_rate=0, delete_rate=1, update_rate=1,
-                                                    generate_item_level=False)
+    __create_assessment_outcome_objects(student, asmt_summ, [], inst_hier, ID_GEN, outcomes,
+                                        skip_rate=0, retake_rate=0, delete_rate=1, update_rate=1)
 
     # Tests
     assert len(outcomes) == 1
@@ -669,9 +663,8 @@ def test_create_assessment_outcome_objects_interims_skipped():
     outcomes = {}
 
     # Create outcomes
-    asmt_gen.create_assessment_outcome_objects(student, asmt_summ, interim_asmts, inst_hier, ID_GEN,
-                                                    outcomes, skip_rate=1, retake_rate=0, delete_rate=0, update_rate=0,
-                                                    generate_item_level=False)
+    __create_assessment_outcome_objects(student, asmt_summ, interim_asmts, inst_hier, ID_GEN, outcomes,
+                                        skip_rate=1, retake_rate=0, delete_rate=0, update_rate=0)
 
     # Tests
     assert len(outcomes) == 0
@@ -691,9 +684,8 @@ def test_create_assessment_outcome_objects_interims_one_active_result():
     outcomes = {}
 
     # Create outcomes
-    asmt_gen.create_assessment_outcome_objects(student, asmt_summ, interim_asmts, inst_hier, ID_GEN,
-                                                    outcomes, skip_rate=0, retake_rate=0, delete_rate=0, update_rate=0,
-                                                    generate_item_level=False)
+    __create_assessment_outcome_objects(student, asmt_summ, interim_asmts, inst_hier, ID_GEN, outcomes,
+                                        skip_rate=0, retake_rate=0, delete_rate=0, update_rate=0)
 
     # Tests
     assert len(outcomes) == 4
@@ -725,9 +717,8 @@ def test_create_assessment_outcome_objects_interims_retake_results():
     outcomes = {}
 
     # Create outcomes
-    asmt_gen.create_assessment_outcome_objects(student, asmt_summ, interim_asmts, inst_hier, ID_GEN,
-                                                    outcomes, skip_rate=0, retake_rate=1, delete_rate=0, update_rate=0,
-                                                    generate_item_level=False)
+    __create_assessment_outcome_objects(student, asmt_summ, interim_asmts, inst_hier, ID_GEN, outcomes,
+                                        skip_rate=0, retake_rate=1, delete_rate=0, update_rate=0)
 
     # Tests
     assert len(outcomes) == 4
@@ -771,8 +762,8 @@ def test_create_assessment_outcome_objects_interim_one_deleted_result():
     outcomes = {}
 
     # Create outcomes
-    asmt_gen.create_assessment_outcome_objects(student, asmt_summ, interim_asmts, inst_hier, ID_GEN,
-                                                    outcomes, skip_rate=0, retake_rate=0, delete_rate=1, update_rate=0)
+    __create_assessment_outcome_objects(student, asmt_summ, interim_asmts, inst_hier, ID_GEN, outcomes,
+                                        skip_rate=0, retake_rate=0, delete_rate=1, update_rate=0)
 
     # Tests
     assert len(outcomes) == 4
@@ -804,9 +795,8 @@ def test_create_assessment_outcome_objects_interim_update_no_second_delete_resul
     outcomes = {}
 
     # Create outcomes
-    asmt_gen.create_assessment_outcome_objects(student, asmt_summ, interim_asmts, inst_hier, ID_GEN,
-                                                    outcomes, skip_rate=0, retake_rate=0, delete_rate=0, update_rate=1,
-                                                    generate_item_level=False)
+    __create_assessment_outcome_objects(student, asmt_summ, interim_asmts, inst_hier, ID_GEN, outcomes,
+                                        skip_rate=0, retake_rate=0, delete_rate=0, update_rate=1)
 
     # Tests
     assert len(outcomes) == 4
@@ -850,9 +840,8 @@ def test_create_assessment_outcome_objects_interim_update_second_delete_results(
     outcomes = {}
 
     # Create outcomes
-    asmt_gen.create_assessment_outcome_objects(student, asmt_summ, interim_asmts, inst_hier, ID_GEN,
-                                                    outcomes, skip_rate=0, retake_rate=0, delete_rate=1, update_rate=1,
-                                                    generate_item_level=False)
+    __create_assessment_outcome_objects(student, asmt_summ, interim_asmts, inst_hier, ID_GEN, outcomes,
+                                        skip_rate=0, retake_rate=0, delete_rate=1, update_rate=1)
 
     # Tests
     assert len(outcomes) == 4
@@ -880,3 +869,18 @@ def test_create_assessment_outcome_objects_interim_update_second_delete_results(
     assert outcomes[interim_asmts[2].guid_sr][1].assessment.type == 'INTERIM COMPREHENSIVE'
     assert outcomes[interim_asmts[2].guid_sr][1].result_status == 'D'
     assert outcomes[interim_asmts[2].guid_sr][1].date_taken == datetime.date(2015, 3, 15)
+
+
+# Helper to replace removed method
+def __create_assessment_outcome_objects(student, asmt_summ, interim_asmts, inst_hier, id_gen, assessment_results,
+                                        skip_rate, retake_rate, delete_rate, update_rate):
+    # Create the summative assessment outcome
+    asmt_gen.create_assessment_outcome_object(student, asmt_summ, inst_hier, id_gen, assessment_results, skip_rate,
+                                              retake_rate, delete_rate, update_rate, False)
+
+    # Generate interim assessment results (list will be empty if school does not perform
+    # interim assessments)
+    for asmt in interim_asmts:
+        # Create the interim assessment outcome
+        asmt_gen.create_assessment_outcome_object(student, asmt, inst_hier, id_gen, assessment_results, skip_rate,
+                                                  retake_rate, delete_rate, update_rate, False)

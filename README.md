@@ -1,4 +1,7 @@
-# README #
+## README
+
+**NOTE: recent changes to produce XML output may have broken existing functionality; don't expect the other output 
+formats to work without some testing. Yeah, sorry about that but legacy output will be deprecated soon anyway.**
 
 ### What is this repository for? ###
 
@@ -51,16 +54,25 @@ There are two scripts you can choose to run.
 First script is `generate_data.py`. This generates the data in the requested output formats (can generate multiple formats at once).
 
 > The following arguments apply:
-
 > * `--state_name STATE_NAME`: Specify the name of the state that gets generated (defaults to `California)
 > * `--state_code STATE_CODE`: Specify the code of the state that gets generated (defaults to `CA`)
 > * `--state_type STATE_TYPE`: Specify the hierarchy type for the state to generate. 
 This has to match configuration in in data_generator/config/state_type.py. Examples include `california`, `example` and `devel`. 
+
+> Select what should be generated and output:
+> * `--sum_pkg`: generate/load summative assessment (SUM) packages
+> * `--ica_pkg`: generate/load interim comprehensive assessment (ICA) packages
+> * `--iab_pkg`: generate/load interim assessment block (IAB) packages
+> * `--gen_sum`: generate SUM outcomes
+> * `--gen_ica`: generate ICA outcomes
+> * `--gen_iab`: generate IAB outcomes
+> * `--gen_item`: generate item level data (applies to both packages and outcomes)
+
+> Select desired output:
 > * `--pg_out`: Output data to a PostgreSQL database
 > * `--star_out`: Output data to star schema CSV
 > * `--lz_out`: Output data to landing zone CSV and JSON
-> * `--io`: Output item-level data
-> * `--gia`: Generate interim assessment blocks
+> * `--xml_out`: Output data to (TRT) XML
 
 > If using PostgreSQL output:
 *(Note: with PostgreSQL the db schema must exists. Please refer to scripts/postgresql for more into)*
@@ -69,7 +81,7 @@ This has to match configuration in in data_generator/config/state_type.py. Examp
 > * `--schema`: Schema for PostgreSQL database
 
 To run from IntelliJ, from the generate_data.py tab, select `Create 'generate_data'`, 
-set the Script Parameters to, for example, `--state_type devel --lz_out`, verify the other settings and run.
+set the Script Parameters to, for example, `--state_type devel --gen_sum --xml_out`, verify the other settings and run.
 
 The second script is `calculate_state_size.py`.
 This will print out all the configured 'state_type's (from data_generator/state_type.py) and the stats for them.

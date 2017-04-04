@@ -1,5 +1,5 @@
 """
-Model an item data generated for an assessment outcome (an instance of a student taking an assessment) for the assessment.
+Model an item data generated for an assessment outcome.
 
 """
 
@@ -11,21 +11,14 @@ class AssessmentOutcomeItemData:
 
     def __init__(self):
         self.student_id = None
-        self.key = None         # TODO - somehow, key+bank_key = itemId?
-        self.bank_key = None    # TODO
-        self.segment_id = None
-        self.position = None
-        self.client_id = None
-        self.operational = None
-        self.is_selected = None
-        self.format = None          # aka item_type, e.g. MC
+        self.item = None
         self.admin_date = None
         self.number_visits = None
         self.strand = None
         self.content_level = None
         self.page_number = None
         self.page_visits = None     # responseDuration = page_time / page_visits
-        self.page_time = None       #
+        self.page_time = None  #
         self.dropped = None
         self.response_date = None
         self.response_value = None
@@ -38,4 +31,5 @@ class AssessmentOutcomeItemData:
 
         @returns: Dictionary of root objects
         """
-        return {'assessment_outcome_item_data': self}
+        return {'assessment_item': self.item,
+                'assessment_outcome_item_data': self}

@@ -96,7 +96,8 @@ def test_item_data_get_object_set():
 
     # Tests
     objs = item_data.get_object_set()
-    assert len(objs) == 1
+    assert len(objs) == 2
+    assert 'assessment_item' in objs
     assert 'assessment_outcome_item_data' in objs
     assert objs['assessment_outcome_item_data'].student_id == '0b43854416674ec8961b9db797bca2'
 

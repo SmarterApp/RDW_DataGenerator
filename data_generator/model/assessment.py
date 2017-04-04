@@ -23,7 +23,7 @@ class Assessment:
                  'claim_perf_lvl_name_1', 'claim_perf_lvl_name_2', 'claim_perf_lvl_name_3',
                  'overall_cut_point_1', 'overall_cut_point_2', 'overall_cut_point_3', 'overall_cut_point_4',
                  'claim_cut_point_1', 'claim_cut_point_2',
-                 'from_date', 'to_date', 'effective_date', 'item_bank',)
+                 'from_date', 'to_date', 'effective_date', 'segment', 'item_bank' )
 
     def __init__(self):
         self.guid = None
@@ -75,6 +75,7 @@ class Assessment:
         self.from_date = sbac_config.HIERARCHY_FROM_DATE
         self.to_date = None
         self.effective_date = None
+        self.segment = None
         self.item_bank = None
 
     def get_object_set(self):

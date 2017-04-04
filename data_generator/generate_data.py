@@ -18,13 +18,13 @@ if __name__ == '__main__':
 
     group = parser.add_argument_group('packages')
     group.add_argument('-pkg', '--pkg_source', dest='pkg_source', action='store', default='generate', help='Source of assessment packages, either \'generate\' or a path to tabulator CSV files')
-    group.add_argument('-sum', '--sum_pkg', dest='sum_pkg', action='store_true', default=True, help='Load/generate summative assessment packages')
-    group.add_argument('-ica', '--ica_pkg', dest='ica_pkg', action='store_true', default=True, help='Load/generate  interim comprehensive assessment packages')
+    group.add_argument('-sum', '--sum_pkg', dest='sum_pkg', action='store_true', default=False, help='Load/generate summative assessment packages')
+    group.add_argument('-ica', '--ica_pkg', dest='ica_pkg', action='store_true', default=False, help='Load/generate  interim comprehensive assessment packages')
     group.add_argument('-iab', '--iab_pkg', dest='iab_pkg', action='store_true', default=False, help='Load/generate  interim assessment block packages')
 
     group = parser.add_argument_group('outcomes')
-    group.add_argument('-gsum', '--gen_sum', dest='gen_sum', action='store_true', default=True, help='Generate summative outcomes')
-    group.add_argument('-gica', '--gen_ica', dest='gen_ica', action='store_true', default=True, help='Generate ICA outcomes')
+    group.add_argument('-gsum', '--gen_sum', dest='gen_sum', action='store_true', default=False, help='Generate summative outcomes')
+    group.add_argument('-gica', '--gen_ica', dest='gen_ica', action='store_true', default=False, help='Generate ICA outcomes')
     group.add_argument('-giab', '--gen_iab', dest='gen_iab', action='store_true', default=False, help='Generate IAB outcomes')
     group.add_argument('-gitem', '--gen_item', dest='gen_item', action='store_true', default=False, help='Generate item level data')
 
@@ -41,31 +41,31 @@ if __name__ == '__main__':
 
     args, unknown = parser.parse_known_args()
 
-    if not (args.sum_pkg or args.ica_pkg or args.iab_pkg):
-        print('No assessment package types selected. Please specify at least one')
-        print('  --sum_pkg  Summative assessment package')
-        print('  --ica_pkg  Interim comprehensive assessment package')
-        print('  --iab_pkg  Interim assessment block package')
-        exit()
-
-    if args.gen_sum and not args.sum_pkg:
-        print('Summative outcomes (--gen_sum) specified without summative assessment package (--sum_pkg)')
-        exit()
-
-    if args.gen_ica and not args.ica_pkg:
-        print('ICA outcomes (--gen_ica) specified without ICA package (--ica_pkg)')
-        exit()
-
-    if args.gen_iab and not args.iab_pkg:
-        print('IAB outcomes (--gen_iab) specified without IAB package (--iab_pkg)')
-        exit()
-
     if not (args.pg_out or args.star_out or args.lz_out or args.xml_out):
         print('Please specify at least one output format')
         print('  --pg_out    Output to PostgreSQL')
         print('  --star_out  Output star schema CSV')
         print('  --lz_out    Output landing zone CSV and JSON')
         print('  --xml_out   Output (TRT) XML')
+        exit()
+
+    if args.gen_sum and not args.sum_pkg:
+        print('Summative outcomes (--gen_sum) assuming SUM package (specify --sum_pkg to avoid this warning)')
+        args.sum_pkg = True
+
+    if args.gen_ica and not args.ica_pkg:
+        print('ICA outcomes (--gen_ica) assuming ICA package (specify --ica_pkg to avoid this warning)')
+        args.ica_pkg = True
+
+    if args.gen_iab and not args.iab_pkg:
+        print('IAB outcomes (--gen_iab) assuming IAB package (specify --iab_pkg to avoid this warning)')
+        args.iab_pkg = True
+
+    if not (args.sum_pkg or args.ica_pkg or args.iab_pkg):
+        print('No assessment package types selected. Please specify at least one')
+        print('  --sum_pkg  Summative assessment package')
+        print('  --ica_pkg  Interim comprehensive assessment package')
+        print('  --iab_pkg  Interim assessment block package')
         exit()
 
     worker = WorkerManager(args)

@@ -19,10 +19,7 @@ __pycache__
 # added gitignore file  # 
 # to the csv directory  #
 #########################
-data_generator/cover
-data_generator/coverage.xml
-data_generator/nosetests.xml
-data_generator/out
-
-nosetests.xml
+cover
 coverage.xml
+nosetests.xml
+out
