@@ -3,11 +3,9 @@
 **NOTE: recent changes to produce XML output may have broken existing functionality; don't expect the other output 
 formats to work without some testing. Yeah, sorry about that but legacy output will be deprecated soon anyway.**
 
-### What is this repository for? ###
-
 This project generates sample data to be used in SBAC RDW project for functional testing.
 
-### How do I get set up? ###
+### How do I get set up?
 
 This is a Python 3 project and as such you will need Python 3 installed to use and/or develop the project.
 
@@ -47,7 +45,7 @@ unit tests. To run the unit tests, start from the root of the project and call:
 As you develop new functionality, make sure to write accompanying unit tests so as maintain good code coverage and the
 confidence that comes with it.
 
-### How do I run it? ###
+### How do I run it?
 
 There are two scripts you can choose to run.
 
@@ -86,7 +84,45 @@ set the Script Parameters to, for example, `--state_type devel --gen_sum --xml_o
 The second script is `calculate_state_size.py`.
 This will print out all the configured 'state_type's (from data_generator/state_type.py) and the stats for them.
 
-### Outstanding open items  ###
+### How do i build and run the docker image?
+Building the docker image is not automated so you must do it manually. Assuming you have Docker installed then, 
+from the root folder of the project:
+
+    docker build -t fwsbac/rdw-datagen:latest .
+
+When running the image, pass the data generation parameters:
+
+    docker run fwsbac/rdw-datagen --state_type tiny --gen_iab --gen_item --xml_out
+
+To get at the resulting data you need to either map a local folder:
+
+    docker run -v ~/out:/src/data_generator/out fwsbac/rdw-datagen ...
+
+Or use docker to find where it mapped the folder (NOTE: Docker for Mac adds another layer of abstraction so you'll
+have to dig even deeper to find the actual data bits):
+
+    # get CONTAINER ID of instance that is now exited
+    docker ps -a
+    docker inspect --format '{{.Mounts}}' <CONTAINER ID>
+
+Obviously, pushing the image to docker hub is also not automated so you must do it manually:
+
+    docker push fwsbac/rdw-datagen
+
+#### Setting up an EC2 instance with docker
+Followed the directions from: http://docs.aws.amazon.com/AmazonECS/latest/developerguide/docker-basics.html.
+Create EC2 instance using Amazon Linux or CentOS image. Then ...
+
+    sudo yum update -y
+    sudo yum install -y docker
+    sudo service docker start
+    sudo usermod -a -G docker ec2-user     <-- have to relog to be in group
+    docker info
+    mkdir out
+    docker run -v ~/out:/src/data_generator/out fwsbac/rdw-datagen --state_type tiny --gen_iab --gen_item --xml_out
+
+
+### Outstanding open items  
 1. Model: understand the concepts of Section and Staff. Do we need it? Also I do not like how InterimAssessment re-uses Assessment.
 2. Understand if/how student groups are being generated.
 3. Generators and sbac_generators: need to be combined and cleaned up, and better understood.

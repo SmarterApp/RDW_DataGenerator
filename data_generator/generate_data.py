@@ -10,7 +10,12 @@ from data_generator.worker_manager import WorkerManager
 
 if __name__ == '__main__':
     # Argument parsing for task-specific arguments
-    parser = argparse.ArgumentParser(description='SBAC data generation task.')
+    parser = argparse.ArgumentParser(description='SBAC data generation utility.',
+                                     epilog='Example arguments:' +
+                                            '\n  --state_type devel --gen_iab --gen_item --xml_out --out_dir /out'
+                                            '\n  --state_type tiny --gen_sum --xml_out --out_dir /out'
+                                            '\n  --state_type california --gen_sum --gen_ica --xml_out --out_dir /out'
+                                     )
 
     parser.add_argument('-sn', '--state_name', dest='state_name', action='store', default='California', help='The name of the state (default=California)')
     parser.add_argument('-sc', '--state_code', dest='state_code', action='store', default='CA', help='The code of the state to generate data for')
