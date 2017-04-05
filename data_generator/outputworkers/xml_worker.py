@@ -46,7 +46,7 @@ class XmlWorker(Worker):
 
         # TODO - work out SSID and AlternateSSID
         contextDateStr = outcome.status_date.isoformat()
-        self.add_examinee_attribute(examinee, 'SSID', student.external_ssid, contextDateStr)
+        self.add_examinee_attribute(examinee, 'StudentIdentifier', student.external_ssid, contextDateStr)
         self.add_examinee_attribute(examinee, 'Birthdate', student.dob, contextDateStr)
         self.add_examinee_attribute(examinee, 'FirstName', student.first_name, contextDateStr)
         self.add_examinee_attribute(examinee, 'MiddleName', student.middle_name, contextDateStr)
@@ -59,8 +59,8 @@ class XmlWorker(Worker):
         self.add_examinee_attribute(examinee, 'BlackOrAfricanAmerican', self.map_yes_no(student.eth_black), contextDateStr)
         self.add_examinee_attribute(examinee, 'White', self.map_yes_no(student.eth_white), contextDateStr)
         self.add_examinee_attribute(examinee, 'NativeHawaiianOrOtherPacificIslander', self.map_yes_no(student.eth_pacific), contextDateStr)
-        self.add_examinee_attribute(examinee, 'TwoOrMoreRaces', self.map_yes_no(student.eth_multi), contextDateStr)
-        # self.add_examinee_attribute(examinee, 'IDEAIndicator', self.map_yes_no(student.), contextDate)
+        self.add_examinee_attribute(examinee, 'DemographicRaceTwoOrMoreRaces', self.map_yes_no(student.eth_multi), contextDateStr)
+        self.add_examinee_attribute(examinee, 'IDEAIndicator', self.map_yes_no(student.prg_iep), contextDateStr)
         self.add_examinee_attribute(examinee, 'LEPStatus', self.map_yes_no(student.prg_lep), contextDateStr)
         self.add_examinee_attribute(examinee, 'Section504Status', self.map_yes_no(student.prg_sec504), contextDateStr)
         self.add_examinee_attribute(examinee, 'EconomicDisadvantageStatus', self.map_yes_no(student.prg_econ_disad), contextDateStr)
@@ -71,9 +71,9 @@ class XmlWorker(Worker):
         hierarchy = outcome.inst_hierarchy
         self.add_examinee_relationship(examinee, 'StateAbbreviation', hierarchy.state.code, contextDateStr)
         self.add_examinee_relationship(examinee, 'StateName', hierarchy.state.name, contextDateStr)
-        self.add_examinee_relationship(examinee, 'DistrictID', hierarchy.district.guid, contextDateStr)
+        self.add_examinee_relationship(examinee, 'DistrictId', hierarchy.district.guid, contextDateStr)
         self.add_examinee_relationship(examinee, 'DistrictName', hierarchy.district.name, contextDateStr)
-        self.add_examinee_relationship(examinee, 'SchoolID', hierarchy.school.guid, contextDateStr)
+        self.add_examinee_relationship(examinee, 'SchoolId', hierarchy.school.guid, contextDateStr)
         self.add_examinee_relationship(examinee, 'SchoolName', hierarchy.school.name, contextDateStr)
 
         # write Opportunity

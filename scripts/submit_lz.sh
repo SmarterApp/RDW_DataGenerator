@@ -31,7 +31,7 @@ for csv in ASMT*.csv; do
         fi
     fi
     echo "submitting $gpgfile"
-    "$SCRIPT_DIR/submit.exp" "$gpgfile"
+    "$SCRIPT_DIR/ftp.exp" "$gpgfile"
 #    sleep 2
 done
 
