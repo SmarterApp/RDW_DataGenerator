@@ -59,6 +59,8 @@ def generate_segment_and_item_bank(gen_item, size, id_gen: IDGen):
         item.item_key = str(id_gen.get_rec_id('asmt_item_id'))
         item.type = choice(ASMT_ITEM_BANK_FORMAT)
         item.segment_id = segment.id
+        item.max_score = 1      # TODO - randomly make some >1
+        item.operational = '1'  # TODO - randomly make some field tests?
         item_bank.append(item)
     return segment, item_bank
 
@@ -89,20 +91,19 @@ def generate_item_data(items: [AssessmentItem], student_id, date_taken):
         if item.type == 'MC':
             aid.page_time = randrange(1000, 15000)
             aid.response_value = choice(['A', 'B', 'C', 'D'])
-        elif item.type == 'EQ':
-            aid.page_time = randrange(2000, 60000)
-            aid.response_value = 'EQ response'
         elif item.type == 'MS':
             aid.page_time = randrange(2000, 30000)
             aid.response_value = choice(['A', 'B', 'C', 'D'])
-        elif item.type == 'GI':
+        else:
             aid.page_time = randrange(2000, 60000)
-            aid.response_value = 'GI response'
+            aid.response_value = item.type + ' response'
 
         aid.score_status = 'SCORED'
         if random() < ITEM_ANSWER_RATE:
-            aid.score = 1 if random() < ANSWER_CORRECT_RATE else 0
+            aid.is_selected = '1'
+            aid.score = item.max_score if random() < ANSWER_CORRECT_RATE else randrange(0, item.max_score)
         else:
+            aid.is_selected = '0'
             aid.score = 0
             aid.response_value = None
 

@@ -12,8 +12,8 @@ import data_generator.generators.summative_or_ica_assessment as sbac_asmt_gen
 import data_generator.sbac_generators.hierarchy as sbac_hier_gen
 import data_generator.sbac_generators.population as sbac_pop_gen
 import data_generator.util.hiearchy as hier_util
+from data_generator.model.assessment import Assessment
 from data_generator.model.district import District
-from data_generator.model.interimassessment import InterimAssessment
 from data_generator.model.registrationsystem import RegistrationSystem
 from data_generator.model.state import State
 from data_generator.outputworkers.csv_item_level_data_worker import CSVItemLevelDataWorker
@@ -22,6 +22,7 @@ from data_generator.outputworkers.lz_worker import LzWorker
 from data_generator.outputworkers.pg_worker import PgWorker
 from data_generator.outputworkers.worker import Worker
 from data_generator.outputworkers.xml_worker import XmlWorker
+from data_generator.readers.tabulator_reader import load_assessments
 from data_generator.util.id_gen import IDGen
 
 # constants used when generating assessment packages
@@ -87,30 +88,27 @@ class WorkerManager(Worker):
         """
         Generate or load assessment packages based on settings
         
-        :return: {str: InterimAssessment}
+        :return: [Assessment]
         """
-        assessments = {}
+        assessments = []
 
-        if self.pkg_source != "generate":
-            print("loading assessment packages isn't implemented yet!")
-            exit()
-
-        # TODO - branch, either generate assessments or load assessments
-
-        assessments.update(self.__generate_iabs())
-        assessments.update(self.__generate_assessments())
+        if self.pkg_source == 'generate':
+            assessments.extend(self.__generate_iabs())
+            assessments.extend(self.__generate_assessments())
+        else:
+            assessments.extend(load_assessments(self.pkg_source, self.sum_pkg, self.ica_pkg, self.iab_pkg, self.gen_item))
 
         return assessments
 
-    def __years(self, assessments: {str: InterimAssessment}):
+    def __years(self, assessments: [Assessment]):
         """
         Return the sorted list of years represented by assessment packages.
         :param assessments: assessments 
         :return: sorted list of years, e.g. [2015, 2016, 2017]
         """
-        return sorted(set(map(lambda asmt: asmt.year, assessments.values())))
+        return sorted(set(map(lambda asmt: asmt.year, assessments)))
 
-    def __generate_state_data(self, state: State, assessments: {str: InterimAssessment}):
+    def __generate_state_data(self, state: State, assessments: [Assessment]):
         """
         Generate an entire data set for a single state.
 
@@ -145,7 +143,7 @@ class WorkerManager(Worker):
         generate iab assessment objects
         :return: generate assessments
         """
-        assessments = {}
+        assessments = []
 
         if not self.iab_pkg:
             return assessments
@@ -162,13 +160,12 @@ class WorkerManager(Worker):
                                                               sbac_in_config.IAB_NAMES[subject][grade],
                                                               sbac_in_config.IAB_EFFECTIVE_DATES, ):
                 date = datetime.date(year + offset_date.year - 2, offset_date.month, offset_date.day)
-                key = sbac_interim_asmt_gen.get_iab_key(date, grade, subject, block)
 
-                assessments[key] = sbac_interim_asmt_gen.generate_interim_assessment(date, year, subject, block, grade, self.id_gen,
-                                                                                     gen_item=self.gen_item)
+                assessments.append(sbac_interim_asmt_gen.generate_interim_assessment(date, year, subject, block, grade, self.id_gen,
+                                                                                     gen_item=self.gen_item))
                 # Output to requested mediums
                 for worker in self.workers:
-                    worker.write_iab(assessments[key])
+                    worker.write_iab(assessments[-1])
                 bar.update()
 
         return assessments
@@ -178,7 +175,7 @@ class WorkerManager(Worker):
         generate summative and ica assessment objects
         :return: generate assessments
         """
-        assessments = {}
+        assessments = []
 
         if not (self.sum_pkg or self.ica_pkg):
             return assessments
@@ -192,14 +189,12 @@ class WorkerManager(Worker):
                 for grade in GRADES_OF_CONCERN:
                     if self.sum_pkg:
                         # Create the summative assessment
-                        assessments[sbac_asmt_gen.get_sum_key(year, grade, subject)] = \
-                            self.__create_and_write_assessment('SUMMATIVE', 'Spring', year, subject, grade)
+                        assessments.append(self.__create_and_write_assessment('SUMMATIVE', 'Spring', year, subject, grade))
 
                     if self.ica_pkg:
                         # Create the interim assessments
                         for period in INTERIM_ASMT_PERIODS:
-                            assessments[sbac_asmt_gen.get_ica_key(year, period, grade, subject)] = \
-                                self.__create_and_write_assessment('INTERIM COMPREHENSIVE', period, year, subject, grade)
+                            assessments.append(self.__create_and_write_assessment('INTERIM COMPREHENSIVE', period, year, subject, grade))
 
                     bar.update()
         return assessments
@@ -282,7 +277,7 @@ class WorkerManager(Worker):
         # Some explicit garbage collection
         del hierarchies
 
-    def __generate_district_data(self, state: State, district: District, reg_sys_by_year: {str: RegistrationSystem}, assessments: {str: InterimAssessment}):
+    def __generate_district_data(self, state: State, district: District, reg_sys_by_year: {str: RegistrationSystem}, assessments: [Assessment]):
         """
         Generate an entire data set for a single district.
 
@@ -376,7 +371,7 @@ class WorkerManager(Worker):
                 sbac_pop_gen.assign_student_groups(school, grade, grade_students, pop_schools_with_groupings)
 
             # collect any assessments for this year and grade
-            asmts = list(filter(lambda asmt: asmt.year == year and asmt.grade == grade, assessments.values()))
+            asmts = list(filter(lambda asmt: asmt.year == year and asmt.grade == grade, assessments))
 
             # collect students, generating assessments as appropriate
             for student in grade_students:

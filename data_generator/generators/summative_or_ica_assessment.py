@@ -20,14 +20,6 @@ from data_generator.util.assessment_stats import random_claims
 from data_generator.util.assessment_stats import random_score_given_level
 
 
-def get_sum_key(year, grade, subject):
-    return str(year) + 'summative' + str(grade) + subject
-
-
-def get_ica_key(year, period, grade, subject):
-    return str(year) + 'interim' + period + str(grade) + subject
-
-
 def create_assessment_outcome_object(student, asmt, inst_hier, id_gen, assessment_results,
                                      skip_rate=sbac_in_config.ASMT_SKIP_RATE,
                                      retake_rate=sbac_in_config.ASMT_RETAKE_RATE,

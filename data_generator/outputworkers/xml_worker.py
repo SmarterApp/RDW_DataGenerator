@@ -17,10 +17,12 @@ class XmlWorker(Worker):
         pass
 
     def write_iab_outcome(self, results: [AssessmentOutcome], assessment_guid):
-        self.write_asmt_to_file(results[0])
+        for result in results:
+            self.write_asmt_to_file(result)
 
     def write_assessment_outcome(self, results: [AssessmentOutcome], assessment_guid, state_code, district_id):
-        self.write_asmt_to_file(results[0])
+        for result in results:
+            self.write_asmt_to_file(result)
 
     def write_asmt_to_file(self, outcome: AssessmentOutcome):
         root = Element('TDSReport')
@@ -122,7 +124,7 @@ class XmlWorker(Worker):
             item.set('segmentId', item_data.item.segment_id)
             item.set('format', item_data.item.type)
             item.set('operational', item_data.item.operational)
-            item.set('isSelected', item_data.item.is_selected)
+            item.set('isSelected', item_data.is_selected)
             item.set('adminDate', item_data.admin_date.isoformat())
             item.set('numberVisits', str(item_data.number_visits))
             item.set('pageNumber', str(item_data.page_number))
@@ -139,8 +141,24 @@ class XmlWorker(Worker):
             response.text = item_data.response_value
 
         xml = tostring(root, 'unicode')
-        with open(os.path.join(self.out_path_root, outcome.guid) + '.xml', "w") as f:
+        with open(self.file_path_for_outcome(outcome), "w") as f:
             f.write(xml)
+
+    def file_path_for_outcome(self, outcome: AssessmentOutcome):
+        """
+        Build file path for this outcome from state, district, school, and outcome guid 
+        Make sure parent folders exist.
+        
+        :param outcome: 
+        :return: 
+        """
+        path = os.path.join(self.out_path_root,
+                            outcome.inst_hierarchy.state.code,
+                            outcome.inst_hierarchy.district.guid,
+                            outcome.inst_hierarchy.school.guid)
+        os.makedirs(path, exist_ok=True)
+        return os.path.join(path, outcome.guid) + '.xml'
+
 
     def add_examinee_attribute(self, parent, name, value, contextDateStr):
         if value:
