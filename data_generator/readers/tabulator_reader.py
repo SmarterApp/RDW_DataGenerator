@@ -48,9 +48,6 @@ def load_assessments_file(file, load_sum, load_ica, load_iab, load_items):
     """
     assessments = []
 
-    # TODO - skip rows based on load_sum, load_ica, load_iab settings
-    # TODO - skip rows based on load_items setting
-
     asmt = None
     with open(file) as csvfile:
         reader = csv.DictReader(csvfile)
@@ -65,7 +62,6 @@ def load_assessments_file(file, load_sum, load_ica, load_iab, load_items):
                 type = row['AssessmentSubtype']
                 if (not load_sum and type == 'SUM') or (not load_ica and type == 'ICA') or (not load_iab and type == 'IAB'):
                     continue
-
                 asmt = Assessment()
                 assessments.append(asmt)
                 parse_asmt = True
