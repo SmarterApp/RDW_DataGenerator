@@ -123,9 +123,9 @@ Create EC2 instance using Amazon Linux or CentOS image. Then ...
 
 
 ### Outstanding open items  
-1. Model: understand the concepts of Section and Staff. Do we need it? Also I do not like how InterimAssessment re-uses Assessment.
+1. Model: understand the concepts of Section and Staff. Do we need it?
 2. Understand if/how student groups are being generated.
-3. Generators and sbac_generators: need to be combined and cleaned up, and better understood.
+3. Generators and sbac_generators: need to be combined and cleaned up.
 4. Config: most of it is self descriptive, but would be good to review and comment what each configuration means and how it is used.
 5. WorkerManager - could be improved.
 6. IDGen: need to remove the multithreading support. Also the whole concept of IDs generation could be cleaned up. 
@@ -133,3 +133,12 @@ Create EC2 instance using Amazon Linux or CentOS image. Then ...
 8. There are some places with the explicit memory clean-up calls. Not sure if there is a problem with the memory utilization.
 9. TODO in the code. 
 10. By design, District/School names are random. That means that re-running the app generates different data (while the data volume is comparable).
+11. Generate sessionId ("Typically unique to a time, location, and test administrator")
+12. Scores for item outcomes, more complex than 0/1; configure some to be unscored (-1)
+13. Scores for IAB outcomes
+
+#### Reuse IAB packages
+Currently the system generates multiple IAB packages for a single year, each with a different `period`. I think it
+makes more sense to separate the IAB packages from the date taken. So a single IAB package might be used more than
+once during the academic year. Or even a subsequent academic year. To do this, remove `period` from the package; then
+generate the date-taken and pass it in when generating outcomes.

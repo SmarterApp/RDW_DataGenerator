@@ -10,7 +10,8 @@ HOST="http://localhost:8080"
 
 pushd "$SCRIPT_DIR/../out"
 
-for xml in *.xml; do
+# files are grouped by STATE/DISTRICT/SCHOOL
+for xml in */*/*/*.xml; do
     echo "submitting $xml"
     curl -X POST ${CREDS} --header "Content-Type:application/xml" --data-binary @${xml} ${HOST}/exams/imports
 done

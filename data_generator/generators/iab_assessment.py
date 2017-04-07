@@ -42,10 +42,6 @@ def create_iab_outcome_object(student: Student,
     iab_results[iab_asmt.guid_sr].append(ao)
 
 
-def get_iab_key(date, grade, subject, block):
-    return "%i-%i-%i IAB %i %s %s" % (date.year, date.month, date.day, grade, subject, block)
-
-
 def generate_interim_assessment(date: datetime.date,
                                 asmt_year: int,
                                 subject: str,

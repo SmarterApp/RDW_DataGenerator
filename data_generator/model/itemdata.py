@@ -22,6 +22,7 @@ class AssessmentOutcomeItemData:
         self.dropped = None
         self.response_date = None
         self.response_value = None
+        self.is_selected = '1'      # did student attempt an answer
         self.score = None
         self.score_status = None
 
