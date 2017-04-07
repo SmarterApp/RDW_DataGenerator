@@ -136,7 +136,6 @@ Create EC2 instance using Amazon Linux or CentOS image. Then ...
 11. Generate sessionId ("Typically unique to a time, location, and test administrator")
 12. Scores for item outcomes, more complex than 0/1; configure some to be unscored (-1)
 13. Scores for IAB outcomes
-14. Test slack integration.
 
 #### Reuse IAB packages
 Currently the system generates multiple IAB packages for a single year, each with a different `period`. I think it
