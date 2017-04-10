@@ -54,12 +54,13 @@ def generate_segment_and_item_bank(gen_item, size, id_gen: IDGen):
     item_bank = []
     for i in range(size):
         item = AssessmentItem()
-        item.position = i+1
+        item.position = i + 1
         item.bank_key = '200'   # TODO - handle properly
         item.item_key = str(id_gen.get_rec_id('asmt_item_id'))
         item.type = choice(ASMT_ITEM_BANK_FORMAT)
         item.segment_id = segment.id
         item.max_score = 1      # TODO - randomly make some >1
+        item.dok = choice([1, 1, 1, 2, 2, 2, 3, 3, 4])
         item.operational = '1'  # TODO - randomly make some field tests?
         item_bank.append(item)
     return segment, item_bank
