@@ -48,6 +48,9 @@ def load_assessments_file(file, load_sum, load_ica, load_iab, load_items):
     """
     assessments = []
 
+    def should_process(subtype):
+        return (subtype == 'SUM' and load_sum) or (subtype == 'ICA' and load_ica) or (subtype == 'IAB' and load_iab)
+
     asmt = None
     with open(file) as csvfile:
         reader = csv.DictReader(csvfile)
@@ -59,8 +62,7 @@ def load_assessments_file(file, load_sum, load_ica, load_iab, load_items):
                     continue
                 # else fall thru and load row's item into current assessment
             else:
-                type = row['AssessmentSubtype']
-                if (not load_sum and type == 'SUM') or (not load_ica and type == 'ICA') or (not load_iab and type == 'IAB'):
+                if not should_process(row['AssessmentSubtype']):
                     continue
                 asmt = Assessment()
                 assessments.append(asmt)
@@ -88,7 +90,8 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
         asmt.overall_score_max = int(float(row['ScaledHigh4']))
         # TODO - standard? what's in there?
         # TODO - claim/target? they'll need to be trimmed (trailing tab)
-        # TODO - derive accommodations from 'ASL', 'Braille', 'AllowCalculator', etc.
+        # TODO - derive accommodations from 'ASL', 'Braille', 'AllowCalculator'?
+        # TODO   currently the model doesn't have any accommodation info in Assessment
 
         # this is silly but adheres to the way the generation framework currently works:
         # the assessment package has a period and that is used as the date taken; so we'll
@@ -130,6 +133,7 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
         item.position = int(row['FormPosition'])
         item.segment_id = asmt.segment.id
         item.max_score = int(row['MaxPoints'])
+        item.dok = int(row['DOK'])
         item.operational = '0' if row['IsFieldTest'] == 'true' else '1'
         asmt.item_bank.append(item)
 
@@ -140,8 +144,8 @@ def __mapAssessmentType(type, subtype):
     if subtype == 'SUM': return 'SUMMATIVE'
     raise Exception('Unexpected assessment type {}-{}'.format(type, subtype))
 
+
 def __mapSubject(subject):
     if subject.lower() == 'math': return 'Math'
     if subject.lower() == 'ela': return 'ELA'
     raise Exception('Unexpected assessment subject {}'.format(subject))
-
