@@ -112,9 +112,8 @@ class XmlWorker(Worker):
             segment.set('algorithm', outcome.assessment.segment.algorithm)
             segment.set('algorithmVersion', outcome.assessment.segment.algorithm_version)
 
-        # TODO - Accommodations
-
-        # TODO - Score
+        self.add_overall_score(opportunity, 'ScaleScore', outcome.overall_score, (outcome.overall_score - outcome.overall_score_range_min))
+        self.add_overall_score(opportunity, 'PerformanceLevel', outcome.overall_perf_lvl)
 
         for item_data in outcome.item_data:
             item = SubElement(opportunity, 'Item')
@@ -175,6 +174,13 @@ class XmlWorker(Worker):
             attr.set('name', name)
             attr.set('value', str(value))
             attr.set('contextDate', contextDateStr)
+
+    def add_overall_score(self, parent, label, value, standard_error=''):
+        score = SubElement(parent, 'Score')
+        score.set('measureOf', 'Overall')
+        score.set('measureLabel', label)
+        score.set('value', str(value))
+        score.set('standardError', str(standard_error))
 
     def map_asmt_type(self, value):
         if 'summative' in value.lower(): return 'SUM'

@@ -88,13 +88,13 @@ def generate_interim_assessment(date: datetime.date,
     sa.claim_2_name = "Grade %s" % grade
     sa.claim_3_name = None
     sa.claim_4_name = None
-    sa.perf_lvl_name_1 = None
-    sa.perf_lvl_name_2 = None
-    sa.perf_lvl_name_3 = None
+    sa.perf_lvl_name_1 = sbac_config.CLAIM_PERF_LEVEL_NAME_1
+    sa.perf_lvl_name_2 = sbac_config.CLAIM_PERF_LEVEL_NAME_2
+    sa.perf_lvl_name_3 = sbac_config.CLAIM_PERF_LEVEL_NAME_3
     sa.perf_lvl_name_4 = None
     sa.perf_lvl_name_5 = None
-    sa.overall_score_min = 0
-    sa.overall_score_max = 0
+    sa.overall_score_min = sbac_config.ASMT_SCORE_MIN
+    sa.overall_score_max = sbac_config.ASMT_SCORE_MAX
     sa.claim_1_score_min = sbac_config.CLAIM_SCORE_MIN
     sa.claim_1_score_max = sbac_config.CLAIM_SCORE_MAX
     sa.claim_1_score_weight = 1.0
@@ -110,16 +110,16 @@ def generate_interim_assessment(date: datetime.date,
     sa.claim_perf_lvl_name_1 = sbac_config.CLAIM_PERF_LEVEL_NAME_1
     sa.claim_perf_lvl_name_2 = sbac_config.CLAIM_PERF_LEVEL_NAME_2
     sa.claim_perf_lvl_name_3 = sbac_config.CLAIM_PERF_LEVEL_NAME_3
-    sa.overall_cut_point_1 = None
-    sa.overall_cut_point_2 = None
-    sa.overall_cut_point_3 = None
-    sa.overall_cut_point_4 = None
+    sa.overall_cut_point_1 = sbac_config.ASMT_SCORE_CUT_POINT_1
+    sa.overall_cut_point_2 = sbac_config.ASMT_SCORE_CUT_POINT_2
+    sa.overall_cut_point_3 = sbac_config.ASMT_SCORE_CUT_POINT_3
+    sa.overall_cut_point_4 = sbac_config.ASMT_SCORE_CUT_POINT_4
     sa.claim_cut_point_1 = sbac_config.CLAIM_SCORE_CUT_POINT_1
     sa.claim_cut_point_2 = sbac_config.CLAIM_SCORE_CUT_POINT_2
     sa.effective_date = date
     sa.from_date = date
     sa.to_date = date
-    sa.segment, sa.item_bank = gen_asmt_generator.generate_segment_and_item_bank(gen_item, sbac_config.IAB_ITEM_BANK_SIZE, id_gen)
+    gen_asmt_generator.generate_segment_and_item_bank(sa, gen_item, sbac_config.IAB_ITEM_BANK_SIZE, id_gen)
 
     return sa
 
@@ -139,8 +139,6 @@ def generate_interim_assessment_outcome(student: Student,
     @param gen_item: If should create item-level responses
     @returns: The assessment outcome
     """
-    # Create cut-point lists
-    claim_cut_points = [assessment.claim_cut_point_1, assessment.claim_cut_point_2]
 
     # Run the General generator
     sao = gen_asmt_generator.generate_assessment_outcome(student, assessment, AssessmentOutcome)
@@ -179,10 +177,22 @@ def generate_interim_assessment_outcome(student: Student,
                                       gender=student.gender,
                                       race=student_race)
 
+    # The legacy output expects there to be a claim_1_score. But that is not correct for IABs, there should be just
+    # an overall score. So we'll fill out both for now ...
+    if gen_item:
+        percent_points = sum(map(lambda aid: aid.score, sao.item_data)) / assessment.item_total_score
+        sao.overall_score = (assessment.overall_score_max - assessment.overall_score_min) * percent_points + assessment.overall_score_min
+    else:
+        sao.overall_score = random.randint(assessment.overall_score_min, assessment.overall_score_max)
+    sao.overall_score_range_min = max(assessment.overall_score_min, sao.overall_score - 20)
+    sao.overall_score_range_max = min(assessment.overall_score_max, sao.overall_score + 20)
+    sao.overall_perf_lvl = _pick_performance_level(sao.overall_score,
+        (assessment.overall_cut_point_1, assessment.overall_cut_point_2, assessment.overall_cut_point_3))
+
     sao.claim_1_score = random.randint(assessment.claim_1_score_min, assessment.claim_1_score_max)
     sao.claim_1_score_range_min = max(sbac_config.CLAIM_SCORE_MIN, sao.claim_1_score - 20)
     sao.claim_1_score_range_max = min(sbac_config.CLAIM_SCORE_MAX, sao.claim_1_score + 20)
-    sao.claim_1_perf_lvl = _pick_performance_level(sao.claim_1_score, claim_cut_points)
+    sao.claim_1_perf_lvl = _pick_performance_level(sao.claim_1_score, (assessment.claim_cut_point_1, assessment.claim_cut_point_2))
 
     # Create accommodations details
     sao.acc_asl_video_embed = _pick_default_accommodation_code(

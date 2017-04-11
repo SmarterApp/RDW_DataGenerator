@@ -168,7 +168,7 @@ def generate_assessment(type, period, asmt_year, subject, grade, id_gen, from_da
     sa.effective_date = datetime.date(asmt_year - year_adj, period_month, 15)
     sa.from_date = from_date if from_date is not None else sa.effective_date
     sa.to_date = to_date if to_date is not None else sbac_config.ASMT_TO_DATE
-    sa.segment, sa.item_bank = gen_asmt_generator.generate_segment_and_item_bank(gen_item, sbac_config.ASMT_ITEM_BANK_SIZE, id_gen)
+    gen_asmt_generator.generate_segment_and_item_bank(sa, gen_item, sbac_config.ASMT_ITEM_BANK_SIZE, id_gen)
 
     return sa
 

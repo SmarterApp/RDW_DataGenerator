@@ -5,49 +5,10 @@ formats to work without some testing. Yeah, sorry about that but legacy output w
 
 This project generates sample data to be used in SBAC RDW project for functional testing.
 
-### How do I get set up?
-
-This is a Python 3 project and as such you will need Python 3 installed to use and/or develop the project.
-
-To set up a virtual environment, execute the following command:
-
-    virtualenv data-gen-env
-
-> Where `data-gen-env` is the name of the directory where you want your environment files placed. 
-
-You can activate the virtual environment with this command (_note that `data-gen-env` is the same name that was used 
-with the creation of the environment. If you change the name of the environment in the first command, change it in 
-this command too_):
-
-    source data-gen-env/bin/activate
-
-Once you have your environment activated (or you've decided not to use an environment), go into your repository and run
-this command to finish setup:
-
-    python setup.py develop
-
-Note the use of `develop` in the call to `setup.py`. This will create a sym-link from the site-packages directory to the
-working directory of your code. If instead you use `install`, it will copy the code and changes you make to the code
-will probably not be picked up.
-
-You will need `nose` to run the test suites. Along with those, we are using
-[`coverage`](http://nedbatchelder.com/code/coverage/) for a unit testing code coverage report and
-[`pep8`](http://pep8.readthedocs.org/en/latest/) as a style checker. If you have a virtual environment, run this within
-it:
-
-    pip install nose coverage pep8
-
-Within the project is a suite of unit tests that cover a large percentage of the codebase. We are using `nose` for the
-unit tests. To run the unit tests, start from the root of the project and call:
-
-    nosetests test/*
-
-As you develop new functionality, make sure to write accompanying unit tests so as maintain good code coverage and the
-confidence that comes with it.
-
 ### How do I run it?
 
-There are two scripts you can choose to run.
+There are two scripts you can choose to run. See CONTRIBUTING.md for instructions for running them directly. 
+Otherwise use the docker image to run the generate script.
 
 First script is `generate_data.py`. This generates the data in the requested output formats (can generate multiple formats at once).
 
@@ -78,18 +39,37 @@ This has to match configuration in in data_generator/config/state_type.py. Examp
 > * `--host`: Host for PostgreSQL server
 > * `--schema`: Schema for PostgreSQL database
 
-To run from IntelliJ, from the generate_data.py tab, select `Create 'generate_data'`, 
-set the Script Parameters to, for example, `--state_type devel --gen_sum --xml_out`, verify the other settings and run.
-
 The second script is `calculate_state_size.py`.
 This will print out all the configured 'state_type's (from data_generator/state_type.py) and the stats for them.
+Current output looks like:
+```text
+Calculating for type: devel
+    Districts: 4
+    Schools  : 24
+    Students : 8600
+Calculating for type: udl_test
+    Districts: 1
+    Schools  : 200
+    Students : 200000
+Calculating for type: pa
+    Districts: 102
+    Schools  : 5184
+    Students : 2017200
+Calculating for type: tiny
+    Districts: 2
+    Schools  : 12
+    Students : 182
+Calculating for type: example
+    Districts: 13
+    Schools  : 264
+    Students : 109475
+Calculating for type: california
+    Districts: 1011
+    Schools  : 16150
+    Students : 7033000
+```
 
-### How do i build and run the docker image?
-Building the docker image is not automated so you must do it manually. Assuming you have Docker installed then, 
-from the root folder of the project:
-
-    docker build -t fwsbac/rdw-datagen:latest .
-
+### How do i run the docker image?
 When running the image, pass the data generation parameters:
 
     docker run fwsbac/rdw-datagen --state_type tiny --gen_iab --gen_item --xml_out
@@ -105,10 +85,6 @@ have to dig even deeper to find the actual data bits):
     docker ps -a
     docker inspect --format '{{.Mounts}}' <CONTAINER ID>
 
-Obviously, pushing the image to docker hub is also not automated so you must do it manually:
-
-    docker push fwsbac/rdw-datagen
-
 #### Setting up an EC2 instance with docker
 Followed the directions from: http://docs.aws.amazon.com/AmazonECS/latest/developerguide/docker-basics.html.
 Create EC2 instance using Amazon Linux or CentOS image. Then ...
@@ -120,25 +96,3 @@ Create EC2 instance using Amazon Linux or CentOS image. Then ...
     docker info
     mkdir out
     docker run -v ~/out:/src/data_generator/out fwsbac/rdw-datagen --state_type tiny --gen_iab --gen_item --xml_out
-
-
-### Outstanding open items  
-1. Model: understand the concepts of Section and Staff. Do we need it?
-2. Understand if/how student groups are being generated.
-3. Generators and sbac_generators: need to be combined and cleaned up.
-4. Config: most of it is self descriptive, but would be good to review and comment what each configuration means and how it is used.
-5. WorkerManager - could be improved.
-6. IDGen: need to remove the multithreading support. Also the whole concept of IDs generation could be cleaned up. 
-7. When pointing to DB, it fails if you re-run it (with duplicate id constraint violation).It would be nice to be able to load the data incrementally.
-8. There are some places with the explicit memory clean-up calls. Not sure if there is a problem with the memory utilization.
-9. TODO in the code. 
-10. By design, District/School names are random. That means that re-running the app generates different data (while the data volume is comparable).
-11. Generate sessionId ("Typically unique to a time, location, and test administrator")
-12. Scores for item outcomes, more complex than 0/1; configure some to be unscored (-1)
-13. Scores for IAB outcomes
-
-#### Reuse IAB packages
-Currently the system generates multiple IAB packages for a single year, each with a different `period`. I think it
-makes more sense to separate the IAB packages from the date taken. So a single IAB package might be used more than
-once during the academic year. Or even a subsequent academic year. To do this, remove `period` from the package; then
-generate the date-taken and pass it in when generating outcomes.

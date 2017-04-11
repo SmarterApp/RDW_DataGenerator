@@ -124,6 +124,7 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
             asmt.segment = AssessmentSegment()
             asmt.segment.id = IDGen.get_uuid()
             asmt.item_bank = []
+            asmt.item_total_score = 0
 
     if parse_item:
         item = AssessmentItem()
@@ -136,6 +137,7 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
         item.dok = int(row['DOK'])
         item.operational = '0' if row['IsFieldTest'] == 'true' else '1'
         asmt.item_bank.append(item)
+        asmt.item_total_score += item.max_score
 
 
 def __mapAssessmentType(type, subtype):

@@ -44,9 +44,12 @@ def generate_assessment_outcome(student: Student, assessment: Assessment, sub_cl
     return ao
 
 
-def generate_segment_and_item_bank(gen_item, size, id_gen: IDGen):
+def generate_segment_and_item_bank(asmt: Assessment, gen_item, size, id_gen: IDGen):
     if not gen_item:
-        return None, []
+        asmt.segment = None
+        asmt.item_bank = []
+        asmt.item_total_score = None
+        return
 
     segment = AssessmentSegment()
     segment.id = id_gen.get_uuid()
@@ -57,13 +60,16 @@ def generate_segment_and_item_bank(gen_item, size, id_gen: IDGen):
         item.position = i + 1
         item.bank_key = '200'   # TODO - handle properly
         item.item_key = str(id_gen.get_rec_id('asmt_item_id'))
-        item.type = choice(ASMT_ITEM_BANK_FORMAT)
         item.segment_id = segment.id
-        item.max_score = 1      # TODO - randomly make some >1
+        item.type = choice(ASMT_ITEM_BANK_FORMAT)
+        item.max_score = 1
         item.dok = choice([1, 1, 1, 2, 2, 2, 3, 3, 4])
-        item.operational = '1'  # TODO - randomly make some field tests?
+        item.operational = '1'
         item_bank.append(item)
-    return segment, item_bank
+
+    asmt.segment = segment
+    asmt.item_bank = item_bank
+    asmt.item_total_score = sum(map(lambda i: i.max_score, item_bank))
 
 
 def generate_item_data(items: [AssessmentItem], student_id, date_taken):
@@ -74,8 +80,6 @@ def generate_item_data(items: [AssessmentItem], student_id, date_taken):
     item_data = []
 
     # TODO - emit only a subset of the items in the item bank?
-
-    # TODO - score should be more complex than 1 or 0
 
     admin_date = datetime.combine(date_taken, time(hour=randrange(7, 14)))
     resp_date = admin_date
