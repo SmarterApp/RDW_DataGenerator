@@ -13,7 +13,7 @@ Otherwise use the docker image to run the generate script.
 First script is `generate_data.py`. This generates the data in the requested output formats (can generate multiple formats at once).
 
 > The following arguments apply:
-> * `--state_name STATE_NAME`: Specify the name of the state that gets generated (defaults to `California)
+> * `--state_name STATE_NAME`: Specify the name of the state that gets generated (defaults to `California`)
 > * `--state_code STATE_CODE`: Specify the code of the state that gets generated (defaults to `CA`)
 > * `--state_type STATE_TYPE`: Specify the hierarchy type for the state to generate. 
 This has to match configuration in in data_generator/config/state_type.py. Examples include `california`, `example` and `devel`. 
@@ -22,6 +22,7 @@ This has to match configuration in in data_generator/config/state_type.py. Examp
 > * `--sum_pkg`: generate/load summative assessment (SUM) packages
 > * `--ica_pkg`: generate/load interim comprehensive assessment (ICA) packages
 > * `--iab_pkg`: generate/load interim assessment block (IAB) packages
+> * `--pkg_source`: either `generate` (default) or path where tabulator CSV files are located
 > * `--gen_sum`: generate SUM outcomes
 > * `--gen_ica`: generate ICA outcomes
 > * `--gen_iab`: generate IAB outcomes
@@ -68,6 +69,17 @@ Calculating for type: california
     Schools  : 16150
     Students : 7033000
 ```
+The number of test results produced depends on the distribution of the students, which assessment types are enabled
+and which years results are generated for. Using the default 2015, 2016, 2017 you can expect per student, about:
+```text
+SUM - 6 
+ICA - 18
+IAB - 147, weighted average of ~130 for grades 3-8, ~230 for grade 11
+```
+Call it 170 per student over the three years. So, `example` produces > 18 million results; `california` > 1.2 billion! 
+
+Obviously, the size of the output depends on the format:
+* XML with item data ~ 18k per file
 
 ### How do i run the docker image?
 When running the image, pass the data generation parameters:
