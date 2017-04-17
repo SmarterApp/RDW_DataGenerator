@@ -85,6 +85,7 @@ class XmlWorker(Worker):
         opportunity.set('clientName', outcome.client_name)
         opportunity.set('status', outcome.status)
         opportunity.set('completeness', outcome.completeness)
+        opportunity.set('completeStatus', outcome.completeness)
         opportunity.set('key', outcome.guid)
         opportunity.set('oppId', str(outcome.rec_id))
         opportunity.set('opportunity', '5')         # TODO

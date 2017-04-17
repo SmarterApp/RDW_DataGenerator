@@ -43,7 +43,7 @@ class AssessmentOutcome:
         self.database = 'session'           # TODO - ?
         self.client_name = 'SBAC'
         self.status = 'scored'              # TODO - should we randomly not score a teeny fraction of them?
-        self.completeness = 'complete'      # TODO - should we have forceComplete, invalid, etc.?
+        self.completeness = 'Complete'      # TODO - should we have forceComplete, invalid, etc.?
         self.admin_condition = None
         self.overall_score = None
         self.overall_score_range_min = None
