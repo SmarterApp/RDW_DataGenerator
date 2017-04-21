@@ -85,6 +85,7 @@ number of things that may need cleaning up. And there are some enhancements/impr
  - [x] Scores for IAB outcomes
  - [ ] Use only a subset of items from item bank in a particular session outcome (?)
  - [ ] Session-based generation. Assign sessionId, test adminstrator, etc.
+ - [ ] Valid categories for IAB are 1 -3, it returns 2-4
  - [ ] date-taken should be passed into outcome generation, not pulled from assessment.
  - [ ] min/max scores are silly (1200/2400, grade independent); should use LOSS/HOSS tables from SB docs. 
  - [ ] How are Section/Staff used? Can they be removed? Consider the session-based generation task.
