@@ -17,7 +17,8 @@ from data_generator.util.assessment_stats import Properties, RandomLevelByDemogr
 from data_generator.util.id_gen import IDGen
 
 
-def create_iab_outcome_object(student: Student,
+def create_iab_outcome_object(date_taken: datetime.date,
+                              student: Student,
                               iab_asmt: InterimAssessment,
                               inst_hier: InstitutionHierarchy,
                               id_gen: IDGen,
@@ -38,12 +39,11 @@ def create_iab_outcome_object(student: Student,
         iab_results[iab_asmt.guid_sr] = []
 
     # Create the original outcome object
-    ao = generate_interim_assessment_outcome(student, iab_asmt, inst_hier, id_gen, gen_item=gen_item)
+    ao = generate_interim_assessment_outcome(date_taken, student, iab_asmt, inst_hier, id_gen, gen_item=gen_item)
     iab_results[iab_asmt.guid_sr].append(ao)
 
 
-def generate_interim_assessment(date: datetime.date,
-                                asmt_year: int,
+def generate_interim_assessment(asmt_year: int,
                                 subject: str,
                                 block: str,
                                 grade: int,
@@ -53,7 +53,6 @@ def generate_interim_assessment(date: datetime.date,
     """
     Generate an assessment object.
 
-    @param date: Assessment to date
     @param asmt_year: Assessment year
     @param subject: Assessment subject
     @param block: block
@@ -76,7 +75,7 @@ def generate_interim_assessment(date: datetime.date,
     sa.rec_id = id_gen.get_rec_id('assessment')
     sa.guid_sr = id_gen.get_sr_uuid()
     sa.type = 'INTERIM ASSESSMENT BLOCK'
-    sa.period = date
+    sa.period = str(asmt_year-1)
     sa.year = asmt_year
     sa.version = sbac_config.ASMT_VERSION
     sa.name = 'SBAC-IAB-FIXED-G{}{}-{}-{}-{}'.format(grade, subject[0], ''.join(c for c in block if c.isupper()), subject, grade)
@@ -116,15 +115,16 @@ def generate_interim_assessment(date: datetime.date,
     sa.overall_cut_point_4 = sbac_config.ASMT_SCORE_CUT_POINT_4
     sa.claim_cut_point_1 = sbac_config.CLAIM_SCORE_CUT_POINT_1
     sa.claim_cut_point_2 = sbac_config.CLAIM_SCORE_CUT_POINT_2
-    sa.effective_date = date
-    sa.from_date = date
-    sa.to_date = date
+    sa.effective_date = datetime.date(asmt_year-1, 8, 15)
+    sa.from_date = sa.effective_date
+    sa.to_date = sbac_config.ASMT_TO_DATE
     gen_asmt_generator.generate_segment_and_item_bank(sa, gen_item, sbac_config.IAB_ITEM_BANK_SIZE, id_gen)
 
     return sa
 
 
-def generate_interim_assessment_outcome(student: Student,
+def generate_interim_assessment_outcome(date_taken: datetime.date,
+                                        student: Student,
                                         assessment: Assessment,
                                         inst_hier: InstitutionHierarchy,
                                         id_gen: IDGen,
@@ -146,9 +146,7 @@ def generate_interim_assessment_outcome(student: Student,
     # Set other specifics
     sao.rec_id = id_gen.get_rec_id('assessment_outcome')
     sao.inst_hierarchy = inst_hier
-
-    # Create the date taken
-    sao.date_taken = assessment.period
+    sao.date_taken = date_taken
 
     # Generate assessment outcome Item-level data
     sao.item_data = [] if not gen_item else \

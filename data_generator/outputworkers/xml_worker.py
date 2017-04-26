@@ -30,8 +30,9 @@ class XmlWorker(Worker):
         # write Test
         asmt = outcome.assessment
         test = SubElement(root, 'Test')
-        test.set('testId', asmt.id)
-        test.set('name', asmt.name)
+        # in TRT, the testId is the name and the name is the id
+        test.set('testId', asmt.name)
+        test.set('name', asmt.id)
         test.set('bankKey', asmt.bank_key)
         test.set('subject', asmt.subject)
         test.set('grade', '{:02}'.format(asmt.grade))

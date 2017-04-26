@@ -156,12 +156,9 @@ class WorkerManager(Worker):
 
         # generate iabs
         for subject, grade in itertools.product(sbac_in_config.SUBJECTS, GRADES_OF_CONCERN):
-            for year, block, offset_date in itertools.product(ASMT_YEARS,
-                                                              sbac_in_config.IAB_NAMES[subject][grade],
-                                                              sbac_in_config.IAB_EFFECTIVE_DATES, ):
-                date = datetime.date(year + offset_date.year - 2, offset_date.month, offset_date.day)
+            for year, block in itertools.product(ASMT_YEARS, sbac_in_config.IAB_NAMES[subject][grade]):
 
-                assessments.append(sbac_interim_asmt_gen.generate_interim_assessment(date, year, subject, block, grade, self.id_gen,
+                assessments.append(sbac_interim_asmt_gen.generate_interim_assessment(year, subject, block, grade, self.id_gen,
                                                                                      gen_item=self.gen_item))
                 # Output to requested mediums
                 for worker in self.workers:
@@ -377,8 +374,10 @@ class WorkerManager(Worker):
             for student in grade_students:
                 for asmt in asmts:
                     if 'block' in asmt.type.lower():
-                        sbac_interim_asmt_gen.create_iab_outcome_object(student, asmt, inst_hier, self.id_gen,
-                            iab_results, gen_item=self.gen_item)
+                        for offset_date in sbac_in_config.IAB_EFFECTIVE_DATES:
+                            date_taken = datetime.date(year + offset_date.year - 2, offset_date.month, offset_date.day)
+                            sbac_interim_asmt_gen.create_iab_outcome_object(date_taken, student, asmt, inst_hier,
+                                self.id_gen, iab_results, gen_item=self.gen_item)
                     else:
                         sbac_asmt_gen.create_assessment_outcome_object(student, asmt, inst_hier, self.id_gen,
                            assessment_results, asmt_skip_rates_by_subject[asmt.subject], gen_item=self.gen_item)
