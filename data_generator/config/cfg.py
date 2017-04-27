@@ -23,10 +23,8 @@ PRG_DISABILITY_TYPES = [None, None,  # Allow blanks and give them higher weight
 
 HAS_ASMT_RESULT_IN_SR_FILE_RATE = .985  # The rate at which students with assessment results are in the SR CSV file
 
-STUDENT_GROUPING_RATE = .7
+STAFF_GROUP_RATE = .2
 ALL_GROUP_RATE = .9
-ONE_GROUP_RATE = .5
-STUDENTS_PER_GROUP = 50
 GROUP_TYPE = ['section_based', 'staff_based']
 
 HOLD_BACK_RATE = .01

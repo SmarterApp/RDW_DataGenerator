@@ -1,6 +1,7 @@
 """
 A school.
 """
+from math import ceil
 
 
 class School:
@@ -43,3 +44,15 @@ class School:
             smin, smax = self.config['students']['min'], self.config['students']['max']
             self.config['students']['avg'] = ((smax - smin) // 2) + smin
         return self.config['students']['avg']
+
+    @property
+    def group_size(self):
+        """The average group size
+        """
+        return self.config['group_size']
+
+    @property
+    def num_groups(self):
+        """The number of groups in a school (~ student count / group size)
+        """
+        return ceil(self.student_count_avg / self.group_size)

@@ -69,7 +69,16 @@ class XmlWorker(Worker):
         self.add_examinee_attribute(examinee, 'EconomicDisadvantageStatus', self.map_yes_no(student.prg_econ_disad), contextDateStr)
         self.add_examinee_attribute(examinee, 'LanguageCode', student.lang_code, contextDateStr)
         self.add_examinee_attribute(examinee, 'EnglishLanguageProficiencyLevel', student.lang_prof_level, contextDateStr)
-        # TODO - there are a few more of these
+        self.add_examinee_attribute(examinee, 'StudentGroupName', student.group_1_text, contextDateStr)
+        self.add_examinee_attribute(examinee, 'StudentGroupName', student.group_2_text, contextDateStr)
+        self.add_examinee_attribute(examinee, 'StudentGroupName', student.group_3_text, contextDateStr)
+        self.add_examinee_attribute(examinee, 'StudentGroupName', student.group_4_text, contextDateStr)
+        self.add_examinee_attribute(examinee, 'StudentGroupName', student.group_5_text, contextDateStr)
+        self.add_examinee_attribute(examinee, 'StudentGroupName', student.group_6_text, contextDateStr)
+        self.add_examinee_attribute(examinee, 'StudentGroupName', student.group_7_text, contextDateStr)
+        self.add_examinee_attribute(examinee, 'StudentGroupName', student.group_8_text, contextDateStr)
+        self.add_examinee_attribute(examinee, 'StudentGroupName', student.group_9_text, contextDateStr)
+        self.add_examinee_attribute(examinee, 'StudentGroupName', student.group_10_text, contextDateStr)
 
         hierarchy = outcome.inst_hierarchy
         self.add_examinee_relationship(examinee, 'StateAbbreviation', hierarchy.state.code, contextDateStr)

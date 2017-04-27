@@ -5,6 +5,8 @@ Generate SBAC-specific hierarchy components.
 
 import random
 
+from math import ceil
+
 import data_generator.config.cfg as sbac_config
 import data_generator.generators.hierarchy as general_hier_gen
 import data_generator.sbac_generators.population as sbac_pop_gen
@@ -47,8 +49,8 @@ def generate_district(district_type, state: State, id_gen):
     # Run the general generator
     d = general_hier_gen.generate_district(district_type, state)
 
-    if random.random() < sbac_config.STUDENT_GROUPING_RATE:
-        d.student_grouping = True
+    # grouping is integral now so always generate them
+    d.student_grouping = True
     # Set the SR guid
     d.guid_sr = id_gen.get_sr_uuid()
 
@@ -122,7 +124,7 @@ def generate_institution_hierarchy(state: State, district: District, school: Sch
     return ih
 
 
-def generate_group(group_type, school: School, id_gen):
+def generate_group(group_type, subject, school: School, id_gen):
     """
     Generate a group of given group_type and school
     @param group_type: Type of group
@@ -139,7 +141,7 @@ def generate_group(group_type, school: School, id_gen):
     g.id = id_gen.get_group_id('group')
 
     if group_type == 'section_based':
-        g.name = "Homeroom " + str(g.id)
+        g.name = subject + " " + str(g.id)
     elif group_type == 'staff_based':
         # Create a teacher object
         staff = sbac_pop_gen.generate_teaching_staff_member(school, id_gen)
@@ -189,12 +191,11 @@ def populate_schools_with_groupings(schools_with_groupings, id_gen):
     """
 
     for school, grades in schools_with_groupings.items():
-        num_groups = school.student_count_avg / sbac_config.STUDENTS_PER_GROUP
         for grade, subjects in grades.items():
             for subject, groups in subjects.items():
                 for group_type, group_list in groups.items():
-                    for i in range(int(num_groups)):
-                        g = generate_group(group_type, school, id_gen)
+                    for i in range(school.num_groups):
+                        g = generate_group(group_type, subject, school, id_gen)
                         group_list.append(g)
     return schools_with_groupings
 
@@ -213,12 +214,13 @@ def set_up_schools_with_groupings(schools, grades_of_concern):
         grade_sub_groups = {}
         grades_for_school = grades_of_concern.intersection(school.config['grades'])
 
+        group_types = list(sbac_config.GROUP_TYPE)
+        if random.random() >= sbac_config.STAFF_GROUP_RATE: group_types.remove('staff_based')
+
         for grade in grades_for_school:
-            group_types = dict(zip(sbac_config.GROUP_TYPE,
-                                   [[] for _ in range(len(sbac_config.GROUP_TYPE))]))
             grade_sub_groups[grade] = dict(zip(sbac_config.SUBJECTS,
-                                               [dict(zip(sbac_config.GROUP_TYPE,
-                                                         [[] for _ in range(len(sbac_config.GROUP_TYPE))]))
+                                               [dict(zip(group_types,
+                                                         [[] for _ in range(len(group_types))]))
                                                 for _ in range(len(sbac_config.SUBJECTS))]))
         schools_with_groupings[school] = grade_sub_groups
 

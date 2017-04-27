@@ -45,88 +45,104 @@ SCHOOL_TYPES = {
     'High School':
         {'type': 'High School',
          'grades': [11],
-         'students': {'min': 300, 'max': 400, 'avg': 350}
+         'students': {'min': 300, 'max': 400, 'avg': 350},
+         'group_size': 40
          },
     'Middle School':
         {'type': 'Middle School',
          'grades': [6, 7, 8],
-         'students': {'min': 175, 'max': 250, 'avg': 225}
+         'students': {'min': 175, 'max': 250, 'avg': 225},
+         'group_size': 30
          },
     'Elementary School':
         {'type': 'Elementary School',
          'grades': [3, 4, 5],
-         'students': {'min': 75, 'max': 125, 'avg': 100}
+         'students': {'min': 75, 'max': 125, 'avg': 100},
+         'group_size': 20
          },
     'Poor High School':
         {'type': 'High School',
          'grades': [11],
          'students': {'min': 300, 'max': 400, 'avg': 350},
+         'group_size': 50,
          'adjust_pld': -0.45
          },
     'Poor Middle School':
         {'type': 'Middle School',
          'grades': [6, 7, 8],
          'students': {'min': 175, 'max': 250, 'avg': 225},
+         'group_size': 40,
          'adjust_pld': -0.5
          },
     'Poor Elementary School':
         {'type': 'Elementary School',
          'grades': [3, 4, 5],
          'students': {'min': 75, 'max': 125, 'avg': 100},
+         'group_size': 30,
          'adjust_pld': -0.6
          },
     'Good High School':
         {'type': 'High School',
          'grades': [11],
          'students': {'min': 300, 'max': 400, 'avg': 350},
+         'group_size': 30,
          'adjust_pld': 0.35
          },
     'Good Middle School':
         {'type': 'Middle School',
          'grades': [6, 7, 8],
          'students': {'min': 175, 'max': 250, 'avg': 225},
+         'group_size': 25,
          'adjust_pld': 0.4
          },
     'Good Elementary School':
         {'type': 'Elementary School',
          'grades': [3, 4, 5],
          'students': {'min': 75, 'max': 125, 'avg': 100},
+         'group_size': 15,
          'adjust_pld': 0.5
          },
     'Big High School':
         {'type': 'High School',
          'grades': [11],
-         'students': {'min': 600, 'max': 800, 'avg': 700}
+         'students': {'min': 600, 'max': 800, 'avg': 700},
+         'group_size': 40
          },
     'Big Middle School':
         {'type': 'Middle School',
          'grades': [6, 7, 8],
-         'students': {'min': 200, 'max': 400, 'avg': 300}
+         'students': {'min': 200, 'max': 400, 'avg': 300},
+         'group_size': 30
          },
     'Big Elementary School':
         {'type': 'Elementary School',
          'grades': [3, 4, 5],
-         'students': {'min': 100, 'max': 200, 'avg': 150}
+         'students': {'min': 100, 'max': 200, 'avg': 150},
+         'group_size': 20
          },
     'UDL High School':
         {'type': 'High School',
          'grades': [11],
-         'students': {'min': 999, 'max': 1001, 'avg': 1000}
+         'students': {'min': 999, 'max': 1001, 'avg': 1000},
+         'group_size': 40
          },
     'Tiny High School':
         {'type': 'High School',
          'grades': [11],
-         'students': {'min': 5, 'max': 10, 'avg': 7}
+         'students': {'min': 5, 'max': 10, 'avg': 7},
+         'group_size': 10
          },
     'Tiny Middle School':
         {'type': 'Middle School',
          'grades': [6, 7, 8],
-         'students': {'min': 5, 'max': 10, 'avg': 7}
+         'students': {'min': 5, 'max': 10, 'avg': 7},
+         'group_size': 10
          },
     'Tiny Elementary School':
         {'type': 'Elementary School',
          'grades': [3, 4, 5],
-         'students': {'min': 5, 'max': 10, 'avg': 7}
+         'students': {'min': 5, 'max': 10, 'avg': 7},
+         'group_size': 10
          },
 }
 

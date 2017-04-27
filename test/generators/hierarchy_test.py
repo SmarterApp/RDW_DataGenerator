@@ -73,7 +73,7 @@ def test_generate_group():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Big Average', state, ID_GEN)
     school = hier_gen.generate_school('High School', district, ID_GEN)
-    group = hier_gen.generate_group('section_based', school, ID_GEN)
+    group = hier_gen.generate_group('section_based', "ELA", school, ID_GEN)
 
     # Tests
     assert_is_instance(group, Group)
@@ -86,7 +86,7 @@ def test_generate_group_invalid_type():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Big Average', state, ID_GEN)
     school = hier_gen.generate_school('High School', district, ID_GEN)
-    assert_raises(LookupError, hier_gen.generate_group, 'unknown', school, ID_GEN)
+    assert_raises(LookupError, hier_gen.generate_group, 'unknown', "ELA", school, ID_GEN)
 
 
 def test_generate_school_no_interims():
