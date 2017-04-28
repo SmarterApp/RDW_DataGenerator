@@ -5,17 +5,15 @@ Generate SBAC-specific hierarchy components.
 
 import random
 
-from math import ceil
-
 import data_generator.config.cfg as sbac_config
 import data_generator.generators.hierarchy as general_hier_gen
 import data_generator.sbac_generators.population as sbac_pop_gen
 from data_generator.model.district import District
 from data_generator.model.group import Group
 from data_generator.model.institutionhierarchy import InstitutionHierarchy
+from data_generator.model.registrationsystem import RegistrationSystem
 from data_generator.model.school import School
 from data_generator.model.state import State
-from data_generator.model.registrationsystem import RegistrationSystem
 
 
 def generate_state(state_type, name, code, id_gen):
@@ -124,10 +122,12 @@ def generate_institution_hierarchy(state: State, district: District, school: Sch
     return ih
 
 
-def generate_group(group_type, subject, school: School, id_gen):
+def generate_group(group_type, grade, subject, school: School, id_gen):
     """
     Generate a group of given group_type and school
     @param group_type: Type of group
+    @param grade: grade
+    @param subject: subject
     @param id_gen: ID generator
     @returns: A group object
     """
@@ -141,7 +141,7 @@ def generate_group(group_type, subject, school: School, id_gen):
     g.id = id_gen.get_group_id('group')
 
     if group_type == 'section_based':
-        g.name = subject + " " + str(g.id)
+        g.name = subject + " G" + str(grade) + " " + str(g.id)
     elif group_type == 'staff_based':
         # Create a teacher object
         staff = sbac_pop_gen.generate_teaching_staff_member(school, id_gen)
@@ -195,7 +195,7 @@ def populate_schools_with_groupings(schools_with_groupings, id_gen):
             for subject, groups in subjects.items():
                 for group_type, group_list in groups.items():
                     for i in range(school.num_groups):
-                        g = generate_group(group_type, subject, school, id_gen)
+                        g = generate_group(group_type, grade, subject, school, id_gen)
                         group_list.append(g)
     return schools_with_groupings
 
