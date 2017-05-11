@@ -10,6 +10,8 @@ pushd "$SCRIPT_DIR/../out"
 # fetch bearer token (need jq installed)
 HOST="http://localhost:8080"
 ACCESS_TOKEN=`curl -s -X POST --data "grant_type=password&username=dwtest@example.com&password=password&client_id=ets&client_secret=ets123" https://sso-deployment.sbtds.org:443/auth/oauth2/access_token?realm=/sbac | jq -r '.access_token'`
+# if host is using the "stub" token service, this works:
+# ACCESS_TOKEN="sbac;dwtest@example.com;|SBAC|ASMTDATALOAD|CLIENT|SBAC||||||||||||||"
 
 # files are grouped by STATE/DISTRICT/SCHOOL
 for xml in */*/*/*.xml; do
