@@ -82,12 +82,12 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
         asmt.version = row['AssessmentVersion']
         asmt.year = int(row['AcademicYear']) + 1  # TODO - remove +1 when tabulator is fixed
         asmt.bank_key = row['BankKey']
-        asmt.overall_score_min = int(float(row['ScaledLow1']))
-        asmt.overall_cut_point_1 = int(float(row['ScaledHigh1']))
-        asmt.overall_cut_point_2 = int(float(row['ScaledHigh2']))
-        asmt.overall_cut_point_3 = int(float(row['ScaledHigh3']))
+        asmt.overall_score_min = __getScore(row['ScaledLow1'])
+        asmt.overall_cut_point_1 = __getScore(row['ScaledHigh1'])
+        asmt.overall_cut_point_2 = __getScore(row['ScaledHigh2'])
+        asmt.overall_cut_point_3 = __getScore(row['ScaledHigh3'])
         asmt.overall_cut_point_4 = None
-        asmt.overall_score_max = int(float(row['ScaledHigh4']))
+        asmt.overall_score_max = __getScore(row['ScaledHigh4'])
         # TODO - standard? what's in there?
         # TODO - claim/target? they'll need to be trimmed (trailing tab)
         # TODO - derive accommodations from 'ASL', 'Braille', 'AllowCalculator'?
@@ -96,11 +96,15 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
         # this is silly but adheres to the way the generation framework currently works:
         # the assessment package has a period and that is used as the date taken; so we'll
         # follow the pattern and arbitrarily pick the first effective date for this year
-        asmt.period = datetime.date(asmt.year - 1, 10, 1)
+        effective_date = datetime.date(asmt.year - 1, 10, 1)
+        if asmt.type == 'INTERIM ASSESSMENT BLOCK':
+            asmt.period = effective_date
+        else:
+            asmt.period = 'Spring ' + str(asmt.year)
         # TODO - these dates should come from the assessment package, but not in CSV?
-        asmt.effective_date = asmt.period
-        asmt.from_date = asmt.period
-        asmt.to_date = asmt.period
+        asmt.effective_date = effective_date
+        asmt.from_date = effective_date
+        asmt.to_date = effective_date
 
         # more stuff that doesn't really make sense but the framework currently requires
         # TODO - figure out how the claim stuff will work for realsies
@@ -151,3 +155,7 @@ def __mapSubject(subject):
     if subject.lower() == 'math': return 'Math'
     if subject.lower() == 'ela': return 'ELA'
     raise Exception('Unexpected assessment subject {}'.format(subject))
+
+
+def __getScore(value):
+    return int(float(value))

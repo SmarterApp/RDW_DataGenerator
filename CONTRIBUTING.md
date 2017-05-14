@@ -86,6 +86,7 @@ number of things that may need cleaning up. And there are some enhancements/impr
  - [ ] Use only a subset of items from item bank in a particular session outcome (?)
  - [ ] Session-based generation. Assign sessionId, test adminstrator, etc.
  - [ ] Valid categories for IAB are 1 -3, it returns 2-4
+ - [ ] Errors during outcome generation for ICA's read from tabulator CSV.
  - [ ] ICA report is missing claim scores
  - [ ] Valid categories for IAB are 1 -3, it returns 2-4
  - [ ] date-taken should be passed into outcome generation, not pulled from assessment.
