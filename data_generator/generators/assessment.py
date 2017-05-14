@@ -3,6 +3,7 @@
 from datetime import timedelta, datetime, time
 from random import choice, randrange, random
 
+from data_generator.config import cfg
 from data_generator.config.cfg import ASMT_ITEM_BANK_FORMAT, ITEM_ANSWER_RATE, ANSWER_CORRECT_RATE
 from data_generator.model.assessment import Assessment
 from data_generator.model.assessmentoutcome import AssessmentOutcome
@@ -40,6 +41,9 @@ def generate_assessment_outcome(student: Student, assessment: Assessment, sub_cl
     ao.guid = IDGen.get_uuid()
     ao.student = student
     ao.assessment = assessment
+
+    # set session based on subject and student group
+    ao.session = getattr(student, "group_%i_text" % (1+cfg.SUBJECTS.index(assessment.subject),))
 
     return ao
 

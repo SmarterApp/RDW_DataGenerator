@@ -290,12 +290,6 @@ class WorkerManager(Worker):
         # Sort the schools
         schools_by_grade = sbac_hier_gen.sort_schools_by_grade(schools)
 
-        pop_schools_with_groupings = {}
-        # Student grouping is enabled for district using Student_grouping_rate
-        if district.student_grouping:
-            schools_with_groupings = sbac_hier_gen.set_up_schools_with_groupings(schools, GRADES_OF_CONCERN)
-            pop_schools_with_groupings = sbac_hier_gen.populate_schools_with_groupings(schools_with_groupings, self.id_gen)
-
         # Begin processing the years for data
         unique_students = {}
         students = {}
@@ -330,8 +324,7 @@ class WorkerManager(Worker):
             for school, grades in schools_with_grades.items():
                 # Process the whole school
                 student_count += self.__process_school(grades, school, students, unique_students, state, district,
-                                                       reg_system, year, inst_hiers[school.guid], assessments,
-                                                       pop_schools_with_groupings)
+                                                       reg_system, year, inst_hiers[school.guid], assessments)
                 bar.update()
 
         unique_student_count = len(unique_students)
@@ -347,7 +340,7 @@ class WorkerManager(Worker):
         return int(student_count // len(years)), unique_student_count
 
     def __process_school(self, grades, school, students, unique_students, state, district, reg_system: RegistrationSystem,
-                         year, inst_hier, assessments, pop_schools_with_groupings):
+                         year, inst_hier, assessments):
 
         # Grab the assessment rates by subjects
         asmt_skip_rates_by_subject = state.config['subject_skip_percentages']
@@ -364,8 +357,7 @@ class WorkerManager(Worker):
             sbac_pop_gen.repopulate_school_grade(school, grade, grade_students, self.id_gen, state, reg_system, year)
             student_count += len(grade_students)
 
-            if district.student_grouping:
-                sbac_pop_gen.assign_student_groups(school, grade, grade_students, pop_schools_with_groupings)
+            sbac_pop_gen.assign_student_groups(school, grade, grade_students, self.id_gen)
 
             # collect any assessments for this year and grade
             asmts = list(filter(lambda asmt: asmt.year == year and asmt.grade == grade, assessments))

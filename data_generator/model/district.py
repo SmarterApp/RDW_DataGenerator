@@ -15,5 +15,4 @@ class District:
         self.type_str = None
         self.config = None
         self.demo_config = None
-        self.student_grouping = False
         self.guid_sr = None

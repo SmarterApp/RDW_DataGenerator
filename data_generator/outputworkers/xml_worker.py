@@ -109,7 +109,7 @@ class XmlWorker(Worker):
         opportunity.set('gracePeriodRestarts', '0')
         # opportunity.set('taId', None)
         # opportunity.set('taName', None)
-        # opportunity.set('sessionId', None)
+        opportunity.set('sessionId', outcome.session)
         opportunity.set('windowId', 'WINDOW_ID')    # TODO
         # opportunity.set('windowOpportunity', None)
         opportunity.set('administrationCondition', 'Valid')

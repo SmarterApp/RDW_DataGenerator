@@ -50,9 +50,3 @@ class School:
         """The average group size
         """
         return self.config['group_size']
-
-    @property
-    def num_groups(self):
-        """The number of groups in a school (~ student count / group size)
-        """
-        return ceil(self.student_count_avg / self.group_size)

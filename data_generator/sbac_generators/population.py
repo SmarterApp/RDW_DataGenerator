@@ -6,11 +6,15 @@ Augment the generation of population elements with SBAC-specific items.
 import datetime
 import random
 
+from math import ceil
+
 import data_generator.config.cfg as sbac_in_config
 import data_generator.generators.population as general_pop_gen
+from data_generator.config import cfg
 from data_generator.model.school import School
-from data_generator.model.student import Student
 from data_generator.model.staff import TeachingStaff
+from data_generator.model.student import Student
+from data_generator.util.id_gen import IDGen
 
 
 def generate_student(school: School, grade, id_gen, state, acad_year=datetime.datetime.now().year):
@@ -114,34 +118,36 @@ def repopulate_school_grade(school: School, grade, grade_students, id_gen, state
         grade_students.append(s)
 
 
-def assign_student_groups(school, grade, grade_students, schools_with_groupings):
+def assign_student_groups(school, grade, grade_students, id_gen=IDGen(), subjects=cfg.SUBJECTS):
     """
     Assign students to groups.
-
-    @param school: The school to assign groupings to.
+    Each student is assigned to one group per subject. The groups assigned correspond
+    to the subjects, so group_1 -> subjects[0], group_2 -> subjects[1], etc. The student
+    group is overwritten if there is already one set.
+    Currently, there are no "staff_based" groups assigned.
+    
+    @param school: The school
     @param grade: The grade in the school to assign groupings to.
     @param grade_students: The students currently in the grade for this school
-    @param schools_with_groupings: The dict of groups in school by grade, subject and group_type
+    @param id_gen: The IDGen instance, used to make groups unique across multiple schools
+    @param subjects: The list of subjects
     """
-    ela_groups = schools_with_groupings[school][grade]['ELA']
-    math_groups = schools_with_groupings[school][grade]['Math']
+    # generate lists of subgroups for each subject corresponding to school's group size
+    num_groups = int(ceil(len(grade_students) / school.group_size))
+    groups = []
+    for subject in subjects:
+        subgroups = []
+        for _ in range(num_groups):
+            group_id = id_gen.get_group_id('group')
+            group_name = subject + '-G' + str(grade) + '-' + str(group_id)
+            subgroups.append((group_id, group_name))
+        groups.append(subgroups)
 
-    ela_groups_staff_based = ela_groups['staff_based'] if 'staff_based' in ela_groups else []
-    ela_groups_section_based = ela_groups['section_based']
-    math_groups_staff_based = math_groups['staff_based'] if 'staff_based' in math_groups else []
-    math_groups_section_based = math_groups['section_based']
-
-    all_groups = ela_groups_staff_based + ela_groups_section_based + math_groups_staff_based + math_groups_section_based
-    for grade_student in grade_students:
-        ns_for_student = [n for n in range(1, 11) if random.random() < sbac_in_config.ALL_GROUP_RATE]
-        if len(ns_for_student) > len(all_groups):
-            ns_for_student = random.sample(ns_for_student, len(all_groups))
-
-        groups_for_student = random.sample(all_groups, len(ns_for_student))
-
-        for n, group in zip(ns_for_student, groups_for_student):
-            setattr(grade_student, "group_%i_id" % (n,), group.id)
-            setattr(grade_student, "group_%i_text" % (n,), group.name)
+    for (i, subgroups) in enumerate(groups, start=1):
+        for grade_student in grade_students:
+            (group_id, group_name) = random.choice(subgroups)
+            setattr(grade_student, "group_%i_id" % (i,), group_id)
+            setattr(grade_student, "group_%i_text" % (i,), group_name)
 
 
 def generate_teaching_staff_member(school: School, id_gen):
