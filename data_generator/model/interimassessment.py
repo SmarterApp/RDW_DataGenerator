@@ -22,7 +22,7 @@ class InterimAssessment(Assessment):
         :return:
         """
         if name in {'overall_score_min', 'overall_score_max',
-                    'overall_cut_point_1', 'overall_cut_point_2', 'overall_cut_point_3', 'overall_cut_point_4',
+                    'overall_cut_point_1', 'overall_cut_point_2', 'overall_cut_point_3',
                     'perf_lvl_name_1', 'perf_lvl_name_2', 'perf_lvl_name_3', 'perf_lvl_name_4',
                     'claim_1_score_weight',
                     'claim_2_name', 'claim_2_score_min', 'claim_2_score_max', 'claim_2_score_weight',

@@ -49,17 +49,7 @@ ASMT_STATUS_ACTIVE = 'C'
 ASMT_STATUS_INACTIVE = 'I'
 ASMT_STATUS_DELETED = 'D'
 
-ASMT_SCORE_MIN = 1200
-ASMT_SCORE_MAX = 2400
-ASMT_SCORE_AVG = (ASMT_SCORE_MIN + ASMT_SCORE_MAX) / 2
-ASMT_SCORE_STD = (ASMT_SCORE_AVG - ASMT_SCORE_MIN) / 4
-
 ASMT_VERSION = 'V1'
-
-ASMT_SCORE_CUT_POINT_1 = 1400
-ASMT_SCORE_CUT_POINT_2 = 1800
-ASMT_SCORE_CUT_POINT_3 = 2100
-ASMT_SCORE_CUT_POINT_4 = None
 
 ASMT_PERF_LEVEL_NAME_1 = 'Minimal Understanding'
 ASMT_PERF_LEVEL_NAME_2 = 'Partial Understanding'
@@ -67,15 +57,31 @@ ASMT_PERF_LEVEL_NAME_3 = 'Adequate Understanding'
 ASMT_PERF_LEVEL_NAME_4 = 'Thorough Understanding'
 ASMT_PERF_LEVEL_NAME_5 = None
 
-CLAIM_SCORE_MIN = 1200
-CLAIM_SCORE_MAX = 2400
-
-CLAIM_SCORE_CUT_POINT_1 = 1600
-CLAIM_SCORE_CUT_POINT_2 = 2000
-
 CLAIM_PERF_LEVEL_NAME_1 = 'Below Standard'
 CLAIM_PERF_LEVEL_NAME_2 = 'At/Near Standard'
 CLAIM_PERF_LEVEL_NAME_3 = 'Above Standard'
+
+# for each subject and grade, the LOSS, CP12, CP23, CP34, HOSS
+ASMT_SCALE_SCORE = {
+    'Math': {
+        3:  [2189, 2381, 2436, 2501, 2621],
+        4:  [2204, 2411, 2485, 2549, 2659],
+        5:  [2219, 2455, 2528, 2579, 2700],
+        6:  [2235, 2473, 2552, 2610, 2748],
+        7:  [2250, 2484, 2567, 2635, 2778],
+        8:  [2265, 2504, 2586, 2653, 2802],
+        11: [2280, 2543, 2628, 2718, 2862]
+    },
+    'ELA': {
+        3:  [2114, 2367, 2432, 2490, 2623],
+        4:  [2131, 2416, 2473, 2533, 2663],
+        5:  [2201, 2442, 2502, 2582, 2701],
+        6:  [2210, 2457, 2531, 2618, 2724],
+        7:  [2258, 2479, 2552, 2649, 2745],
+        8:  [2288, 2487, 2567, 2668, 2769],
+        11: [2299, 2493, 2583, 2682, 2795]
+    }
+}
 
 CLAIM_DEFINITIONS = {'Math': [{'name': 'Concepts & Procedures', 'weight': .4},
                               {'name': 'Problem Solving and Modeling & Data Analysis', 'weight': .45},

@@ -84,13 +84,12 @@ number of things that may need cleaning up. And there are some enhancements/impr
 
  - [x] Scores for IAB outcomes
  - [ ] Use only a subset of items from item bank in a particular session outcome (?)
- - [ ] Session-based generation. Assign sessionId, test adminstrator, etc.
- - [ ] Valid categories for IAB are 1 -3, it returns 2-4
+ - [x] Session-based generation. Assign sessionId, test adminstrator, etc.
+ - [x] Valid categories for IAB are 1-3, it returns 2-4
  - [ ] Errors during outcome generation for ICA's read from tabulator CSV.
- - [ ] ICA report is missing claim scores
- - [ ] Valid categories for IAB are 1 -3, it returns 2-4
+ - [x] ICA report is missing claim scores
  - [ ] date-taken should be passed into outcome generation, not pulled from assessment.
- - [ ] min/max scores are silly (1200/2400, grade independent); should use LOSS/HOSS tables from SB docs. 
+ - [x] min/max scores are silly (1200/2400, grade independent); should use LOSS/HOSS tables from SB docs. 
  - [ ] How are Section/Staff used? Can they be removed? Consider the session-based generation task.
  - [ ] Combine remaining sbac_generators into generators.
  - [ ] IDGen: remove MTS, clean up in general.
@@ -107,4 +106,7 @@ making score more complex than 0/1.
  - [ ] Clean up accommodations. These belong to the student profile combined with assessment-specific restrictions.
  - [ ] Remove deprecated output workers. Consider that pg_worker could be repurposed as a sql_worker.
  - [ ] Student.skip_iab is not being used. Should it? Some way of skipping IAB's at the student level makes sense.
+ - [x] Set admin condition of outcome based on assessment type (Summative: Valid, ICA: SD, IAB: NS)
+ - [ ] Very rarely generate admin condition IN for outcomes of summative assessments
+ - [ ] Randomly generate admin condition NS for outcomes of ICA assessments
  

@@ -5,6 +5,10 @@ import os
 from data_generator.model.assessmentoutcome import AssessmentOutcome
 from data_generator.outputworkers.worker import Worker
 
+CLAIM_MEASURES = {
+    'Math': ['1', 'SOCK_2', '3', ''],
+    'ELA': ['SOCK_R', '2-W', 'SOCK_LS', '4-CR']
+}
 
 class XmlWorker(Worker):
     def __init__(self, out_path_root):
@@ -112,7 +116,7 @@ class XmlWorker(Worker):
         opportunity.set('sessionId', outcome.session)
         opportunity.set('windowId', 'WINDOW_ID')    # TODO
         # opportunity.set('windowOpportunity', None)
-        opportunity.set('administrationCondition', 'Valid')
+        opportunity.set('administrationCondition', outcome.admin_condition)
         opportunity.set('assessmentParticipantSessionPlatformUserAgent', '')
         opportunity.set('effectiveDate', asmt.effective_date.isoformat())
 
@@ -123,8 +127,17 @@ class XmlWorker(Worker):
             segment.set('algorithm', outcome.assessment.segment.algorithm)
             segment.set('algorithmVersion', outcome.assessment.segment.algorithm_version)
 
-        self.add_overall_score(opportunity, 'ScaleScore', outcome.overall_score, (outcome.overall_score - outcome.overall_score_range_min))
-        self.add_overall_score(opportunity, 'PerformanceLevel', outcome.overall_perf_lvl)
+        self.add_scale_score(opportunity, 'Overall',
+            outcome.overall_score, outcome.overall_score_range_min, outcome.overall_perf_lvl)
+        if self.map_asmt_type(asmt.type) != 'IAB':
+            self.add_scale_score(opportunity, CLAIM_MEASURES[asmt.subject][0],
+                outcome.claim_1_score, outcome.claim_1_score_range_min, outcome.claim_1_perf_lvl)
+            self.add_scale_score(opportunity, CLAIM_MEASURES[asmt.subject][1],
+                outcome.claim_2_score, outcome.claim_2_score_range_min, outcome.claim_2_perf_lvl)
+            self.add_scale_score(opportunity, CLAIM_MEASURES[asmt.subject][2],
+                outcome.claim_3_score, outcome.claim_3_score_range_min, outcome.claim_3_perf_lvl)
+            self.add_scale_score(opportunity, CLAIM_MEASURES[asmt.subject][3],
+                outcome.claim_4_score, outcome.claim_4_score_range_min, outcome.claim_4_perf_lvl)
 
         for item_data in outcome.item_data:
             item = SubElement(opportunity, 'Item')
@@ -169,7 +182,6 @@ class XmlWorker(Worker):
         os.makedirs(path, exist_ok=True)
         return os.path.join(path, outcome.guid) + '.xml'
 
-
     def add_examinee_attribute(self, parent, name, value, contextDateStr):
         if value:
             attr = SubElement(parent, 'ExamineeAttribute')
@@ -186,12 +198,18 @@ class XmlWorker(Worker):
             attr.set('value', str(value))
             attr.set('contextDate', contextDateStr)
 
-    def add_overall_score(self, parent, label, value, standard_error=''):
-        score = SubElement(parent, 'Score')
-        score.set('measureOf', 'Overall')
-        score.set('measureLabel', label)
-        score.set('value', str(value))
-        score.set('standardError', str(standard_error))
+    def add_scale_score(self, parent, measure, scale_score, scale_score_range_min, perf_lvl):
+        if scale_score:
+            score = SubElement(parent, 'Score')
+            score.set('measureOf', measure)
+            score.set('measureLabel', 'ScaleScore')
+            score.set('value', str(scale_score))
+            score.set('standardError', str(scale_score - scale_score_range_min))
+            score = SubElement(parent, 'Score')
+            score.set('measureOf', measure)
+            score.set('measureLabel', 'PerformanceLevel')
+            score.set('value', str(perf_lvl))
+            score.set('standardError', '')
 
     def map_asmt_type(self, value):
         if 'summative' in value.lower(): return 'SUM'

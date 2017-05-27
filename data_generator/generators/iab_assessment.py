@@ -7,13 +7,14 @@ import random
 
 import data_generator.config.cfg as sbac_config
 import data_generator.generators.assessment as gen_asmt_generator
+from data_generator.generators.population import generate_perf_lvl
 from data_generator.model.assessment import Assessment
 from data_generator.model.assessmentoutcome import AssessmentOutcome
 from data_generator.model.interimassessment import InterimAssessment
 from data_generator.model.interimassessmentoutcome import InterimAssessmentOutcome
 from data_generator.model.student import Student
 from data_generator.sbac_generators.hierarchy import InstitutionHierarchy
-from data_generator.util.assessment_stats import Properties, RandomLevelByDemographics
+from data_generator.util.assessment_stats import random_score_given_level, random_claim_error, claim_perf_lvl
 from data_generator.util.id_gen import IDGen
 
 
@@ -67,6 +68,7 @@ def generate_interim_assessment(asmt_year: int,
         raise KeyError("Subject '%s' not found in claim definitions" % subject)
 
     claims = claim_definitions[subject]
+    asmt_scale_scores = sbac_config.ASMT_SCALE_SCORE[subject][grade]
 
     # Run the General generator
     sa = gen_asmt_generator.generate_assessment(Assessment)
@@ -92,10 +94,10 @@ def generate_interim_assessment(asmt_year: int,
     sa.perf_lvl_name_3 = sbac_config.CLAIM_PERF_LEVEL_NAME_3
     sa.perf_lvl_name_4 = None
     sa.perf_lvl_name_5 = None
-    sa.overall_score_min = sbac_config.ASMT_SCORE_MIN
-    sa.overall_score_max = sbac_config.ASMT_SCORE_MAX
-    sa.claim_1_score_min = sbac_config.CLAIM_SCORE_MIN
-    sa.claim_1_score_max = sbac_config.CLAIM_SCORE_MAX
+    sa.overall_score_min = asmt_scale_scores[0]
+    sa.overall_score_max = asmt_scale_scores[-1]
+    sa.claim_1_score_min = asmt_scale_scores[0]
+    sa.claim_1_score_max = asmt_scale_scores[-1]
     sa.claim_1_score_weight = 1.0
     sa.claim_2_score_min = 0
     sa.claim_2_score_max = 0
@@ -109,12 +111,9 @@ def generate_interim_assessment(asmt_year: int,
     sa.claim_perf_lvl_name_1 = sbac_config.CLAIM_PERF_LEVEL_NAME_1
     sa.claim_perf_lvl_name_2 = sbac_config.CLAIM_PERF_LEVEL_NAME_2
     sa.claim_perf_lvl_name_3 = sbac_config.CLAIM_PERF_LEVEL_NAME_3
-    sa.overall_cut_point_1 = sbac_config.ASMT_SCORE_CUT_POINT_1
-    sa.overall_cut_point_2 = sbac_config.ASMT_SCORE_CUT_POINT_2
-    sa.overall_cut_point_3 = sbac_config.ASMT_SCORE_CUT_POINT_3
-    sa.overall_cut_point_4 = sbac_config.ASMT_SCORE_CUT_POINT_4
-    sa.claim_cut_point_1 = sbac_config.CLAIM_SCORE_CUT_POINT_1
-    sa.claim_cut_point_2 = sbac_config.CLAIM_SCORE_CUT_POINT_2
+    sa.overall_cut_point_1 = asmt_scale_scores[1]
+    sa.overall_cut_point_2 = asmt_scale_scores[2]
+    sa.overall_cut_point_3 = asmt_scale_scores[3]
     sa.effective_date = datetime.date(asmt_year-1, 8, 15)
     sa.from_date = sa.effective_date
     sa.to_date = sbac_config.ASMT_TO_DATE
@@ -147,6 +146,7 @@ def generate_interim_assessment_outcome(date_taken: datetime.date,
     sao.rec_id = id_gen.get_rec_id('assessment_outcome')
     sao.inst_hierarchy = inst_hier
     sao.date_taken = date_taken
+    sao.admin_condition = 'NS'
 
     # Generate assessment outcome Item-level data
     sao.item_data = [] if not gen_item else \
@@ -155,42 +155,27 @@ def generate_interim_assessment_outcome(date_taken: datetime.date,
     # set timestamps for the opportunity
     gen_asmt_generator.set_opportunity_dates(sao)
 
-    demographics = sbac_config.DEMOGRAPHICS_BY_GRADE[student.grade]
-    level_breakdowns = sbac_config.LEVELS_BY_GRADE_BY_SUBJ[assessment.subject][student.grade]
-    level_generator = RandomLevelByDemographics(demographics, level_breakdowns)
-
-    student_race = ('dmg_eth_2mr' if student.eth_multi else
-                    'dmg_eth_ami' if student.eth_amer_ind else
-                    'dmg_eth_asn' if student.eth_asian else
-                    'dmg_eth_blk' if student.eth_black else
-                    'dmg_eth_hsp' if student.eth_hispanic else
-                    'dmg_eth_pcf' if student.eth_pacific else
-                    'dmg_eth_wht' if student.eth_white else
-                    'dmg_eth_nst')
-
-    student_demographics = Properties(dmg_prg_504=student.prg_sec504,
-                                      dmg_prg_tt1=student.prg_econ_disad,
-                                      dmg_prg_iep=student.prg_iep,
-                                      dmg_prg_lep=student.prg_lep,
-                                      gender=student.gender,
-                                      race=student_race)
-
-    # The legacy output expects there to be a claim_1_score. But that is not correct for IABs, there should be just
-    # an overall score. So we'll fill out both for now ...
     if gen_item:
+        # if item data was generated, calculate the score from that
+        # (note: currently item data is randomly generated so this won't produce well distributed results)
         percent_points = sum(map(lambda aid: aid.score, sao.item_data)) / assessment.item_total_score
         sao.overall_score = (assessment.overall_score_max - assessment.overall_score_min) * percent_points + assessment.overall_score_min
     else:
-        sao.overall_score = random.randint(assessment.overall_score_min, assessment.overall_score_max)
-    sao.overall_score_range_min = max(assessment.overall_score_min, sao.overall_score - 20)
-    sao.overall_score_range_max = min(assessment.overall_score_max, sao.overall_score + 20)
-    sao.overall_perf_lvl = _pick_performance_level(sao.overall_score,
-        (assessment.overall_cut_point_1, assessment.overall_cut_point_2, assessment.overall_cut_point_3))
+        # otherwise, pick a random overall perf level (based on demographics) and use that to get a score
+        sao.overall_score = random_score_given_level(generate_perf_lvl(student, assessment.subject) - 1,
+            [assessment.overall_score_min, assessment.overall_cut_point_1, assessment.overall_cut_point_2, assessment.overall_cut_point_3, assessment.overall_score_max])
 
-    sao.claim_1_score = random.randint(assessment.claim_1_score_min, assessment.claim_1_score_max)
-    sao.claim_1_score_range_min = max(sbac_config.CLAIM_SCORE_MIN, sao.claim_1_score - 20)
-    sao.claim_1_score_range_max = min(sbac_config.CLAIM_SCORE_MAX, sao.claim_1_score + 20)
-    sao.claim_1_perf_lvl = _pick_performance_level(sao.claim_1_score, (assessment.claim_cut_point_1, assessment.claim_cut_point_2))
+    # now that we have a score, generate a random SE and figure out IAB perf level (1-3) using SB formulae
+    stderr = random_claim_error(sao.overall_score, assessment.overall_score_min, assessment.overall_score_max)
+    sao.overall_score_range_min = max(assessment.overall_score_min, sao.overall_score - stderr)
+    sao.overall_score_range_max = min(assessment.overall_score_max, sao.overall_score + stderr)
+    sao.overall_perf_lvl = claim_perf_lvl(sao.overall_score, stderr, assessment.overall_cut_point_3)
+
+    # The legacy output expects there to be a claim_1_score; not really correct for IABs but for now ...
+    sao.claim_1_score = sao.overall_score
+    sao.claim_1_score_range_min = sao.overall_score_range_min
+    sao.claim_1_score_range_max = sao.overall_score_range_max
+    sao.claim_1_perf_lvl = sao.overall_perf_lvl
 
     # Create accommodations details
     sao.acc_asl_video_embed = _pick_default_accommodation_code(
@@ -225,21 +210,6 @@ def generate_interim_assessment_outcome(date_taken: datetime.date,
         sbac_config.ACCOMMODATIONS['acc_streamline_mode'][assessment.subject])
 
     return sao
-
-
-def _pick_performance_level(score, cut_points):
-    """
-    Pick the performance level for a given score and cut points.
-
-    @param score: The score to assign a performance level for
-    @param cut_points: List of scores that separate the performance levels
-    @returns: Performance level
-    """
-    for i, cut_point in enumerate(cut_points):
-        if score < cut_point:
-            return i + 1
-
-    return len(cut_points) + 1
 
 
 def _pick_default_accommodation_code(default_code):

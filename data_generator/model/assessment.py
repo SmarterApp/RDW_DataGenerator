@@ -21,8 +21,7 @@ class Assessment:
                  'claim_4_score_max',
                  'claim_1_score_weight', 'claim_2_score_weight', 'claim_3_score_weight', 'claim_4_score_weight',
                  'claim_perf_lvl_name_1', 'claim_perf_lvl_name_2', 'claim_perf_lvl_name_3',
-                 'overall_cut_point_1', 'overall_cut_point_2', 'overall_cut_point_3', 'overall_cut_point_4',
-                 'claim_cut_point_1', 'claim_cut_point_2',
+                 'overall_cut_point_1', 'overall_cut_point_2', 'overall_cut_point_3',
                  'from_date', 'to_date', 'effective_date', 'segment', 'item_bank', 'item_total_score')
 
     def __init__(self):
@@ -69,9 +68,6 @@ class Assessment:
         self.overall_cut_point_1 = None
         self.overall_cut_point_2 = None
         self.overall_cut_point_3 = None
-        self.overall_cut_point_4 = None
-        self.claim_cut_point_1 = None
-        self.claim_cut_point_2 = None
         self.from_date = sbac_config.HIERARCHY_FROM_DATE
         self.to_date = None
         self.effective_date = None

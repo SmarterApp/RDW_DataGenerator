@@ -302,7 +302,6 @@ DIM_ASMT_FORMAT = {'format': 'csv',
                                {'name': 'asmt_cut_point_1', 'val': 'assessment.overall_cut_point_1'},
                                {'name': 'asmt_cut_point_2', 'val': 'assessment.overall_cut_point_2'},
                                {'name': 'asmt_cut_point_3', 'val': 'assessment.overall_cut_point_3'},
-                               {'name': 'asmt_cut_point_4', 'val': 'assessment.overall_cut_point_4'},
                                {'name': 'from_date', 'val': 'assessment.from_date', 'filter': 'date_Ymd'},
                                {'name': 'to_date', 'val': 'assessment.to_date', 'filter': 'date_Ymd'},
                                {'name': 'rec_status', 'val': 'C'},
@@ -387,10 +386,6 @@ ASMT_JSON_FORMAT = {'format': 'json',
                             'Level4': {
                                 'Name': 'assessment.perf_lvl_name_4',
                                 'CutPoint': 'assessment.overall_cut_point_3'
-                            },
-                            'Level5': {
-                                'Name': 'assessment.perf_lvl_name_5',
-                                'CutPoint': 'assessment.overall_cut_point_4'
                             }
                         },
                         'Claims': {
@@ -461,10 +456,6 @@ IAB_JSON_FORMAT = {'format': 'json',
                            'Level4': {
                                'Name': 'assessment.perf_lvl_name_4',
                                'CutPoint': 'assessment.overall_cut_point_3'
-                           },
-                           'Level5': {
-                               'Name': 'assessment.perf_lvl_name_5',
-                               'CutPoint': 'assessment.overall_cut_point_4'
                            }
                        },
                        'Claims': {

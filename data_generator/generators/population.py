@@ -6,12 +6,14 @@ import calendar
 import datetime
 import random
 
+import data_generator.config.cfg as sbac_config
 import data_generator.config.population as pop_config
 import data_generator.generators.names as name_gen
 from data_generator.model.district import District
 from data_generator.model.school import School
 from data_generator.model.staff import DistrictStaff, TeachingStaff
 from data_generator.model.student import Student
+from data_generator.util.assessment_stats import Properties, RandomLevelByDemographics
 from data_generator.util.id_gen import IDGen as id_gen
 from data_generator.util.weighted_choice import weighted_choice
 
@@ -226,3 +228,33 @@ def _pick_demo_option(sub_config):
     """
     return weighted_choice({name: obj['perc']
                             for name, obj in sub_config.items()})
+
+
+def generate_perf_lvl(student: Student, subject):
+    """For the student, randomly generate performance level based on demographics.
+
+    :param student: student
+    :param subject: assessment subject, Math or ELA
+    :return: 1 - 4
+    """
+    demographics = sbac_config.DEMOGRAPHICS_BY_GRADE[student.grade]
+    level_breakdowns = sbac_config.LEVELS_BY_GRADE_BY_SUBJ[subject][student.grade]
+    level_generator = RandomLevelByDemographics(demographics, level_breakdowns)
+
+    student_race = ('dmg_eth_2mr' if student.eth_multi else
+                    'dmg_eth_ami' if student.eth_amer_ind else
+                    'dmg_eth_asn' if student.eth_asian else
+                    'dmg_eth_blk' if student.eth_black else
+                    'dmg_eth_hsp' if student.eth_hispanic else
+                    'dmg_eth_pcf' if student.eth_pacific else
+                    'dmg_eth_wht' if student.eth_white else
+                    'dmg_eth_nst')
+
+    student_demographics = Properties(dmg_prg_504=student.prg_sec504,
+                                      dmg_prg_tt1=student.prg_econ_disad,
+                                      dmg_prg_iep=student.prg_iep,
+                                      dmg_prg_lep=student.prg_lep,
+                                      gender=student.gender,
+                                      race=student_race)
+
+    return level_generator.random_level(student_demographics) + 1

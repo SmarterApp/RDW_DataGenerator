@@ -82,12 +82,14 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
         asmt.version = row['AssessmentVersion']
         asmt.year = int(row['AcademicYear']) + 1  # TODO - remove +1 when tabulator is fixed
         asmt.bank_key = row['BankKey']
-        asmt.overall_score_min = __getScore(row['ScaledLow1'])
-        asmt.overall_cut_point_1 = __getScore(row['ScaledHigh1'])
-        asmt.overall_cut_point_2 = __getScore(row['ScaledHigh2'])
-        asmt.overall_cut_point_3 = __getScore(row['ScaledHigh3'])
-        asmt.overall_cut_point_4 = None
-        asmt.overall_score_max = __getScore(row['ScaledHigh4'])
+
+        asmt_scale_scores = cfg.ASMT_SCALE_SCORE[asmt.subject][asmt.grade]
+        asmt.overall_score_min = __getScore(row['ScaledLow1'], asmt_scale_scores[0])
+        asmt.overall_cut_point_1 = __getScore(row['ScaledHigh1'], asmt_scale_scores[1])
+        asmt.overall_cut_point_2 = __getScore(row['ScaledHigh2'], asmt_scale_scores[2])
+        asmt.overall_cut_point_3 = __getScore(row['ScaledHigh3'], asmt_scale_scores[3])
+        asmt.overall_score_max = __getScore(row['ScaledHigh4'], asmt_scale_scores[-1])
+
         # TODO - standard? what's in there?
         # TODO - claim/target? they'll need to be trimmed (trailing tab)
         # TODO - derive accommodations from 'ASL', 'Braille', 'AllowCalculator'?
@@ -106,22 +108,28 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
         asmt.from_date = effective_date
         asmt.to_date = effective_date
 
-        # more stuff that doesn't really make sense but the framework currently requires
-        # TODO - figure out how the claim stuff will work for realsies
-        asmt.claim_1_score_min = cfg.CLAIM_SCORE_MIN
-        asmt.claim_1_score_max = cfg.CLAIM_SCORE_MAX
-        asmt.claim_1_score_weight = 1.0
-        asmt.claim_2_score_min = 0
-        asmt.claim_2_score_max = 0
-        asmt.claim_2_score_weight = 0.0
-        asmt.claim_3_score_min = 0
-        asmt.claim_3_score_max = 0
-        asmt.claim_3_score_weight = 0.0
+        # claims (this is just using the hard-coded values from generator code)
+        asmt.claim_1_score_min = asmt.overall_score_min
+        asmt.claim_1_score_max = asmt.overall_score_max
         asmt.claim_perf_lvl_name_1 = cfg.CLAIM_PERF_LEVEL_NAME_1
         asmt.claim_perf_lvl_name_2 = cfg.CLAIM_PERF_LEVEL_NAME_2
         asmt.claim_perf_lvl_name_3 = cfg.CLAIM_PERF_LEVEL_NAME_3
-        asmt.claim_cut_point_1 = cfg.CLAIM_SCORE_CUT_POINT_1
-        asmt.claim_cut_point_2 = cfg.CLAIM_SCORE_CUT_POINT_2
+        if asmt.type != 'IAB':
+            claims = cfg.CLAIM_DEFINITIONS[asmt.subject]
+            asmt.claim_1_name = claims[0]['name']
+            asmt.claim_1_score_weight = claims[0]['weight']
+            asmt.claim_2_name = claims[1]['name']
+            asmt.claim_2_score_min = asmt.overall_score_min
+            asmt.claim_2_score_max = asmt.overall_score_max
+            asmt.claim_2_score_weight = claims[1]['weight']
+            asmt.claim_3_name = claims[2]['name']
+            asmt.claim_3_score_min = asmt.overall_score_min
+            asmt.claim_3_score_max = asmt.overall_score_max
+            asmt.claim_3_score_weight = claims[2]['weight']
+            asmt.claim_4_name = claims[3]['name'] if len(claims) == 4 else None
+            asmt.claim_4_score_min = asmt.overall_score_min if len(claims) == 4 else None
+            asmt.claim_4_score_max = asmt.overall_score_max if len(claims) == 4 else None
+            asmt.claim_4_score_weight = claims[3]['weight'] if len(claims) == 4 else None
 
         # if items are being parsed, create segment and list
         if parse_item:
@@ -157,5 +165,8 @@ def __mapSubject(subject):
     raise Exception('Unexpected assessment subject {}'.format(subject))
 
 
-def __getScore(value):
-    return int(float(value))
+def __getScore(value, default_value):
+    try:
+        return int(float(value))
+    except ValueError:
+        return default_value

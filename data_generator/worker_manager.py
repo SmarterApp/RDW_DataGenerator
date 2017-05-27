@@ -81,6 +81,10 @@ class WorkerManager(Worker):
 
         assessments = self.__assessment_packages()
 
+        if len(assessments) == 0:
+            print('No assessment packages found')
+            return
+
         # Process the state
         self.__generate_state_data(state, assessments)
 
