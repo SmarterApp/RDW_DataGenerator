@@ -234,19 +234,19 @@ def generate_assessment_outcome(student: Student, assessment: Assessment, inst_h
     stderr = random_claim_error(sao.claim_1_score, assessment.overall_score_min, assessment.overall_score_max)
     sao.claim_1_score_range_min = max(assessment.claim_1_score_min, sao.claim_1_score - stderr)
     sao.claim_1_score_range_max = min(assessment.claim_1_score_max, sao.claim_1_score + stderr)
-    sao.claim_1_perf_lvl = claim_perf_lvl(sao.claim_1_score, stderr, assessment.overall_cut_point_3)
+    sao.claim_1_perf_lvl = claim_perf_lvl(sao.claim_1_score, stderr, assessment.overall_cut_point_2)
 
     sao.claim_2_score = claim_scores[1]
     stderr = random_claim_error(sao.claim_2_score, assessment.overall_score_min, assessment.overall_score_max)
     sao.claim_2_score_range_min = max(assessment.claim_2_score_min, sao.claim_2_score - stderr)
     sao.claim_2_score_range_max = min(assessment.claim_2_score_max, sao.claim_2_score + stderr)
-    sao.claim_2_perf_lvl = claim_perf_lvl(sao.claim_2_score, stderr, assessment.overall_cut_point_3)
+    sao.claim_2_perf_lvl = claim_perf_lvl(sao.claim_2_score, stderr, assessment.overall_cut_point_2)
 
     sao.claim_3_score = claim_scores[2]
     stderr = random_claim_error(sao.claim_3_score, assessment.overall_score_min, assessment.overall_score_max)
     sao.claim_3_score_range_min = max(assessment.claim_3_score_min, sao.claim_3_score - stderr)
     sao.claim_3_score_range_max = min(assessment.claim_3_score_max, sao.claim_3_score + stderr)
-    sao.claim_3_perf_lvl = claim_perf_lvl(sao.claim_3_score, stderr, assessment.overall_cut_point_3)
+    sao.claim_3_perf_lvl = claim_perf_lvl(sao.claim_3_score, stderr, assessment.overall_cut_point_2)
 
     if assessment.claim_4_name is not None:
         if len(claim_scores) != 4:
@@ -257,7 +257,7 @@ def generate_assessment_outcome(student: Student, assessment: Assessment, inst_h
         stderr = random_claim_error(sao.claim_4_score, assessment.overall_score_min, assessment.overall_score_max)
         sao.claim_4_score_range_min = max(assessment.claim_4_score_min, sao.claim_4_score - stderr)
         sao.claim_4_score_range_max = min(assessment.claim_4_score_max, sao.claim_4_score + stderr)
-        sao.claim_4_perf_lvl = claim_perf_lvl(sao.claim_4_score, stderr, assessment.overall_cut_point_3)
+        sao.claim_4_perf_lvl = claim_perf_lvl(sao.claim_4_score, stderr, assessment.overall_cut_point_2)
 
     elif len(claim_scores) != 3:
         raise Exception(

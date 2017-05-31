@@ -169,7 +169,7 @@ def generate_interim_assessment_outcome(date_taken: datetime.date,
     stderr = random_claim_error(sao.overall_score, assessment.overall_score_min, assessment.overall_score_max)
     sao.overall_score_range_min = max(assessment.overall_score_min, sao.overall_score - stderr)
     sao.overall_score_range_max = min(assessment.overall_score_max, sao.overall_score + stderr)
-    sao.overall_perf_lvl = claim_perf_lvl(sao.overall_score, stderr, assessment.overall_cut_point_3)
+    sao.overall_perf_lvl = claim_perf_lvl(sao.overall_score, stderr, assessment.overall_cut_point_2)
 
     # The legacy output expects there to be a claim_1_score; not really correct for IABs but for now ...
     sao.claim_1_score = sao.overall_score
