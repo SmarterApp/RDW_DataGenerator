@@ -99,6 +99,8 @@ class WorkerManager(Worker):
         if self.pkg_source == 'generate':
             assessments.extend(self.__generate_iabs())
             assessments.extend(self.__generate_assessments())
+            for worker in self.workers:
+                worker.write_assessments(assessments)
         else:
             assessments.extend(load_assessments(self.pkg_source, self.sum_pkg, self.ica_pkg, self.iab_pkg, self.gen_item))
 

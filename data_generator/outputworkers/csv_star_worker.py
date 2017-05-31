@@ -23,15 +23,11 @@ class CSVStarWorker(Worker):
         csv_writer.prepare_csv_file(sbac_out_config.DIM_ASMT_FORMAT['name'], sbac_out_config.DIM_ASMT_FORMAT['columns'], self.root_path)
         csv_writer.prepare_csv_file(sbac_out_config.SR_FORMAT['name'], sbac_out_config.SR_FORMAT['columns'], self.root_path)
 
-    def write_iab(self, asmt: Assessment):
+    def write_assessments(self, asmts: [Assessment]):
         file_name = sbac_out_config.DIM_ASMT_FORMAT['name']
-        csv_writer.write_records_to_file(file_name, sbac_out_config.DIM_ASMT_FORMAT['columns'], [asmt], tbl_name='dim_asmt', root_path=self.root_path)
+        csv_writer.write_records_to_file(file_name, sbac_out_config.DIM_ASMT_FORMAT['columns'], asmts, tbl_name='dim_asmt', root_path=self.root_path)
 
-    def write_assessment(self, asmt: Assessment):
-        file_name = sbac_out_config.DIM_ASMT_FORMAT['name']
-        csv_writer.write_records_to_file(file_name, sbac_out_config.DIM_ASMT_FORMAT['columns'], [asmt], tbl_name='dim_asmt', root_path=self.root_path)
-
-    def write_hierarchies(self, hierarchies: InstitutionHierarchy):
+    def write_hierarchies(self, hierarchies: [InstitutionHierarchy]):
         csv_writer.write_records_to_file(sbac_out_config.DIM_INST_HIER_FORMAT['name'],
                                          sbac_out_config.DIM_INST_HIER_FORMAT['columns'], hierarchies,
                                          tbl_name='dim_hier', root_path=self.root_path)

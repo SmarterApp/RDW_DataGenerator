@@ -25,13 +25,10 @@ class PgWorker(Worker):
         if self.db_connection:
             self.db_connection.close()
 
-    def write_iab(self, asmt: Assessment):
-        postgres_writer.write_records_to_table(self.db_connection, self.schema + '.dim_asmt', sbac_out_config.DIM_ASMT_FORMAT['columns'], [asmt])
+    def write_assessments(self, asmts: [Assessment]):
+        postgres_writer.write_records_to_table(self.db_connection, self.schema + '.dim_asmt', sbac_out_config.DIM_ASMT_FORMAT['columns'], asmts)
 
-    def write_assessment(self, asmt: Assessment):
-        postgres_writer.write_records_to_table(self.db_connection, self.schema + '.dim_asmt', sbac_out_config.DIM_ASMT_FORMAT['columns'], [asmt])
-
-    def write_hierarchies(self, hierarchies: InstitutionHierarchy):
+    def write_hierarchies(self, hierarchies: [InstitutionHierarchy]):
         postgres_writer.write_records_to_table(self.db_connection, self.schema + '.dim_inst_hier', sbac_out_config.DIM_INST_HIER_FORMAT['columns'], hierarchies)
 
     def write_students_dim(self, students: [Student]):

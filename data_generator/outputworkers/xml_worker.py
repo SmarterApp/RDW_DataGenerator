@@ -1,9 +1,13 @@
+import json
 from xml.etree.ElementTree import Element, SubElement, tostring
 
 import os
 
+from data_generator.model.assessment import Assessment
 from data_generator.model.assessmentoutcome import AssessmentOutcome
+from data_generator.model.institutionhierarchy import InstitutionHierarchy
 from data_generator.outputworkers.worker import Worker
+from data_generator.writers import tabulator_writer
 
 CLAIM_MEASURES = {
     'Math': ['1', 'SOCK_2', '3', ''],
@@ -19,6 +23,32 @@ class XmlWorker(Worker):
 
     def cleanup(self):
         pass
+
+    def write_hierarchies(self, hierarchies: [InstitutionHierarchy]):
+        # create a list of schools and districts, de-duping based on something
+        districts = {}
+        schools = {}
+        for hierarchy in hierarchies:
+            if hierarchy.district.guid not in districts:
+                districts[hierarchy.district.guid] = {
+                    'entityId': hierarchy.district.guid,
+                    'entityName': hierarchy.district.name,
+                    'entityType': 'DISTRICT',
+                    'parentEntityId': hierarchy.state.code
+                }
+            if hierarchy.school.guid not in schools:
+                schools[hierarchy.school.guid] = {
+                    'entityId': hierarchy.school.guid,
+                    'entityName': hierarchy.school.name,
+                    'entityType': 'INSTITUTION',
+                    'parentEntityId': hierarchy.district.guid
+                }
+
+        with open(os.path.join(self.out_path_root, 'organization.json'), "w") as f:
+            json.dump({'districts': list(districts.values()), 'institutions': list(schools.values())}, f, indent=2)
+
+    def write_assessments(self, asmts: [Assessment]):
+        tabulator_writer.write_assessments(os.path.join(self.out_path_root, 'assessments.csv'), asmts, )
 
     def write_iab_outcome(self, results: [AssessmentOutcome], assessment_guid):
         for result in results:
