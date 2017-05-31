@@ -25,9 +25,18 @@ class XmlWorker(Worker):
         pass
 
     def write_hierarchies(self, hierarchies: [InstitutionHierarchy]):
-        # create a list of schools and districts, de-duping based on something
-        districts = {}
-        schools = {}
+        # because each district is generated individually, we need to read the file to
+        # get previous districts, merge the new ones, then rewrite the file ...
+        file = os.path.join(self.out_path_root, 'organization.json')
+        if os.path.isfile(file):
+            with open(file, "r") as f:
+                org = json.load(f)
+                districts = {d['entityId']: d for d in org['districts']}
+                schools = {s['entityId']: s for s in org['institutions']}
+        else:
+            districts = {}
+            schools = {}
+
         for hierarchy in hierarchies:
             if hierarchy.district.guid not in districts:
                 districts[hierarchy.district.guid] = {
@@ -44,7 +53,7 @@ class XmlWorker(Worker):
                     'parentEntityId': hierarchy.district.guid
                 }
 
-        with open(os.path.join(self.out_path_root, 'organization.json'), "w") as f:
+        with open(file, "w") as f:
             json.dump({'districts': list(districts.values()), 'institutions': list(schools.values())}, f, indent=2)
 
     def write_assessments(self, asmts: [Assessment]):
