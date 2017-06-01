@@ -25,17 +25,17 @@ class XmlWorker(Worker):
         pass
 
     def write_hierarchies(self, hierarchies: [InstitutionHierarchy]):
+        districts = {}
+        schools = {}
+
         # because each district is generated individually, we need to read the file to
         # get previous districts, merge the new ones, then rewrite the file ...
         file = os.path.join(self.out_path_root, 'organization.json')
         if os.path.isfile(file):
             with open(file, "r") as f:
                 org = json.load(f)
-                districts = {d['entityId']: d for d in org['districts']}
-                schools = {s['entityId']: s for s in org['institutions']}
-        else:
-            districts = {}
-            schools = {}
+                if 'districts' in org: districts = {d['entityId']: d for d in org['districts']}
+                if 'institutions' in org: schools = {s['entityId']: s for s in org['institutions']}
 
         for hierarchy in hierarchies:
             if hierarchy.district.guid not in districts:
