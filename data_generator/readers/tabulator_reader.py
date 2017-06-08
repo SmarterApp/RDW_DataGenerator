@@ -80,7 +80,7 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
         asmt.grade = int(row['AssessmentGrade'])
         asmt.type = __mapAssessmentType(row['AssessmentType'], row['AssessmentSubtype'])
         asmt.version = row['AssessmentVersion']
-        asmt.year = int(row['AcademicYear']) + 1  # TODO - remove +1 when tabulator is fixed
+        asmt.year = int(row['AcademicYear'])
         asmt.bank_key = row['BankKey']
 
         asmt_scale_scores = cfg.ASMT_SCALE_SCORE[asmt.subject][asmt.grade]
@@ -143,7 +143,7 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
         item.bank_key = row['BankKey']
         item.item_key = row['ItemId']
         item.type = row['ItemType']
-        item.position = int(row['FormPosition'])
+        item.position = __getInt(row['FormPosition'], 0)
         item.segment_id = asmt.segment.id
         item.max_score = int(row['MaxPoints'])
         item.dok = int(row['DOK'])
@@ -168,5 +168,12 @@ def __mapSubject(subject):
 def __getScore(value, default_value):
     try:
         return int(float(value))
+    except ValueError:
+        return default_value
+
+
+def __getInt(value, default_value):
+    try:
+        return int(value)
     except ValueError:
         return default_value
