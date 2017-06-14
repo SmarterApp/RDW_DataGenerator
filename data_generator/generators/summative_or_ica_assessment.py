@@ -53,8 +53,7 @@ def create_assessment_outcome_object(student, asmt, inst_hier, id_gen, assessmen
         assessment_results[asmt.guid_sr] = []
 
     # Create the original outcome object
-    ao = generate_assessment_outcome(student, asmt, inst_hier, id_gen,
-                                     gen_item=gen_item)
+    ao = generate_assessment_outcome(student, asmt, inst_hier, id_gen, gen_item=gen_item)
     assessment_results[asmt.guid_sr].append(ao)
 
     # Decide if something special is happening
@@ -204,6 +203,8 @@ def generate_assessment_outcome(student: Student, assessment: Assessment, inst_h
         year_adj = 0
         period_month = 3
     sao.date_taken = datetime.date(assessment.year - year_adj, period_month, 15)
+
+    gen_asmt_generator.generate_session(sao)
 
     # Generate assessment outcome Item-level data
     sao.item_data = [] if not gen_item else \

@@ -131,6 +131,7 @@ def generate_interim_assessment_outcome(date_taken: datetime.date,
     """
     Generate an assessment outcome for a given student.
 
+    @param date_taken: date test was taken
     @param student: The student to create the outcome for
     @param assessment: The assessment to create the outcome for
     @param inst_hier: The institution hierarchy this student belongs to
@@ -147,6 +148,7 @@ def generate_interim_assessment_outcome(date_taken: datetime.date,
     sao.inst_hierarchy = inst_hier
     sao.date_taken = date_taken
     sao.admin_condition = 'NS'
+    gen_asmt_generator.generate_session(sao)
 
     # Generate assessment outcome Item-level data
     sao.item_data = [] if not gen_item else \

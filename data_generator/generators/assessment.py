@@ -1,5 +1,6 @@
 """Generate assessment elements.
 """
+import hashlib
 from datetime import timedelta, datetime, time
 from random import choice, randrange, random
 
@@ -41,9 +42,6 @@ def generate_assessment_outcome(student: Student, assessment: Assessment, sub_cl
     ao.guid = IDGen.get_uuid()
     ao.student = student
     ao.assessment = assessment
-
-    # set session based on subject and student group
-    ao.session = getattr(student, "group_%i_text" % (1+cfg.SUBJECTS.index(assessment.subject),))
 
     return ao
 
@@ -122,6 +120,18 @@ def generate_item_data(items: [AssessmentItem], student_id, date_taken):
         item_data.append(aid)
 
     return item_data
+
+
+def generate_session(outcome: [AssessmentOutcome]):
+    """ generate and set session based on date, student group for this subject
+    """
+    group = getattr(outcome.student, "group_%i_text" % (1 + cfg.SUBJECTS.index(outcome.assessment.subject),))
+    if not outcome.date_taken and not group: return
+
+    hasher = hashlib.sha1()
+    if outcome.date_taken: hasher.update(str(outcome.date_taken).encode())
+    if group: hasher.update(group.encode())
+    outcome.session = hasher.hexdigest()[:16]
 
 
 def set_opportunity_dates(outcome: [AssessmentOutcome]):
