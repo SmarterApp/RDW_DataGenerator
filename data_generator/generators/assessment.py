@@ -6,6 +6,7 @@ from random import choice, randrange, random
 
 from data_generator.config import cfg
 from data_generator.config.cfg import ASMT_ITEM_BANK_FORMAT, ITEM_ANSWER_RATE, ANSWER_CORRECT_RATE
+from data_generator.generators import names
 from data_generator.model.assessment import Assessment
 from data_generator.model.assessmentoutcome import AssessmentOutcome
 from data_generator.model.item import AssessmentItem
@@ -131,7 +132,9 @@ def generate_session(outcome: [AssessmentOutcome]):
     hasher = hashlib.sha1()
     if outcome.date_taken: hasher.update(str(outcome.date_taken).encode())
     if group: hasher.update(group.encode())
-    outcome.session = hasher.hexdigest()[:16]
+    hexdigest = hasher.hexdigest()
+    # pick last name based on last 4 digits of digest and combine with first 4 digits
+    outcome.session = names.PEOPLE_NAMES.last_names[int(hexdigest[-4:], 16)][:3].upper() + '-' + hexdigest[:4]
 
 
 def set_opportunity_dates(outcome: [AssessmentOutcome]):
