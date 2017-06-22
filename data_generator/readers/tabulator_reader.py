@@ -145,7 +145,7 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
         item.type = row['ItemType']
         item.position = __getInt(row['FormPosition'], 0)
         item.segment_id = asmt.segment.id
-        item.max_score = int(row['MaxPoints'])
+        item.max_score = int(row['ScorePoints'])
         item.dok = int(row['DOK'])
         item.operational = '0' if row['IsFieldTest'] == 'true' else '1'
         asmt.item_bank.append(item)
