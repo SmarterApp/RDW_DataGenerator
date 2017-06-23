@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# This scripts spawns multiple processes to quickly (?) submit xml files.
+# This scripts spawns multiple processes to more quickly submit xml files.
 # It is expecting to run for a single district, spawning processes for the schools one-at-a-time.
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
