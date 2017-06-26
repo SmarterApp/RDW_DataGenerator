@@ -81,21 +81,14 @@ Call it 170 per student over the three years. So, `example` produces > 18 millio
 Obviously, the size of the output depends on the format:
 * XML with item data ~ 18k per file
 
-### How do i run the docker image?
-When running the image, pass the data generation parameters:
+### Running the docker image
+When running the image, pass the data generation parameters, e.g. `--state_type tiny --gen_iab --gen_item --xml_out`.
+To provide data (assessment package, organization, etc.) you need to map a local folder and set source parameters, 
+e.g. `-v ~/in:/src/data_generator/in --pkg_source /src/data_generator/in`.
+To get at the resulting data you need to map a local folder, e.g. `-v ~/out:/src/data_generator/out`.
+Combining all these looks something like:
 
-    docker run fwsbac/rdw-datagen --state_type tiny --gen_iab --gen_item --xml_out
-
-To get at the resulting data you need to either map a local folder:
-
-    docker run -v ~/out:/src/data_generator/out fwsbac/rdw-datagen ...
-
-Or use docker to find where it mapped the folder (NOTE: Docker for Mac adds another layer of abstraction so you'll
-have to dig even deeper to find the actual data bits):
-
-    # get CONTAINER ID of instance that is now exited
-    docker ps -a
-    docker inspect --format '{{.Mounts}}' <CONTAINER ID>
+    docker run -v ~/out:/src/data_generator/out -v ~/in:/src/data_generator/in fwsbac/rdw-datagen --state_type tiny --gen_iab --gen_item --xml_out --pkg_source /src/data_generator/in
 
 #### Setting up an EC2 instance with docker
 Followed the directions from: http://docs.aws.amazon.com/AmazonECS/latest/developerguide/docker-basics.html.

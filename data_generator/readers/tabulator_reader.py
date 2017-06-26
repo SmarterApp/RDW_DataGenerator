@@ -143,7 +143,7 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
         item.bank_key = row['BankKey']
         item.item_key = row['ItemId']
         item.type = row['ItemType']
-        item.position = __getInt(row['FormPosition'], 0)
+        item.position = __getInt(row['ItemPosition'], 0)
         item.segment_id = asmt.segment.id
         item.max_score = int(row['ScorePoints'])
         item.dok = int(row['DOK'])
