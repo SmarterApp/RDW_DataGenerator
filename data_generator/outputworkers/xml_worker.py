@@ -38,19 +38,19 @@ class XmlWorker(Worker):
                 if 'institutions' in org: schools = {s['entityId']: s for s in org['institutions']}
 
         for hierarchy in hierarchies:
-            if hierarchy.district.guid not in districts:
-                districts[hierarchy.district.guid] = {
-                    'entityId': hierarchy.district.guid,
+            if hierarchy.district.guid_sr not in districts:
+                districts[hierarchy.district.guid_sr] = {
+                    'entityId': hierarchy.district.guid_sr,
                     'entityName': hierarchy.district.name,
                     'entityType': 'DISTRICT',
                     'parentEntityId': hierarchy.state.code
                 }
-            if hierarchy.school.guid not in schools:
-                schools[hierarchy.school.guid] = {
-                    'entityId': hierarchy.school.guid,
+            if hierarchy.school.guid_sr not in schools:
+                schools[hierarchy.school.guid_sr] = {
+                    'entityId': hierarchy.school.guid_sr,
                     'entityName': hierarchy.school.name,
                     'entityType': 'INSTITUTION',
-                    'parentEntityId': hierarchy.district.guid
+                    'parentEntityId': hierarchy.district.guid_sr
                 }
 
         with open(file, "w") as f:
@@ -90,9 +90,9 @@ class XmlWorker(Worker):
         examinee = SubElement(root, 'Examinee')
         examinee.set('key', str(student.rec_id))
 
-        # TODO - work out SSID and AlternateSSID
         contextDateStr = outcome.status_date.isoformat()
-        self.add_examinee_attribute(examinee, 'StudentIdentifier', student.external_ssid, contextDateStr)
+        self.add_examinee_attribute(examinee, 'StudentIdentifier', student.guid_sr, contextDateStr)
+        self.add_examinee_attribute(examinee, 'AlternateSSID', student.external_ssid_sr, contextDateStr)
         self.add_examinee_attribute(examinee, 'Birthdate', student.dob, contextDateStr)
         self.add_examinee_attribute(examinee, 'FirstName', student.first_name, contextDateStr)
         self.add_examinee_attribute(examinee, 'MiddleName', student.middle_name, contextDateStr)
@@ -126,9 +126,9 @@ class XmlWorker(Worker):
         hierarchy = outcome.inst_hierarchy
         self.add_examinee_relationship(examinee, 'StateAbbreviation', hierarchy.state.code, contextDateStr)
         self.add_examinee_relationship(examinee, 'StateName', hierarchy.state.name, contextDateStr)
-        self.add_examinee_relationship(examinee, 'DistrictId', hierarchy.district.guid, contextDateStr)
+        self.add_examinee_relationship(examinee, 'DistrictId', hierarchy.district.guid_sr, contextDateStr)
         self.add_examinee_relationship(examinee, 'DistrictName', hierarchy.district.name, contextDateStr)
-        self.add_examinee_relationship(examinee, 'SchoolId', hierarchy.school.guid, contextDateStr)
+        self.add_examinee_relationship(examinee, 'SchoolId', hierarchy.school.guid_sr, contextDateStr)
         self.add_examinee_relationship(examinee, 'SchoolName', hierarchy.school.name, contextDateStr)
 
         # write Opportunity
@@ -216,8 +216,8 @@ class XmlWorker(Worker):
         """
         path = os.path.join(self.out_path_root,
                             outcome.inst_hierarchy.state.code,
-                            outcome.inst_hierarchy.district.guid,
-                            outcome.inst_hierarchy.school.guid)
+                            outcome.inst_hierarchy.district.guid_sr,
+                            outcome.inst_hierarchy.school.guid_sr)
         os.makedirs(path, exist_ok=True)
         return os.path.join(path, outcome.guid) + '.xml'
 
