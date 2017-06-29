@@ -82,13 +82,13 @@ Obviously, the size of the output depends on the format:
 * XML with item data ~ 18k per file
 
 ### Running the docker image
-When running the image, pass the data generation parameters, e.g. `--state_type tiny --gen_iab --gen_item --xml_out`.
+When running the image, pass the data generation parameters, e.g. `--state_type tiny --gen_ica --gen_iab --gen_item --xml_out`.
 To provide data (assessment package, organization, etc.) you need to map a local folder and set source parameters, 
 e.g. `-v ~/in:/src/data_generator/in --pkg_source /src/data_generator/in`.
 To get at the resulting data you need to map a local folder, e.g. `-v ~/out:/src/data_generator/out`.
 Combining all these looks something like:
 
-    docker run -v ~/out:/src/data_generator/out -v ~/in:/src/data_generator/in fwsbac/rdw-datagen --state_type tiny --gen_iab --gen_item --xml_out --pkg_source /src/data_generator/in
+    docker run -v ~/out:/src/data_generator/out -v ~/in:/src/data_generator/in fwsbac/rdw-datagen --state_type tiny --gen_ica --gen_iab --gen_item --xml_out --pkg_source /src/data_generator/in
 
 #### Setting up an EC2 instance with docker
 Followed the directions from: http://docs.aws.amazon.com/AmazonECS/latest/developerguide/docker-basics.html.
@@ -100,4 +100,4 @@ Create EC2 instance using Amazon Linux or CentOS image. Then ...
     sudo usermod -a -G docker ec2-user     <-- have to relog to be in group
     docker info
     mkdir out
-    docker run -v ~/out:/src/data_generator/out fwsbac/rdw-datagen --state_type tiny --gen_iab --gen_item --xml_out
+    docker run -v ~/out:/src/data_generator/out fwsbac/rdw-datagen --state_type tiny --gen_ica --gen_iab --gen_item --xml_out
