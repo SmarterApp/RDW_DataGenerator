@@ -99,6 +99,7 @@ number of things that may need cleaning up. And there are some enhancements/impr
 making score more complex than 0/1.
  - [ ] Make some items field tests (i.e. item.operational='0')
  - [ ] Improve fake answers for items; based on item type of course.
+ - [ ] Make item score distribution correspond to item difficulty.
  - [ ] Reuse IAB packages. Currently the system generates multiple IAB packages for a single year, each with a 
  different `period`. It makes more sense to separate the IAB packages from the date taken. So a single IAB package
  might be used more than once during the academic year. Or even in a subsequent academic year. To do this, remove
