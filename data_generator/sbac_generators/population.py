@@ -135,11 +135,11 @@ def assign_student_groups(school, grade, grade_students, id_gen=IDGen(), subject
     # generate lists of subgroups for each subject corresponding to school's group size
     num_groups = int(ceil(len(grade_students) / school.group_size))
     groups = []
-    for subject in subjects:
+    for _ in subjects:
         subgroups = []
         for _ in range(num_groups):
             group_id = id_gen.get_group_id('group')
-            group_name = subject + '-G' + str(grade) + '-' + str(group_id)
+            group_name = 'G' + str(grade) + '-' + str(group_id)
             subgroups.append((group_id, group_name))
         groups.append(subgroups)
 
