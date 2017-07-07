@@ -105,6 +105,7 @@ class XmlWorker(Worker):
         self.add_examinee_attribute(examinee, 'BlackOrAfricanAmerican', self.map_yes_no(student.eth_black), contextDateStr)
         self.add_examinee_attribute(examinee, 'White', self.map_yes_no(student.eth_white), contextDateStr)
         self.add_examinee_attribute(examinee, 'NativeHawaiianOrOtherPacificIslander', self.map_yes_no(student.eth_pacific), contextDateStr)
+        self.add_examinee_attribute(examinee, 'Filipino', self.map_yes_no(student.eth_filipino), contextDateStr)
         self.add_examinee_attribute(examinee, 'DemographicRaceTwoOrMoreRaces', self.map_yes_no(student.eth_multi), contextDateStr)
         self.add_examinee_attribute(examinee, 'IDEAIndicator', self.map_yes_no(student.prg_iep), contextDateStr)
         self.add_examinee_attribute(examinee, 'LEPStatus', self.map_yes_no(student.prg_lep), contextDateStr)
@@ -168,7 +169,7 @@ class XmlWorker(Worker):
 
         self.add_scale_score(opportunity, 'Overall',
             outcome.overall_score, outcome.overall_score_range_min, outcome.overall_perf_lvl)
-        if self.map_asmt_type(asmt.type) != 'IAB':
+        if self.is_iab(asmt.type):
             self.add_scale_score(opportunity, CLAIM_MEASURES[asmt.subject][0],
                 outcome.claim_1_score, outcome.claim_1_score_range_min, outcome.claim_1_perf_lvl)
             self.add_scale_score(opportunity, CLAIM_MEASURES[asmt.subject][1],
@@ -250,10 +251,11 @@ class XmlWorker(Worker):
             score.set('value', str(perf_lvl))
             score.set('standardError', '')
 
+    def is_iab(self, value):
+        return 'block' in value.lower()
+
     def map_asmt_type(self, value):
-        if 'summative' in value.lower(): return 'SUM'
-        if 'block' in value.lower(): return 'IAB'
-        return 'ICA'
+        return 'Summative' if 'summative' in value.lower() else 'Interim'
 
     def map_gender(self, value):
         if 'female' == value.lower(): return 'Female'
