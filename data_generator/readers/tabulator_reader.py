@@ -54,6 +54,10 @@ def load_assessments_file(file, load_sum, load_ica, load_iab, load_items):
     asmt = None
     with open(file) as csvfile:
         reader = csv.DictReader(csvfile)
+        # get out early if this doesn't look like an assessments file
+        if 'AssessmentId' not in reader.fieldnames:
+            return assessments
+
         for row in reader:
             parse_asmt = False
             id = row['AssessmentId']
