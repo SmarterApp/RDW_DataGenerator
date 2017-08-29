@@ -1,6 +1,6 @@
 -- This script applies preferred labels to all assessments. The label values are provided by SBAC.
 --
--- This should be run *after* all assessment packages are loaded from ART.
+-- This should be run *after* all assessment packages are loaded from tabulator files.
 
 use warehouse;
 
