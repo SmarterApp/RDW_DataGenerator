@@ -43,6 +43,7 @@ class XmlWorker(Worker):
                     'entityId': hierarchy.district.guid_sr,
                     'entityName': hierarchy.district.name,
                     'entityType': 'DISTRICT',
+                    'parentEntityType': 'STATE',
                     'parentEntityId': hierarchy.state.code
                 }
             if hierarchy.school.guid_sr not in schools:
@@ -50,6 +51,7 @@ class XmlWorker(Worker):
                     'entityId': hierarchy.school.guid_sr,
                     'entityName': hierarchy.school.name,
                     'entityType': 'INSTITUTION',
+                    'parentEntityType': 'DISTRICT',
                     'parentEntityId': hierarchy.district.guid_sr
                 }
 
