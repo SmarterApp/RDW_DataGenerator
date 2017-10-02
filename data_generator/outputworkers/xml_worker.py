@@ -1,4 +1,5 @@
 import json
+from collections import OrderedDict
 from xml.etree.ElementTree import Element, SubElement, tostring
 
 import os
@@ -56,7 +57,8 @@ class XmlWorker(Worker):
                 }
 
         with open(file, "w") as f:
-            json.dump({'districts': list(districts.values()), 'institutions': list(schools.values())}, f, indent=2)
+            # force output order to be same as org hierarchy
+            json.dump(OrderedDict([('districts', list(districts.values())), ('institutions', list(schools.values()))]), f, indent=2)
 
     def write_assessments(self, asmts: [Assessment]):
         tabulator_writer.write_assessments(os.path.join(self.out_path_root, 'assessments.csv'), asmts, )
