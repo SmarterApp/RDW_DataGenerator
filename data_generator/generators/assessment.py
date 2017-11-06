@@ -1,8 +1,10 @@
 """Generate assessment elements.
 """
 import hashlib
+
 from datetime import timedelta, datetime, time
-from random import choice, randrange, random
+from random import choice, randrange, random, sample
+from string import ascii_uppercase
 
 from data_generator.config import cfg
 from data_generator.config.cfg import ASMT_ITEM_BANK_FORMAT, ITEM_ANSWER_RATE, ANSWER_CORRECT_RATE
@@ -65,6 +67,12 @@ def generate_segment_and_item_bank(asmt: Assessment, gen_item, size, id_gen: IDG
         item.item_key = str(id_gen.get_rec_id('asmt_item_id'))
         item.segment_id = segment.id
         item.type = choice(ASMT_ITEM_BANK_FORMAT)
+        if item.type == 'MC':
+            item.options_count = 4
+            item.answer_key = choice(ascii_uppercase[0:4])
+        if item.type == 'MS':
+            item.options_count = 6
+            item.answer_key = ','.join(sorted(sample(ascii_uppercase[0:6], 2)))
         item.max_score = 1
         item.dok = choice([1, 1, 1, 2, 2, 2, 3, 3, 4])
         item.operational = '1'
@@ -95,22 +103,36 @@ def generate_item_data(items: [AssessmentItem], student_id, date_taken):
         aid.page_visits = 1
         aid.dropped = '0'
         aid.admin_date = admin_date
-
-        if item.type == 'MC':
-            aid.page_time = randrange(1000, 15000)
-            aid.response_value = choice(['A', 'B', 'C', 'D'])
-        elif item.type == 'MS':
-            aid.page_time = randrange(2000, 30000)
-            aid.response_value = choice(['A', 'B', 'C', 'D'])
-        else:
-            aid.page_time = randrange(2000, 60000)
-            aid.response_value = item.type + ' response'
-
         aid.score_status = 'SCORED'
+
         if random() < ITEM_ANSWER_RATE:
             aid.is_selected = '1'
-            aid.score = item.max_score if random() < ANSWER_CORRECT_RATE else randrange(0, item.max_score)
+            correct = random() < ANSWER_CORRECT_RATE
+
+            if item.type == 'MC':
+                aid.page_time = randrange(1000, 15000)
+                if correct:
+                    aid.response_value = item.answer_key
+                    aid.score = item.max_score
+                else:
+                    aid.response_value = choice(ascii_uppercase[0:item.options_count].replace(item.answer_key, ''))
+                    aid.score = 0
+            elif item.type == 'MS':
+                aid.page_time = randrange(2000, 30000)
+                if correct:
+                    aid.response_value = item.answer_key
+                    aid.score = item.max_score
+                else:
+                    wrong_answers = ascii_uppercase[0:item.options_count]
+                    for ch in item.answer_key.split(','): wrong_answers = wrong_answers.replace(ch, '')
+                    aid.response_value = ','.join(sorted(sample(ascii_uppercase[0:item.options_count].replace(item.answer_key[0], ''), 2)))
+                    aid.score = 0
+            else:
+                aid.page_time = randrange(2000, 60000)
+                aid.response_value = item.type + ' response'
+                aid.score = item.max_score if correct else randrange(0, item.max_score)
         else:
+            aid.page_time = randrange(1000, 5000)
             aid.is_selected = '0'
             aid.score = 0
             aid.response_value = None

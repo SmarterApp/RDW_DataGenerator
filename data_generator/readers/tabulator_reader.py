@@ -152,6 +152,8 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
         item.max_score = int(row['ScorePoints'])
         item.dok = int(row['DOK'])
         item.operational = '0' if row['IsFieldTest'] == 'true' else '1'
+        item.answer_key = row['AnswerKey']
+        item.options_count = int(row['NumberOfAnswerOptions'])
         asmt.item_bank.append(item)
         asmt.item_total_score += item.max_score
 
