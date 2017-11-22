@@ -22,4 +22,6 @@ __pycache__
 cover
 coverage.xml
 nosetests.xml
-out
+
+out/
+out.*/
