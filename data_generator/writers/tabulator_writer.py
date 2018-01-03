@@ -62,6 +62,7 @@ def __asmt_to_rows(asmt):
         row['ItemPosition'] = item.position
         row['MaxPoints'] = item.max_score
         row['DOK'] = item.dok
+        row['avg_b'] = item.difficulty
         row['IsFieldTest'] = 'FALSE' if item.operational else 'TRUE'
         row['IsActive'] = 'TRUE'
         rows.append(row.copy())

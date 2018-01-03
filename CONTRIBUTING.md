@@ -83,6 +83,7 @@ generate data for the new system, mostly to take advantage of the good demograph
 number of things that may need cleaning up. And there are some enhancements/improvements. In no particular order:
 
  - [x] Scores for IAB outcomes
+ - [x] Generate (writing) trait scores for WER items
  - [ ] Use only a subset of items from item bank in a particular session outcome (?)
  - [x] Session-based generation. Assign sessionId, test adminstrator, etc.
  - [x] Valid categories for IAB are 1-3, it returns 2-4
@@ -98,8 +99,8 @@ number of things that may need cleaning up. And there are some enhancements/impr
  - [ ] Make item.max_score more complex than 1; configure some to be unscored (-1). Then percolate to item outcomes,
 making score more complex than 0/1.
  - [ ] Make some items field tests (i.e. item.operational='0')
- - [ ] Improve fake answers for items; based on item type of course.
- - [ ] Make item score distribution correspond to item difficulty.
+ - [x] Improve fake answers for items; based on item type of course.
+ - [x] Make item score distribution correspond to item difficulty.
  - [ ] Reuse IAB packages. Currently the system generates multiple IAB packages for a single year, each with a 
  different `period`. It makes more sense to separate the IAB packages from the date taken. So a single IAB package
  might be used more than once during the academic year. Or even in a subsequent academic year. To do this, remove
@@ -110,4 +111,5 @@ making score more complex than 0/1.
  - [x] Set admin condition of outcome based on assessment type (Summative: Valid, ICA: SD, IAB: NS)
  - [ ] Very rarely generate admin condition IN for outcomes of summative assessments
  - [ ] Randomly generate admin condition NS for outcomes of ICA assessments
- 
+ - [ ] Make scores for a student consistent with student capability
+

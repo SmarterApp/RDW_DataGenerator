@@ -202,10 +202,18 @@ class XmlWorker(Worker):
             item.set('score', str(item_data.score))
             item.set('scoreStatus', item_data.score_status)
             item.set('mimeType', 'text/plain')      # TODO
+
             response = SubElement(item, 'Response')
             response.set('date', item_data.response_date.isoformat())
             response.set('type', 'value')
             response.text = item_data.response_value
+
+            if item_data.sub_scores:
+                scoreInfo = self.add_score_info(item, 'Overall', item_data.score)
+                subScoreList = SubElement(scoreInfo, 'SubScoreList')
+                self.add_score_info(subScoreList, 'Organization/Purpose', item_data.sub_scores[0])
+                self.add_score_info(subScoreList, 'Evidence/Elaboration', item_data.sub_scores[1])
+                self.add_score_info(subScoreList, 'Conventions', item_data.sub_scores[2])
 
         xml = tostring(root, 'unicode')
         with open(self.file_path_for_outcome(outcome), "w") as f:
@@ -254,6 +262,14 @@ class XmlWorker(Worker):
             score.set('measureLabel', 'PerformanceLevel')
             score.set('value', str(perf_lvl))
             score.set('standardError', '')
+
+    def add_score_info(self, parent, dimension, points):
+        scoreInfo = SubElement(parent, 'ScoreInfo')
+        scoreInfo.set('maxScore', '0')
+        scoreInfo.set('scoreDimension', dimension)
+        scoreInfo.set('scorePoint', str(points))
+        scoreInfo.set('scoreStatus', 'Scored')
+        return scoreInfo
 
     def is_iab(self, value):
         return 'block' in value.lower()

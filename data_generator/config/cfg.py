@@ -9,6 +9,10 @@ from data_generator.util.assessment_stats import Properties, Stats, GradeLevels,
 HIERARCHY_FROM_DATE = datetime.date(2014, 9, 1)
 HIERARCHY_TO_DATE = datetime.date(9999, 12, 31)
 
+EXTERNAL_DISTRICTS = {}  # map of unused district id -> json for organization
+EXTERNAL_SCHOOLS = {}  # map of unused school id -> json for organization
+HIERARCHY_MAP = {}  # map of district/school guid -> (id, name)
+
 LEP_LANGUAGE_CODES = ['fre', 'ben', 'ger', 'chi', 'kor', 'jpn', 'rus']
 LEP_PROFICIENCY_LEVELS = ['very poor', 'poor', 'adequate', 'good', 'very good']
 LEP_PROFICIENCY_LEVELS_EXIT = ['good', 'very good']

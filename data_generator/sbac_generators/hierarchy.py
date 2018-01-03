@@ -45,8 +45,15 @@ def generate_district(district_type, state: State, id_gen):
     # Run the general generator
     d = general_hier_gen.generate_district(district_type, state)
 
-    # Set the SR guid
+    # set "nice" external id
     d.guid_sr = id_gen.get_sr_uuid()
+
+    # override external id and name (if available)
+    if d.guid in sbac_config.HIERARCHY_MAP:
+        d.guid_sr, d.name = sbac_config.HIERARCHY_MAP[d.guid]
+    elif len(sbac_config.EXTERNAL_DISTRICTS) > 0:
+        ext_district = sbac_config.EXTERNAL_DISTRICTS.popitem()[1]
+        d.guid_sr, d.name = sbac_config.HIERARCHY_MAP[d.guid] = (ext_district['entityId'], ext_district['entityName'])
 
     return d
 
@@ -64,8 +71,19 @@ def generate_school(school_type, district: District, id_gen, interim_asmt_rate=s
     # Run the general generator
     s = general_hier_gen.generate_school(school_type, district)
 
-    # Set the SR guid
+    # Set "nice" external id
     s.guid_sr = id_gen.get_sr_uuid()
+
+    # override external id and name (if available)
+    if s.guid in sbac_config.HIERARCHY_MAP:
+        s.guid_sr, s.name = sbac_config.HIERARCHY_MAP[s.guid]
+    elif len(sbac_config.EXTERNAL_SCHOOLS) > 0:
+        # find an external school that points to the correct district, if any
+        for key, ext_school in sbac_config.EXTERNAL_SCHOOLS.items():
+            if ext_school['parentEntityId'] == district.guid_sr:
+                sbac_config.EXTERNAL_SCHOOLS.pop(key)
+                s.guid_sr, s.name = sbac_config.HIERARCHY_MAP[s.guid] = (ext_school['entityId'], ext_school['entityName'])
+                break
 
     # Decide if the school takes interim assessments
     if random.random() < interim_asmt_rate:

@@ -3,12 +3,15 @@
 import hashlib
 
 from datetime import timedelta, datetime, time
-from random import choice, randrange, random, sample
+from random import choice, randrange, random, sample, randint
 from string import ascii_uppercase
+
+from math import ceil
 
 from data_generator.config import cfg
 from data_generator.config.cfg import ASMT_ITEM_BANK_FORMAT, ITEM_ANSWER_RATE, ANSWER_CORRECT_RATE
-from data_generator.generators import names
+from data_generator.generators import names, text
+from data_generator.generators.text import RandomText
 from data_generator.model.assessment import Assessment
 from data_generator.model.assessmentoutcome import AssessmentOutcome
 from data_generator.model.item import AssessmentItem
@@ -56,6 +59,13 @@ def generate_segment_and_item_bank(asmt: Assessment, gen_item, size, id_gen: IDG
         asmt.item_total_score = None
         return
 
+    # make a set of difficulty ranges favoring easy (x2), moderate (x3), hard (x1)
+    diff_low = -3.0
+    diff_mod = -2.5 + 0.2 * asmt.grade
+    diff_hard = -1.25 + 0.25 * asmt.grade
+    diff_high = 4.0
+    diff_ranges = [(diff_low, diff_mod), (diff_low, diff_mod), (diff_mod, diff_hard), (diff_mod, diff_hard), (diff_mod, diff_hard), (diff_hard, diff_high)]
+
     segment = AssessmentSegment()
     segment.id = id_gen.get_uuid()
 
@@ -75,6 +85,8 @@ def generate_segment_and_item_bank(asmt: Assessment, gen_item, size, id_gen: IDG
             item.answer_key = ','.join(sorted(sample(ascii_uppercase[0:6], 2)))
         item.max_score = 1
         item.dok = choice([1, 1, 1, 2, 2, 2, 3, 3, 4])
+        dr = choice(diff_ranges)
+        item.difficulty = dr[0] + random() * (dr[1] - dr[0])
         item.operational = '1'
         item_bank.append(item)
 
@@ -106,31 +118,7 @@ def generate_item_data(items: [AssessmentItem], student_id, date_taken):
         aid.score_status = 'SCORED'
 
         if random() < ITEM_ANSWER_RATE:
-            aid.is_selected = '1'
-            correct = random() < ANSWER_CORRECT_RATE
-
-            if item.type == 'MC':
-                aid.page_time = randrange(1000, 15000)
-                if correct:
-                    aid.response_value = item.answer_key
-                    aid.score = item.max_score
-                else:
-                    aid.response_value = choice(ascii_uppercase[0:item.options_count].replace(item.answer_key, ''))
-                    aid.score = 0
-            elif item.type == 'MS':
-                aid.page_time = randrange(2000, 30000)
-                if correct:
-                    aid.response_value = item.answer_key
-                    aid.score = item.max_score
-                else:
-                    wrong_answers = ascii_uppercase[0:item.options_count]
-                    for ch in item.answer_key.split(','): wrong_answers = wrong_answers.replace(ch, '')
-                    aid.response_value = ','.join(sorted(sample(ascii_uppercase[0:item.options_count].replace(item.answer_key[0], ''), 2)))
-                    aid.score = 0
-            else:
-                aid.page_time = randrange(2000, 60000)
-                aid.response_value = item.type + ' response'
-                aid.score = item.max_score if correct else randrange(0, item.max_score)
+            generate_response(aid, item)
         else:
             aid.page_time = randrange(1000, 5000)
             aid.is_selected = '0'
@@ -167,3 +155,68 @@ def set_opportunity_dates(outcome: [AssessmentOutcome]):
         outcome.start_date = outcome.item_data[0].response_date
         outcome.submit_date = outcome.item_data[-1].response_date
     outcome.status_date = outcome.submit_date
+
+
+def generate_response(aid: AssessmentOutcomeItemData, item: AssessmentItem):
+    """ generate and set response-related fields in outcome
+
+    :param aid outcome to set
+    :param item outcome's item
+    """
+    # difficulty ranges from -3.0 to 10.0 (more or less)
+    # difficulty cut points vary by asmt/subject/grade but approximately:
+    #   easy:  < -2.5 + 0.2 * grade
+    #   moderate: < -1.25 + 0.25 * grade
+    # chance to answer correctly should be adjusted by difficulty (-3.0 -> .95, 10.0 -> .30)
+    correct = random() < (ANSWER_CORRECT_RATE + (0 if not item.difficulty else -0.05 * item.difficulty))
+
+    aid.is_selected = '1'
+    if item.type == 'MC':       # multiple choice
+        aid.page_time = 1000 * randrange(1, 15)
+        if correct:
+            aid.response_value = item.answer_key
+            aid.score = item.max_score
+        else:
+            aid.response_value = choice(ascii_uppercase[0:item.options_count].replace(item.answer_key, ''))
+            aid.score = 0
+    elif item.type == 'MS':     # multi select
+        aid.page_time = 1000 * randrange(2, 30)
+        if correct:
+            aid.response_value = item.answer_key
+            aid.score = item.max_score
+        else:
+            wrong_answers = ascii_uppercase[0:item.options_count]
+            for ch in item.answer_key.split(','): wrong_answers = wrong_answers.replace(ch, '')
+            aid.response_value = ','.join(sorted(sample(ascii_uppercase[0:item.options_count].replace(item.answer_key[0], ''), 2)))
+            aid.score = 0
+    elif item.type == 'SA':     # short answer text response
+        aid.page_time = 1000 * randrange(60, 300)
+        aid.response_value = text.paragraph()
+        if correct:
+            aid.score = item.max_score
+        else:
+            aid.score = 0
+    elif item.type == 'WER' or item.type == 'ER':  # writing extended response (lots of text, shorter for wrong answer)
+        aid.page_time = 1000 * randrange(120, 600)
+        if correct:
+            aid.response_value = generate_wer_response(randint(3, 8))
+            aid.sub_scores = [randrange(1, 5), randrange(1, 5), randrange(0, 3)]
+        else:
+            aid.response_value = generate_wer_response(1)
+            aid.sub_scores = [randrange(0, 2), randrange(0, 2), 0]
+        aid.score = ceil((aid.sub_scores[0] + aid.sub_scores[1]) / 2.0) + aid.sub_scores[2]
+    # elif item.type == 'EBSR':   # evidence-based selected response (letter response)
+    # elif item.type == 'MI':     # match interaction (seems like choice of two for multiple statements)
+    # elif item.type == 'HTQ':    # hot text (is answer the text choices or position? multi-select)
+    # elif item.type == 'EQ':     # equation response ?
+    # elif item.type == 'GI':     # grid item response ?
+    # elif item.type == 'TI':     # table interaction ?
+    else:
+        aid.page_time = 1000 * randrange(2, 60)
+        aid.response_value = ('good ' if correct else 'poor ') + item.type + ' response'
+        aid.score = item.max_score if correct else randrange(0, item.max_score)
+
+
+def generate_wer_response(paragraphs):
+    rt = RandomText()
+    return '\n\n'.join(('<p>\n' + rt.paragraph() + '\n</p>') for _ in range(paragraphs))

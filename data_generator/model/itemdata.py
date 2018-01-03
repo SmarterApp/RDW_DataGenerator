@@ -25,6 +25,7 @@ class AssessmentOutcomeItemData:
         self.is_selected = '1'      # did student attempt an answer
         self.score = None
         self.score_status = None
+        self.sub_scores = None      # array of subscores: "Organization/Purpose", "Evidence/Elaboration", "Conventions"
 
     def get_object_set(self):
         """

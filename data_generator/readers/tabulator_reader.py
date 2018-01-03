@@ -149,8 +149,9 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
         item.type = row['ItemType']
         item.position = __getInt(row['ItemPosition'], 0)
         item.segment_id = asmt.segment.id
-        item.max_score = int(row['ScorePoints'])
+        item.max_score = int(row['MaxPoints'])
         item.dok = int(row['DOK'])
+        item.difficulty = float(row['avg_b'])
         item.operational = '0' if row['IsFieldTest'] == 'true' else '1'
         item.answer_key = row['AnswerKey']
         item.options_count = int(row['NumberOfAnswerOptions'])

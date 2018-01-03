@@ -1,9 +1,11 @@
 import copy
 import datetime
 import itertools
+import json
 import random
 import sys
 
+import os
 import pyprind
 
 import data_generator.config.cfg as sbac_in_config
@@ -65,6 +67,8 @@ class WorkerManager(Worker):
         if self.gen_item:
             self.workers.append(CSVItemLevelDataWorker(self.out_path_root))
 
+        self.org_source = args.org_source
+
         self.id_gen = IDGen()
 
     def cleanup(self):
@@ -86,6 +90,7 @@ class WorkerManager(Worker):
             return
 
         # Process the state
+        self.__load_external_organizations()
         self.__generate_state_data(state, assessments)
 
     def __assessment_packages(self):
@@ -113,6 +118,18 @@ class WorkerManager(Worker):
         :return: sorted list of years, e.g. [2015, 2016, 2017]
         """
         return sorted(set(map(lambda asmt: asmt.year, assessments)))
+
+    def __load_external_organizations(self):
+        """
+        Look for an organizations.json file and load any contents
+        """
+        file = os.path.join(self.org_source, 'organizations.json')
+        if os.path.isfile(file):
+            with open(file, "r") as f:
+                org = json.load(f)
+                if 'districts' in org: sbac_in_config.EXTERNAL_DISTRICTS = {d['entityId']: d for d in org['districts']}
+                if 'institutions' in org: sbac_in_config.EXTERNAL_SCHOOLS = {s['entityId']: s for s in org['institutions']}
+            print('Loaded external organizations, %d districts, %d schools' % (len(sbac_in_config.EXTERNAL_DISTRICTS), len(sbac_in_config.EXTERNAL_SCHOOLS)))
 
     def __generate_state_data(self, state: State, assessments: [Assessment]):
         """

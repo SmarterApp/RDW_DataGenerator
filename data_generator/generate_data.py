@@ -12,14 +12,16 @@ if __name__ == '__main__':
     # Argument parsing for task-specific arguments
     parser = argparse.ArgumentParser(description='SBAC data generation utility.',
                                      epilog='Example arguments:' +
-                                            '\n  --state_type devel --gen_iab --gen_item --xml_out --out_dir /out'
-                                            '\n  --state_type tiny --gen_sum --xml_out --out_dir /out'
-                                            '\n  --state_type california --gen_sum --gen_ica --xml_out --out_dir /out'
+                                            '\n  --state_type devel --gen_iab --gen_item --xml_out --out_dir out'
+                                            '\n  --state_type tiny --gen_sum --xml_out --out_dir out'
+                                            '\n  --state_type california --gen_sum --gen_ica --xml_out --out_dir out'
                                      )
 
     parser.add_argument('-sn', '--state_name', dest='state_name', action='store', default='California', help='The name of the state (default=California)')
     parser.add_argument('-sc', '--state_code', dest='state_code', action='store', default='CA', help='The code of the state to generate data for')
     parser.add_argument('-st', '--state_type', dest='state_type', action='store', default='devel', help='Specify the type of state to generate data for')
+
+    parser.add_argument('-org', '--org_source', dest='org_source', action='store', default='in', help='Source of organizations.json file (default=in)')
 
     group = parser.add_argument_group('packages')
     group.add_argument('-pkg', '--pkg_source', dest='pkg_source', action='store', default='generate', help='Source of assessment packages, either \'generate\' or a path to tabulator CSV files')
