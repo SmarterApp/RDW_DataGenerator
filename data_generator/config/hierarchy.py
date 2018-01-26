@@ -144,6 +144,24 @@ SCHOOL_TYPES = {
          'students': {'min': 5, 'max': 10, 'avg': 7},
          'group_size': 10
          },
+    'Demo High School':
+        {'type': 'High School',
+         'grades': [11],
+         'students': {'min': 350, 'max': 450, 'avg': 400},
+         'group_size': 40
+         },
+    'Demo Middle School':
+        {'type': 'Middle School',
+         'grades': [7],
+         'students': {'min': 175, 'max': 250, 'avg': 225},
+         'group_size': 30
+         },
+    'Demo Elementary School':
+        {'type': 'Elementary School',
+         'grades': [3],
+         'students': {'min': 75, 'max': 125, 'avg': 100},
+         'group_size': 20
+         },
 }
 
 DISTRICT_TYPES = {
@@ -318,6 +336,14 @@ DISTRICT_TYPES = {
              {'Tiny High School': NORM_HIGH,
               'Tiny Middle School': NORM_MIDL,
               'Tiny Elementary School': NORM_ELEM
+              }
+         },
+    'Demo':
+        {'school_counts': {'min': 8, 'max': 24, 'avg': 16},
+         'school_types_and_ratios':
+             {'Demo High School': NORM_HIGH,
+              'Demo Middle School': NORM_MIDL,
+              'Demo Elementary School': NORM_ELEM
               }
          },
 }

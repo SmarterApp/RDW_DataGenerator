@@ -189,14 +189,14 @@ def generate_response(aid: AssessmentOutcomeItemData, item: AssessmentItem):
             for ch in item.answer_key.split(','): wrong_answers = wrong_answers.replace(ch, '')
             aid.response_value = ','.join(sorted(sample(ascii_uppercase[0:item.options_count].replace(item.answer_key[0], ''), 2)))
             aid.score = 0
-    elif item.type == 'SA':     # short answer text response
+    elif item.type == 'SA' or item.type == 'ER':     # short answer text response
         aid.page_time = 1000 * randrange(60, 300)
         aid.response_value = text.paragraph()
         if correct:
             aid.score = item.max_score
         else:
             aid.score = 0
-    elif item.type == 'WER' or item.type == 'ER':  # writing extended response (lots of text, shorter for wrong answer)
+    elif item.type == 'WER':    # writing extended response (lots of text, shorter for wrong answer; has sub-scores)
         aid.page_time = 1000 * randrange(120, 600)
         if correct:
             aid.response_value = generate_wer_response(randint(3, 8))
