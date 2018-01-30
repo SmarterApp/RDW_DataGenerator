@@ -173,7 +173,7 @@ class XmlWorker(Worker):
 
         self.add_scale_score(opportunity, 'Overall',
             outcome.overall_score, outcome.overall_score_range_min, outcome.overall_perf_lvl)
-        if self.is_iab(asmt.type):
+        if not self.is_iab(asmt.type):
             self.add_scale_score(opportunity, CLAIM_MEASURES[asmt.subject][0],
                 outcome.claim_1_score, outcome.claim_1_score_range_min, outcome.claim_1_perf_lvl)
             self.add_scale_score(opportunity, CLAIM_MEASURES[asmt.subject][1],
