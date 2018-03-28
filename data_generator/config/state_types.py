@@ -47,6 +47,12 @@ STATE_TYPES = {
          'subject_skip_percentages': {'Math': .04, 'ELA': .03},
          'demographics': 'california'
          },
+    'uat':
+        {'district_types_and_counts': [('Small Good', 1),
+                                       ('Tiny', 9)],
+         'subject_skip_percentages': {'Math': .04, 'ELA': .03},
+         'demographics': 'california'
+         },
     'udl_test':
         {'district_types_and_counts': [('Big UDL', 1)],
          'subject_skip_percentages': {'Math': 0, 'ELA': 0},
