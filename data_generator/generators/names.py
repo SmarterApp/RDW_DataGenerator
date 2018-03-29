@@ -69,10 +69,10 @@ def generate_person_name(gender):
         fm_names = PEOPLE_NAMES.male_names
     elif gender == 'female':
         fm_names = PEOPLE_NAMES.female_names
-    elif gender == 'none':
+    elif gender == 'none' or gender == 'non_binary':
         fm_names = random.choice([PEOPLE_NAMES.male_names, PEOPLE_NAMES.female_names])
     else:
-        raise Exception("Unknown gender value '" + str(gender) + "' provided [expected 'male', 'female' or 'none']")
+        raise Exception("Unknown gender value '" + str(gender) + "' provided [expected 'male', 'female', 'non_binary' or 'none']")
     return fm_names[random.randint(0, len(fm_names) - 1)], \
            fm_names[random.randint(0, len(fm_names) - 1)] if random.randint(1, 10) < 7 else None, \
            l_names[random.randint(0, len(l_names) - 1)]

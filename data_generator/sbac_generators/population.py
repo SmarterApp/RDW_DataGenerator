@@ -248,6 +248,13 @@ def _set_lang_items(student, acad_year=datetime.datetime.now().year,
         if student.lang_prof_level in lep_proficiency_levels_exit:
             student.prg_lep_exit_date = _generate_date_lep_exit(student.grade, acad_year)
             student.lang_title_3_prg = None
+            student.elas = 'RFEP'
+            student.elas_start_date = student.prg_lep_exit_date
+        else:
+            student.elas = 'EL'
+            student.elas_start_date = student.prg_lep_entry_date
+    else:
+        student.elas = 'EO'
 
 
 def _generate_date_lep_entry(grade, acad_year=datetime.datetime.now().year):

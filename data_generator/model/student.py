@@ -52,6 +52,8 @@ class Student:
         self.lang_title_3_prg = None
         self.prg_lep_entry_date = None
         self.prg_lep_exit_date = None
+        self.elas = None
+        self.elas_start_date = None
         self.prg_primary_disability = None
         self.derived_demographic = None
         self.group_1_id = None

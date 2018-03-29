@@ -117,6 +117,8 @@ class XmlWorker(Worker):
         self.add_examinee_attribute(examinee, 'EconomicDisadvantageStatus', self.map_yes_no(student.prg_econ_disad), contextDateStr)
         self.add_examinee_attribute(examinee, 'LanguageCode', student.lang_code, contextDateStr)
         self.add_examinee_attribute(examinee, 'EnglishLanguageProficiencyLevel', student.lang_prof_level, contextDateStr)
+        self.add_examinee_attribute(examinee, 'EnglishLanguageAcquisitionStatus', student.elas, contextDateStr)
+        self.add_examinee_attribute(examinee, 'EnglishLanguageAcquisitionStatusStartDate', student.elas_start_date, contextDateStr)
         self.add_examinee_attribute(examinee, 'StudentGroupName', student.group_1_text, contextDateStr)
         self.add_examinee_attribute(examinee, 'StudentGroupName', student.group_2_text, contextDateStr)
         self.add_examinee_attribute(examinee, 'StudentGroupName', student.group_3_text, contextDateStr)
@@ -280,6 +282,7 @@ class XmlWorker(Worker):
     def map_gender(self, value):
         if 'female' == value.lower(): return 'Female'
         if 'male' == value.lower(): return 'Male'
+        if 'non_binary' == value.lower(): return 'NonBinary'
         return None
 
     def map_yes_no(self, value):
