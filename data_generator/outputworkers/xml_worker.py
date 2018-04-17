@@ -113,6 +113,8 @@ class XmlWorker(Worker):
         self.add_examinee_attribute(examinee, 'DemographicRaceTwoOrMoreRaces', self.map_yes_no(student.eth_multi), contextDateStr)
         self.add_examinee_attribute(examinee, 'IDEAIndicator', self.map_yes_no(student.prg_iep), contextDateStr)
         self.add_examinee_attribute(examinee, 'LEPStatus', self.map_yes_no(student.prg_lep), contextDateStr)
+        self.add_examinee_attribute(examinee, 'LimitedEnglishProficiencyEntryDate', student.prg_lep_entry_date, contextDateStr)
+        self.add_examinee_attribute(examinee, 'LEPExitDate', student.prg_lep_exit_date, contextDateStr)
         self.add_examinee_attribute(examinee, 'Section504Status', self.map_yes_no(student.prg_sec504), contextDateStr)
         self.add_examinee_attribute(examinee, 'EconomicDisadvantageStatus', self.map_yes_no(student.prg_econ_disad), contextDateStr)
         self.add_examinee_attribute(examinee, 'LanguageCode', student.lang_code, contextDateStr)
