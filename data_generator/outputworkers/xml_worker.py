@@ -72,6 +72,10 @@ class XmlWorker(Worker):
             self.write_asmt_to_file(result)
 
     def write_asmt_to_file(self, outcome: AssessmentOutcome):
+        # skip inactive or deleted outcomes
+        if outcome.result_status != 'C':
+            return
+
         root = Element('TDSReport')
 
         # write Test
@@ -207,10 +211,12 @@ class XmlWorker(Worker):
             item.set('scoreStatus', item_data.score_status)
             item.set('mimeType', 'text/plain')      # TODO
 
-            response = SubElement(item, 'Response')
-            response.set('date', item_data.response_date.isoformat())
-            response.set('type', 'value')
-            response.text = item_data.response_value
+            # summative results should not have item response included (business policy)
+            if not self.is_summative(asmt.type):
+                response = SubElement(item, 'Response')
+                response.set('date', item_data.response_date.isoformat())
+                response.set('type', 'value')
+                response.text = item_data.response_value
 
             if item_data.sub_scores:
                 scoreInfo = self.add_score_info(item, 'Overall', item_data.score)
@@ -277,6 +283,9 @@ class XmlWorker(Worker):
 
     def is_iab(self, value):
         return 'block' in value.lower()
+
+    def is_summative(self, value):
+        return 'summative' in value.lower()
 
     def map_asmt_type(self, value):
         return 'Summative' if 'summative' in value.lower() else 'Interim'
