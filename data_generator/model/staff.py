@@ -41,4 +41,3 @@ class TeachingStaff(Staff):
     def __init__(self):
         super().__init__()
         self.school = None
-        self.guid_sr = None

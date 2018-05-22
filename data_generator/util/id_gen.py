@@ -4,30 +4,28 @@ Generate IDs that conform to student registration (SBAC) requirements.
 """
 
 import multiprocessing
-
 from uuid import uuid4
 
 
 class IDGen():
-    def __init__(self, lock=multiprocessing.Lock(), rec_dict={}):
-        self._start_rec_id = 100000000000
+    def __init__(self, lock=multiprocessing.Lock()):
         self._rec_id_lock = lock
-        self._rec_id_dict = rec_dict
-        self._rec_id = multiprocessing.Value('i', 100000000000)
-        self._start_grp_id = 100
-        self._grp_id_dict = {}
+        self._rec_id_dict = {}
 
-    def get_group_id(self, type_str):
+    def __get_next_rec_id(self, type_str, init=1000000000, inc=1):
         """
-        Get the next integer record ID within the system for the given type string.
+        Safely get the next id.
 
-        @param type_str: The type string to get a record ID for
-        @returns: Next ID for the given type string
+        :param type_str: label for id, e.g. 'student'
+        :param init: initial value for id
+        :param inc: id increment
+        :return: next id
         """
-        if type_str not in self._grp_id_dict:
-            self._grp_id_dict[type_str] = self._start_grp_id
-        nid = self._grp_id_dict[type_str]
-        self._grp_id_dict[type_str] += 100
+        with self._rec_id_lock:
+            if type_str not in self._rec_id_dict:
+                self._rec_id_dict[type_str] = init
+            nid = self._rec_id_dict[type_str]
+            self._rec_id_dict[type_str] += inc
         return nid
 
     def get_rec_id(self, type_str):
@@ -37,12 +35,45 @@ class IDGen():
         @param type_str: The type string to get a record ID for
         @returns: Next ID for the given type string
         """
-        with self._rec_id_lock:
-            if type_str not in self._rec_id_dict:
-                self._rec_id_dict[type_str] = self._start_rec_id
-            nid = self._rec_id_dict[type_str]
-            self._rec_id_dict[type_str] += 1
-        return nid
+        return self.__get_next_rec_id(type_str)
+
+    def get_group_id(self, type_str):
+        """
+        Helper to get group id: starts at 100 and increments by 100.
+
+        @param type_str: The type string to get a record ID for
+        @returns: Next ID for the given type string
+        """
+        return self.__get_next_rec_id(type_str, 100, 100)
+
+    def get_district_id(self, state_id):
+        """
+        Get the next district id, based on next record id for districts.
+        The format is consistent with the NCES LEA ID scheme: LEA has a 7 digit id which consists
+        of the 2 digit state code and a 5 digit unique-within-state id. The school id consists of
+        the 7 digit district id and a 5 digit unique-with-district id. Because leading zeroes are
+        allowed, we must force the formatting.
+
+        :param state_id: district's state's id
+        :return: next district id
+        """
+        return "{s}{d:05}".format(s=state_id, d=self.__get_next_rec_id(state_id, 1))
+
+    def get_school_id(self, district_id):
+        """
+        Get the next school id. For NCES, the school id is the district id plus a 5 digit number.
+
+        :param district_id: school's district's id
+        :return: next school id
+        """
+        school_id = self.__get_next_rec_id(district_id, 1)
+
+        # some legacy district ids have the 7 trailing 0's
+        # for those, strip the trailing 0's and use a 7-digit format for the school id part
+        if len(district_id) > 12 and district_id[-7:] == '0000000':
+            return "{d}{s:07}".format(d=district_id[0:-7], s=school_id)
+        else:
+            return "{d}{s:05}".format(d=district_id, s=school_id)
 
     @staticmethod
     def get_uuid():

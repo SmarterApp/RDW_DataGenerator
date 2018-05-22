@@ -39,21 +39,21 @@ class XmlWorker(Worker):
                 if 'institutions' in org: schools = {s['entityId']: s for s in org['institutions']}
 
         for hierarchy in hierarchies:
-            if hierarchy.district.guid_sr not in districts:
-                districts[hierarchy.district.guid_sr] = {
-                    'entityId': hierarchy.district.guid_sr,
+            if hierarchy.district.id not in districts:
+                districts[hierarchy.district.id] = {
+                    'entityId': hierarchy.district.id,
                     'entityName': hierarchy.district.name,
                     'entityType': 'DISTRICT',
                     'parentEntityType': 'STATE',
                     'parentEntityId': hierarchy.state.code
                 }
-            if hierarchy.school.guid_sr not in schools:
-                schools[hierarchy.school.guid_sr] = {
-                    'entityId': hierarchy.school.guid_sr,
+            if hierarchy.school.id not in schools:
+                schools[hierarchy.school.id] = {
+                    'entityId': hierarchy.school.id,
                     'entityName': hierarchy.school.name,
                     'entityType': 'INSTITUTION',
                     'parentEntityType': 'DISTRICT',
-                    'parentEntityId': hierarchy.district.guid_sr
+                    'parentEntityId': hierarchy.district.id
                 }
 
         with open(file, "w") as f:
@@ -139,9 +139,9 @@ class XmlWorker(Worker):
         hierarchy = outcome.inst_hierarchy
         self.add_examinee_relationship(examinee, 'StateAbbreviation', hierarchy.state.code, contextDateStr)
         self.add_examinee_relationship(examinee, 'StateName', hierarchy.state.name, contextDateStr)
-        self.add_examinee_relationship(examinee, 'DistrictId', hierarchy.district.guid_sr, contextDateStr)
+        self.add_examinee_relationship(examinee, 'DistrictId', hierarchy.district.id, contextDateStr)
         self.add_examinee_relationship(examinee, 'DistrictName', hierarchy.district.name, contextDateStr)
-        self.add_examinee_relationship(examinee, 'SchoolId', hierarchy.school.guid_sr, contextDateStr)
+        self.add_examinee_relationship(examinee, 'SchoolId', hierarchy.school.id, contextDateStr)
         self.add_examinee_relationship(examinee, 'SchoolName', hierarchy.school.name, contextDateStr)
 
         # write Opportunity
@@ -239,8 +239,8 @@ class XmlWorker(Worker):
         """
         path = os.path.join(self.out_path_root,
                             outcome.inst_hierarchy.state.code,
-                            outcome.inst_hierarchy.district.guid_sr,
-                            outcome.inst_hierarchy.school.guid_sr)
+                            outcome.inst_hierarchy.district.id,
+                            outcome.inst_hierarchy.school.id)
         os.makedirs(path, exist_ok=True)
         return os.path.join(path, outcome.guid) + '.xml'
 

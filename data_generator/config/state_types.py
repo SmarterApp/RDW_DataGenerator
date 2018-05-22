@@ -19,7 +19,8 @@ STATE_TYPES = {
                                        ('Small Very Poor', 200),
                                        ('Small Very Good', 100)],
          'subject_skip_percentages': {'Math': .04, 'ELA': .03},
-         'demographics': 'california'
+         'demographics': 'california',
+         'id': '06'
          },
     'example':
         {'district_types_and_counts': [('Big Average', 1),
@@ -30,33 +31,39 @@ STATE_TYPES = {
                                        ('Small Poor', 2),
                                        ('Small Good', 2)],
          'subject_skip_percentages': {'Math': .04, 'ELA': .03},
-         'demographics': 'california'
+         'demographics': 'california',
+         'id': '00'
          },
     'devel':
         {'district_types_and_counts': [('Small Average', 4)],
          'subject_skip_percentages': {'Math': .04, 'ELA': .03},
-         'demographics': 'california'
+         'demographics': 'california',
+         'id': '00'
          },
     'tiny':
         {'district_types_and_counts': [('Tiny', 2)],
          'subject_skip_percentages': {'Math': .04, 'ELA': .03},
-         'demographics': 'california'
+         'demographics': 'california',
+         'id': '06'
          },
     'demo':
         {'district_types_and_counts': [('Demo', 2)],
          'subject_skip_percentages': {'Math': .04, 'ELA': .03},
-         'demographics': 'california'
+         'demographics': 'california',
+         'id': '06'
          },
     'uat':
         {'district_types_and_counts': [('Small Good', 1),
                                        ('Tiny', 9)],
          'subject_skip_percentages': {'Math': .04, 'ELA': .03},
-         'demographics': 'california'
+         'demographics': 'california',
+         'id': '06'
          },
     'udl_test':
         {'district_types_and_counts': [('Big UDL', 1)],
          'subject_skip_percentages': {'Math': 0, 'ELA': 0},
-         'demographics': 'california'
+         'demographics': 'california',
+         'id': '00'
          },
     'pa':
         {'district_types_and_counts': [('Big Average', 10),
@@ -70,6 +77,7 @@ STATE_TYPES = {
                                        ('Small Poor', 8),
                                        ('Small Good', 8)],
          'subject_skip_percentages': {'Math': .04, 'ELA': .03},
-         'demographics': 'california'
+         'demographics': 'california',
+         'id': '42'
          },
 }

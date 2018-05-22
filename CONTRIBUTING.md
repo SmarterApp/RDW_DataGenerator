@@ -92,8 +92,8 @@ number of things that may need cleaning up. And there are some enhancements/impr
  - [ ] date-taken should be passed into outcome generation, not pulled from assessment.
  - [x] min/max scores are silly (1200/2400, grade independent); should use LOSS/HOSS tables from SB docs. 
  - [ ] How are Section/Staff used? Can they be removed? Consider the session-based generation task.
- - [ ] Combine remaining sbac_generators into generators.
- - [ ] IDGen: remove MTS, clean up in general.
+ - [x] Combine remaining sbac_generators into generators.
+ - [x] IDGen: clean up.
  - [ ] Stage work to avoid memory utilization problems for large generations.
  - [ ] Load District/School configurations to allow multiple generations against the same values.
  - [ ] Make item.max_score more complex than 1; configure some to be unscored (-1). Then percolate to item outcomes,
@@ -105,11 +105,11 @@ making score more complex than 0/1.
  different `period`. It makes more sense to separate the IAB packages from the date taken. So a single IAB package
  might be used more than once during the academic year. Or even in a subsequent academic year. To do this, remove
  `period` from the package; then generate the date-taken and pass it in when generating outcomes.
- - [ ] Clean up accommodations. These belong to the student profile combined with assessment-specific restrictions.
+ - [ ] Clean up accommodations. These belong to the student profile combined with assessment-specific restrictions. When doing this update to make them realistic and consistent with current values.
  - [ ] Remove deprecated output workers. Consider that pg_worker could be repurposed as a sql_worker.
  - [ ] Student.skip_iab is not being used. Should it? Some way of skipping IAB's at the student level makes sense.
  - [x] Set admin condition of outcome based on assessment type (Summative: Valid, ICA: SD, IAB: NS)
  - [ ] Very rarely generate admin condition IN for outcomes of summative assessments
  - [ ] Randomly generate admin condition NS for outcomes of ICA assessments
  - [ ] Make scores for a student consistent with student capability
-
+ - [ ] Add filipino as an ethnicity for California demographics.

@@ -9,10 +9,10 @@ import shutil
 
 import data_generator.writers.util as writers_util
 from data_generator.writers.datefilters import FILTERS as DATE_TIME_FILTERS
-from data_generator.writers.filters import SBAC_FILTERS as FILTERS
+from data_generator.writers.filters import ALL_FILTERS as FILTERS
 
-available_filters = DATE_TIME_FILTERS.copy();
-available_filters.update(FILTERS);
+available_filters = DATE_TIME_FILTERS.copy()
+available_filters.update(FILTERS)
 
 
 def clean_dir(out_path_root):

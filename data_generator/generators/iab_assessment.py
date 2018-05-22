@@ -5,15 +5,15 @@ An assessment generator
 import datetime
 import random
 
-import data_generator.config.cfg as sbac_config
+import data_generator.config.cfg as cfg
 import data_generator.generators.assessment as gen_asmt_generator
+from data_generator.generators.hierarchy import InstitutionHierarchy
 from data_generator.generators.population import generate_perf_lvl
 from data_generator.model.assessment import Assessment
 from data_generator.model.assessmentoutcome import AssessmentOutcome
 from data_generator.model.interimassessment import InterimAssessment
 from data_generator.model.interimassessmentoutcome import InterimAssessmentOutcome
 from data_generator.model.student import Student
-from data_generator.sbac_generators.hierarchy import InstitutionHierarchy
 from data_generator.util.assessment_stats import random_score_given_level, random_claim_error, claim_perf_lvl
 from data_generator.util.id_gen import IDGen
 
@@ -49,7 +49,7 @@ def generate_interim_assessment(asmt_year: int,
                                 block: str,
                                 grade: int,
                                 id_gen: IDGen,
-                                claim_definitions=sbac_config.CLAIM_DEFINITIONS,
+                                claim_definitions=cfg.CLAIM_DEFINITIONS,
                                 gen_item=True):
     """
     Generate an assessment object.
@@ -68,7 +68,7 @@ def generate_interim_assessment(asmt_year: int,
         raise KeyError("Subject '%s' not found in claim definitions" % subject)
 
     claims = claim_definitions[subject]
-    asmt_scale_scores = sbac_config.ASMT_SCALE_SCORE[subject][grade]
+    asmt_scale_scores = cfg.ASMT_SCALE_SCORE[subject][grade]
 
     # Run the General generator
     sa = gen_asmt_generator.generate_assessment(Assessment)
@@ -79,7 +79,7 @@ def generate_interim_assessment(asmt_year: int,
     sa.type = 'INTERIM ASSESSMENT BLOCK'
     sa.period = str(asmt_year-1)
     sa.year = asmt_year
-    sa.version = sbac_config.ASMT_VERSION
+    sa.version = cfg.ASMT_VERSION
     sa.name = 'SBAC-IAB-FIXED-G{}{}-{}-{}-{}'.format(grade, subject[0], ''.join(c for c in block if c.isupper()), subject, grade)
     sa.id = '(SBAC){}-{}-{}'.format(sa.name, asmt_year-1, asmt_year)
     sa.subject = subject
@@ -89,9 +89,9 @@ def generate_interim_assessment(asmt_year: int,
     sa.claim_2_name = "Grade %s" % grade
     sa.claim_3_name = None
     sa.claim_4_name = None
-    sa.perf_lvl_name_1 = sbac_config.CLAIM_PERF_LEVEL_NAME_1
-    sa.perf_lvl_name_2 = sbac_config.CLAIM_PERF_LEVEL_NAME_2
-    sa.perf_lvl_name_3 = sbac_config.CLAIM_PERF_LEVEL_NAME_3
+    sa.perf_lvl_name_1 = cfg.CLAIM_PERF_LEVEL_NAME_1
+    sa.perf_lvl_name_2 = cfg.CLAIM_PERF_LEVEL_NAME_2
+    sa.perf_lvl_name_3 = cfg.CLAIM_PERF_LEVEL_NAME_3
     sa.perf_lvl_name_4 = None
     sa.perf_lvl_name_5 = None
     sa.overall_score_min = asmt_scale_scores[0]
@@ -108,16 +108,16 @@ def generate_interim_assessment(asmt_year: int,
     sa.claim_4_score_min = None
     sa.claim_4_score_max = None
     sa.claim_4_score_weight = None
-    sa.claim_perf_lvl_name_1 = sbac_config.CLAIM_PERF_LEVEL_NAME_1
-    sa.claim_perf_lvl_name_2 = sbac_config.CLAIM_PERF_LEVEL_NAME_2
-    sa.claim_perf_lvl_name_3 = sbac_config.CLAIM_PERF_LEVEL_NAME_3
+    sa.claim_perf_lvl_name_1 = cfg.CLAIM_PERF_LEVEL_NAME_1
+    sa.claim_perf_lvl_name_2 = cfg.CLAIM_PERF_LEVEL_NAME_2
+    sa.claim_perf_lvl_name_3 = cfg.CLAIM_PERF_LEVEL_NAME_3
     sa.overall_cut_point_1 = asmt_scale_scores[1]
     sa.overall_cut_point_2 = asmt_scale_scores[2]
     sa.overall_cut_point_3 = asmt_scale_scores[3]
     sa.effective_date = datetime.date(asmt_year-1, 8, 15)
     sa.from_date = sa.effective_date
-    sa.to_date = sbac_config.ASMT_TO_DATE
-    gen_asmt_generator.generate_segment_and_item_bank(sa, gen_item, sbac_config.IAB_ITEM_BANK_SIZE, id_gen)
+    sa.to_date = cfg.ASMT_TO_DATE
+    gen_asmt_generator.generate_segment_and_item_bank(sa, gen_item, cfg.IAB_ITEM_BANK_SIZE, id_gen)
 
     return sa
 
@@ -181,35 +181,35 @@ def generate_interim_assessment_outcome(date_taken: datetime.date,
 
     # Create accommodations details
     sao.acc_asl_video_embed = _pick_default_accommodation_code(
-        sbac_config.ACCOMMODATIONS['acc_asl_video_embed'][assessment.subject])
+        cfg.ACCOMMODATIONS['acc_asl_video_embed'][assessment.subject])
     sao.acc_print_on_demand_items_nonembed = _pick_default_accommodation_code(
-        sbac_config.ACCOMMODATIONS['acc_print_on_demand_items_nonembed'][assessment.subject])
+        cfg.ACCOMMODATIONS['acc_print_on_demand_items_nonembed'][assessment.subject])
     sao.acc_noise_buffer_nonembed = _pick_default_accommodation_code(
-        sbac_config.ACCOMMODATIONS['acc_noise_buffer_nonembed'][assessment.subject])
+        cfg.ACCOMMODATIONS['acc_noise_buffer_nonembed'][assessment.subject])
     sao.acc_braile_embed = _pick_default_accommodation_code(
-        sbac_config.ACCOMMODATIONS['acc_braile_embed'][assessment.subject])
+        cfg.ACCOMMODATIONS['acc_braile_embed'][assessment.subject])
     sao.acc_closed_captioning_embed = _pick_default_accommodation_code(
-        sbac_config.ACCOMMODATIONS['acc_closed_captioning_embed'][assessment.subject])
+        cfg.ACCOMMODATIONS['acc_closed_captioning_embed'][assessment.subject])
     sao.acc_text_to_speech_embed = _pick_default_accommodation_code(
-        sbac_config.ACCOMMODATIONS['acc_text_to_speech_embed'][assessment.subject])
+        cfg.ACCOMMODATIONS['acc_text_to_speech_embed'][assessment.subject])
     sao.acc_abacus_nonembed = _pick_default_accommodation_code(
-        sbac_config.ACCOMMODATIONS['acc_abacus_nonembed'][assessment.subject])
+        cfg.ACCOMMODATIONS['acc_abacus_nonembed'][assessment.subject])
     sao.acc_alternate_response_options_nonembed = _pick_default_accommodation_code(
-        sbac_config.ACCOMMODATIONS['acc_alternate_response_options_nonembed'][assessment.subject])
+        cfg.ACCOMMODATIONS['acc_alternate_response_options_nonembed'][assessment.subject])
     sao.acc_calculator_nonembed = _pick_default_accommodation_code(
-        sbac_config.ACCOMMODATIONS['acc_calculator_nonembed'][assessment.subject])
+        cfg.ACCOMMODATIONS['acc_calculator_nonembed'][assessment.subject])
     sao.acc_multiplication_table_nonembed = _pick_default_accommodation_code(
-        sbac_config.ACCOMMODATIONS['acc_multiplication_table_nonembed'][assessment.subject])
+        cfg.ACCOMMODATIONS['acc_multiplication_table_nonembed'][assessment.subject])
     sao.acc_print_on_demand_nonembed = _pick_default_accommodation_code(
-        sbac_config.ACCOMMODATIONS['acc_asl_video_embed'][assessment.subject])
+        cfg.ACCOMMODATIONS['acc_asl_video_embed'][assessment.subject])
     sao.acc_read_aloud_nonembed = _pick_default_accommodation_code(
-        sbac_config.ACCOMMODATIONS['acc_read_aloud_nonembed'][assessment.subject])
+        cfg.ACCOMMODATIONS['acc_read_aloud_nonembed'][assessment.subject])
     sao.acc_scribe_nonembed = _pick_default_accommodation_code(
-        sbac_config.ACCOMMODATIONS['acc_scribe_nonembed'][assessment.subject])
+        cfg.ACCOMMODATIONS['acc_scribe_nonembed'][assessment.subject])
     sao.acc_speech_to_text_nonembed = _pick_default_accommodation_code(
-        sbac_config.ACCOMMODATIONS['acc_speech_to_text_nonembed'][assessment.subject])
+        cfg.ACCOMMODATIONS['acc_speech_to_text_nonembed'][assessment.subject])
     sao.acc_streamline_mode = _pick_default_accommodation_code(
-        sbac_config.ACCOMMODATIONS['acc_streamline_mode'][assessment.subject])
+        cfg.ACCOMMODATIONS['acc_streamline_mode'][assessment.subject])
 
     return sao
 

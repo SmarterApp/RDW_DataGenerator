@@ -2,17 +2,17 @@ import copy
 import datetime
 import itertools
 import json
+import os
 import random
 import sys
 
-import os
 import pyprind
 
-import data_generator.config.cfg as sbac_in_config
-import data_generator.generators.iab_assessment as sbac_interim_asmt_gen
-import data_generator.generators.summative_or_ica_assessment as sbac_asmt_gen
-import data_generator.sbac_generators.hierarchy as sbac_hier_gen
-import data_generator.sbac_generators.population as sbac_pop_gen
+import data_generator.config.cfg as cfg
+import data_generator.generators.hierarchy as hier_gen
+import data_generator.generators.iab_assessment as iab_asmt_gen
+import data_generator.generators.population as pop_gen
+import data_generator.generators.summative_or_ica_assessment as asmt_gen
 import data_generator.util.hiearchy as hier_util
 from data_generator.model.assessment import Assessment
 from data_generator.model.district import District
@@ -80,7 +80,7 @@ class WorkerManager(Worker):
             worker.prepare()
 
     def run(self):
-        state = sbac_hier_gen.generate_state(self.state_cfg['type'], self.state_cfg['name'], self.state_cfg['code'], self.id_gen)
+        state = hier_gen.generate_state(self.state_cfg['type'], self.state_cfg['name'], self.state_cfg['code'], self.id_gen)
         print('Creating State: %s' % state.name)
 
         assessments = self.__assessment_packages()
@@ -127,9 +127,9 @@ class WorkerManager(Worker):
         if os.path.isfile(file):
             with open(file, "r") as f:
                 org = json.load(f)
-                if 'districts' in org: sbac_in_config.EXTERNAL_DISTRICTS = {d['entityId']: d for d in org['districts']}
-                if 'institutions' in org: sbac_in_config.EXTERNAL_SCHOOLS = {s['entityId']: s for s in org['institutions']}
-            print('Loaded external organizations, %d districts, %d schools' % (len(sbac_in_config.EXTERNAL_DISTRICTS), len(sbac_in_config.EXTERNAL_SCHOOLS)))
+                if 'districts' in org: cfg.EXTERNAL_DISTRICTS = {d['entityId']: d for d in org['districts']}
+                if 'institutions' in org: cfg.EXTERNAL_SCHOOLS = {s['entityId']: s for s in org['institutions']}
+            print('Loaded external organizations, %d districts, %d schools' % (len(cfg.EXTERNAL_DISTRICTS), len(cfg.EXTERNAL_SCHOOLS)))
 
     def __generate_state_data(self, state: State, assessments: [Assessment]):
         """
@@ -147,7 +147,7 @@ class WorkerManager(Worker):
         for district_type, dist_type_count in state.config['district_types_and_counts']:
             for _ in range(dist_type_count):
                 # Create the district
-                district = sbac_hier_gen.generate_district(district_type, state, self.id_gen)
+                district = hier_gen.generate_district(district_type, state, self.id_gen)
                 print('\nCreating District: %s (%s District)' % (district.name, district.type_str))
 
                 # Generate the district data set
@@ -173,16 +173,16 @@ class WorkerManager(Worker):
 
         # set up a progress bar
         progress_max = 0
-        for subject, grade in itertools.product(sbac_in_config.SUBJECTS, GRADES_OF_CONCERN):
-            progress_max += len(ASMT_YEARS) * len(sbac_in_config.IAB_NAMES[subject][grade]) * len(sbac_in_config.IAB_EFFECTIVE_DATES)
+        for subject, grade in itertools.product(cfg.SUBJECTS, GRADES_OF_CONCERN):
+            progress_max += len(ASMT_YEARS) * len(cfg.IAB_NAMES[subject][grade]) * len(cfg.IAB_EFFECTIVE_DATES)
         bar = pyprind.ProgBar(progress_max, stream=sys.stdout, title='Generating IAB assessments')
 
         # generate iabs
-        for subject, grade in itertools.product(sbac_in_config.SUBJECTS, GRADES_OF_CONCERN):
-            for year, block in itertools.product(ASMT_YEARS, sbac_in_config.IAB_NAMES[subject][grade]):
+        for subject, grade in itertools.product(cfg.SUBJECTS, GRADES_OF_CONCERN):
+            for year, block in itertools.product(ASMT_YEARS, cfg.IAB_NAMES[subject][grade]):
 
-                assessments.append(sbac_interim_asmt_gen.generate_interim_assessment(year, subject, block, grade, self.id_gen,
-                                                                                     gen_item=self.gen_item))
+                assessments.append(iab_asmt_gen.generate_interim_assessment(year, subject, block, grade, self.id_gen,
+                                                                            gen_item=self.gen_item))
                 # Output to requested mediums
                 for worker in self.workers:
                     worker.write_iab(assessments[-1])
@@ -201,11 +201,11 @@ class WorkerManager(Worker):
             return assessments
 
         # set up a progress bar
-        progress_max = len(ASMT_YEARS) * len(sbac_in_config.SUBJECTS) * len(GRADES_OF_CONCERN)
+        progress_max = len(ASMT_YEARS) * len(cfg.SUBJECTS) * len(GRADES_OF_CONCERN)
         bar = pyprind.ProgBar(progress_max, stream=sys.stdout, title='Generating Summative and ICA Assessments')
 
         for year in ASMT_YEARS:
-            for subject in sbac_in_config.SUBJECTS:
+            for subject in cfg.SUBJECTS:
                 for grade in GRADES_OF_CONCERN:
                     if self.sum_pkg:
                         # Create the summative assessment
@@ -231,7 +231,7 @@ class WorkerManager(Worker):
         @returns: New assessment object
         """
         # Create assessment
-        asmt = sbac_asmt_gen.generate_assessment(type, period, year, subject, grade, self.id_gen, gen_item=self.gen_item)
+        asmt = asmt_gen.generate_assessment(type, period, year, subject, grade, self.id_gen, gen_item=self.gen_item)
 
         for worker in self.workers:
             worker.write_assessment(asmt)
@@ -252,7 +252,7 @@ class WorkerManager(Worker):
         rs_by_year = {}
         start_year = years[0] - 1
         # Build the original system
-        rs = sbac_hier_gen.generate_registration_system(start_year, str(start_year - 1) + '-02-25', self.id_gen)
+        rs = hier_gen.generate_registration_system(start_year, str(start_year - 1) + '-02-25', self.id_gen)
 
         # Update it over every year
         for year in years:
@@ -284,8 +284,8 @@ class WorkerManager(Worker):
 
             for j in range(school_type_count):
                 # Create the school and institution hierarchy object
-                school = sbac_hier_gen.generate_school(school_type, district, self.id_gen)
-                ih = sbac_hier_gen.generate_institution_hierarchy(state, district, school, self.id_gen)
+                school = hier_gen.generate_school(school_type, district, self.id_gen)
+                ih = hier_gen.generate_institution_hierarchy(state, district, school, self.id_gen)
                 hierarchies.append(ih)
                 inst_hiers[school.guid] = ih
                 schools.append(school)
@@ -311,7 +311,7 @@ class WorkerManager(Worker):
         self.__generate_institution_hierarchy(state, district, inst_hiers, schools)
 
         # Sort the schools
-        schools_by_grade = sbac_hier_gen.sort_schools_by_grade(schools)
+        schools_by_grade = hier_gen.sort_schools_by_grade(schools)
 
         # Begin processing the years for data
         unique_students = {}
@@ -322,7 +322,7 @@ class WorkerManager(Worker):
         years = self.__years(assessments)
 
         # calculate the progress bar max and start the progress
-        progress_max = len(sbac_hier_gen.set_up_schools_with_grades(schools, GRADES_OF_CONCERN)) * len(years)
+        progress_max = len(hier_gen.set_up_schools_with_grades(schools, GRADES_OF_CONCERN)) * len(years)
         bar = pyprind.ProgBar(progress_max, stream=sys.stdout, title='Generating assessments outcome for schools')
 
         for year in years:
@@ -330,7 +330,7 @@ class WorkerManager(Worker):
             reg_system = reg_sys_by_year[year]
 
             # Set up a dictionary of schools and their grades
-            schools_with_grades = sbac_hier_gen.set_up_schools_with_grades(schools, GRADES_OF_CONCERN)
+            schools_with_grades = hier_gen.set_up_schools_with_grades(schools, GRADES_OF_CONCERN)
 
             # Advance the students forward in the grades
             for guid, student in students.items():
@@ -339,7 +339,7 @@ class WorkerManager(Worker):
                 student.rec_id_sr = self.id_gen.get_rec_id('sr_student')
 
                 # Move the student forward (false from the advance method means the student disappears)
-                if sbac_pop_gen.advance_student(student, schools_by_grade):
+                if pop_gen.advance_student(student, schools_by_grade):
                     schools_with_grades[student.school][student.grade].append(student)
 
             # With the students moved around, we will re-populate empty grades and create assessments with outcomes for
@@ -377,10 +377,10 @@ class WorkerManager(Worker):
 
         for grade, grade_students in grades.items():
             # Potentially re-populate the student population
-            sbac_pop_gen.repopulate_school_grade(school, grade, grade_students, self.id_gen, state, reg_system, year)
+            pop_gen.repopulate_school_grade(school, grade, grade_students, self.id_gen, reg_system, year)
             student_count += len(grade_students)
 
-            sbac_pop_gen.assign_student_groups(school, grade, grade_students, self.id_gen)
+            pop_gen.assign_student_groups(school, grade, grade_students, self.id_gen)
 
             # collect any assessments for this year and grade
             asmts = list(filter(lambda asmt: asmt.year == year and asmt.grade == grade, assessments))
@@ -389,13 +389,13 @@ class WorkerManager(Worker):
             for student in grade_students:
                 for asmt in asmts:
                     if 'block' in asmt.type.lower():
-                        for offset_date in sbac_in_config.IAB_EFFECTIVE_DATES:
+                        for offset_date in cfg.IAB_EFFECTIVE_DATES:
                             date_taken = datetime.date(year + offset_date.year - 2, offset_date.month, offset_date.day)
-                            sbac_interim_asmt_gen.create_iab_outcome_object(date_taken, student, asmt, inst_hier,
-                                self.id_gen, iab_results, gen_item=self.gen_item)
+                            iab_asmt_gen.create_iab_outcome_object(date_taken, student, asmt, inst_hier,
+                                                                   self.id_gen, iab_results, gen_item=self.gen_item)
                     else:
-                        sbac_asmt_gen.create_assessment_outcome_object(student, asmt, inst_hier, self.id_gen,
-                           assessment_results, asmt_skip_rates_by_subject[asmt.subject], gen_item=self.gen_item)
+                        asmt_gen.create_assessment_outcome_object(student, asmt, inst_hier, self.id_gen,
+                                                                  assessment_results, asmt_skip_rates_by_subject[asmt.subject], gen_item=self.gen_item)
 
                 if student.guid not in students:
                     students[student.guid] = student
@@ -404,7 +404,7 @@ class WorkerManager(Worker):
                     unique_students[student.guid] = True
                 # if no assessments were generated for this student, always add to SR file
                 # otherwise, randomly allow some students to not be added (not really sure why this logic)
-                if len(asmts) == 0 or (random.random() < sbac_in_config.HAS_ASMT_RESULT_IN_SR_FILE_RATE):
+                if len(asmts) == 0 or (random.random() < cfg.HAS_ASMT_RESULT_IN_SR_FILE_RATE):
                     sr_students.append(student)
 
         # Write out the school

@@ -4,6 +4,7 @@ Unit tests for the generators.text module.
 """
 
 from nose.tools import *
+from pip._vendor.pyparsing import basestring
 
 from data_generator.generators.text import RandomText, sentence, paragraph
 

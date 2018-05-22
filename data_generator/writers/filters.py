@@ -4,7 +4,7 @@ Create output filters for data values that are specific to the SBAC project.
 
 import random
 
-import data_generator.config.cfg as sbac_config
+import data_generator.config.cfg as cfg
 
 
 def filter_yesno(val):
@@ -44,7 +44,7 @@ def filter_only_delete(val):
     @param val: The value to filter
     @returns: D or None
     """
-    return sbac_config.ASMT_STATUS_DELETED if val == sbac_config.ASMT_STATUS_DELETED else None
+    return cfg.ASMT_STATUS_DELETED if val == cfg.ASMT_STATUS_DELETED else None
 
 
 def filter_twenty_characters(val):
@@ -71,7 +71,7 @@ def filter_zero_padded_grade(val):
     return '%02d' % val
 
 
-SBAC_FILTERS = {
+ALL_FILTERS = {
     'yesno': filter_yesno,
     'yesnoblank': filter_yesnoblank,
     'always_true': filter_always_true,

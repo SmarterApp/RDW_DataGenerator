@@ -2,7 +2,7 @@
 Model the core of an assessment.
 """
 
-import data_generator.config.cfg as sbac_config
+import data_generator.config.cfg as cfg
 import data_generator.writers.datefilters as write_filters
 
 
@@ -68,7 +68,7 @@ class Assessment:
         self.overall_cut_point_1 = None
         self.overall_cut_point_2 = None
         self.overall_cut_point_3 = None
-        self.from_date = sbac_config.HIERARCHY_FROM_DATE
+        self.from_date = cfg.HIERARCHY_FROM_DATE
         self.to_date = None
         self.effective_date = None
         self.segment = None

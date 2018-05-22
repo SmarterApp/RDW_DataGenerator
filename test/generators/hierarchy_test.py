@@ -1,21 +1,21 @@
 """
-Unit tests for the sbac_data_generation.generators.hierarchy module.
+Unit tests for the hierarchy module.
 
 """
 
 import datetime
 
-import data_generator.sbac_generators.hierarchy as hier_gen
+from nose.tools import assert_is_instance, assert_raises, assert_regexp_matches
+
+import data_generator.generators.hierarchy as hier_gen
 from data_generator.model.district import District
 from data_generator.model.school import School
 from data_generator.model.state import State
 from data_generator.util.id_gen import IDGen
-from nose.tools import assert_is_instance, assert_raises, assert_regexp_matches
 
 ID_GEN = IDGen()
 
 GUID_REGEX = '[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}'
-SR_GUID_REGEX = '[a-f0-9]{30}'
 
 
 def test_generate_state():
@@ -24,9 +24,9 @@ def test_generate_state():
 
     # Tests
     assert_is_instance(state, State)
+    assert state.id == '00'
     assert state.name == 'Example State'
     assert state.code == 'ES'
-    assert_regexp_matches(state.guid_sr, SR_GUID_REGEX)
 
 
 def test_generate_state_invalid_type():
@@ -41,7 +41,8 @@ def test_generate_district():
     # Tests
     assert_is_instance(district, District)
     assert district.state == state
-    assert_regexp_matches(district.guid_sr, SR_GUID_REGEX)
+    assert_regexp_matches(district.id, state.id + '[0-9]{5}0*')
+    assert district.id[:2] == state.id
 
 
 def test_generate_district_invalid_type():
@@ -58,7 +59,7 @@ def test_generate_school():
     # Tests
     assert_is_instance(school, School)
     assert school.district == district
-    assert_regexp_matches(school.guid_sr, SR_GUID_REGEX)
+    assert_regexp_matches(school.id, district.id + '[0-9]{5}')
 
 
 def test_generate_school_invalid_type():

@@ -1,7 +1,6 @@
 """
 A school.
 """
-from math import ceil
 
 
 class School:
@@ -10,12 +9,12 @@ class School:
 
     def __init__(self):
         self.guid = None
+        self.id = None          # unique natural id for school
         self.name = None
         self.district = None
         self.type_str = None
         self.config = None
         self.demo_config = None
-        self.guid_sr = None
         self.takes_interim_asmts = False
 
     @property

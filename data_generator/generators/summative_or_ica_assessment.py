@@ -6,8 +6,7 @@ An assessment generator for the SBAC assessment.
 import datetime
 import random
 
-import data_generator.config.cfg as sbac_config
-import data_generator.config.cfg as sbac_in_config
+import data_generator.config.cfg as cfg
 import data_generator.config.hierarchy as hierarchy_config
 import data_generator.generators.assessment as gen_asmt_generator
 from data_generator.generators.population import generate_perf_lvl
@@ -21,10 +20,10 @@ from data_generator.util.assessment_stats import random_score_given_level
 
 
 def create_assessment_outcome_object(student, asmt, inst_hier, id_gen, assessment_results,
-                                     skip_rate=sbac_in_config.ASMT_SKIP_RATE,
-                                     retake_rate=sbac_in_config.ASMT_RETAKE_RATE,
-                                     delete_rate=sbac_in_config.ASMT_DELETE_RATE,
-                                     update_rate=sbac_in_config.ASMT_UPDATE_RATE,
+                                     skip_rate=cfg.ASMT_SKIP_RATE,
+                                     retake_rate=cfg.ASMT_RETAKE_RATE,
+                                     delete_rate=cfg.ASMT_DELETE_RATE,
+                                     update_rate=cfg.ASMT_UPDATE_RATE,
                                      gen_item=True):
     """
     Create the outcome(s) for a single assessment for a student. If the student is determined to have skipped the
@@ -60,28 +59,28 @@ def create_assessment_outcome_object(student, asmt, inst_hier, id_gen, assessmen
     special_random = random.random()
     if special_random < retake_rate:
         # Set the original outcome object to inactive, create a new outcome (with an advanced date take), and return
-        ao.result_status = sbac_in_config.ASMT_STATUS_INACTIVE
+        ao.result_status = cfg.ASMT_STATUS_INACTIVE
         ao2 = generate_assessment_outcome(student, asmt, inst_hier, id_gen,
                                           gen_item=gen_item)
         assessment_results[asmt.guid_sr].append(ao2)
         ao2.date_taken += datetime.timedelta(days=5)
     elif special_random < update_rate:
         # Set the original outcome object to deleted and create a new outcome
-        ao.result_status = sbac_in_config.ASMT_STATUS_DELETED
+        ao.result_status = cfg.ASMT_STATUS_DELETED
         ao2 = generate_assessment_outcome(student, asmt, inst_hier, id_gen,
                                           gen_item=gen_item)
         assessment_results[asmt.guid_sr].append(ao2)
 
         # See if the updated record should be deleted
         if random.random() < delete_rate:
-            ao2.result_status = sbac_in_config.ASMT_STATUS_DELETED
+            ao2.result_status = cfg.ASMT_STATUS_DELETED
     elif special_random < delete_rate:
         # Set the original outcome object to deleted
-        ao.result_status = sbac_in_config.ASMT_STATUS_DELETED
+        ao.result_status = cfg.ASMT_STATUS_DELETED
 
 
 def generate_assessment(type, period, asmt_year, subject, grade, id_gen, from_date=None, to_date=None,
-                        claim_definitions=sbac_config.CLAIM_DEFINITIONS,
+                        claim_definitions=cfg.CLAIM_DEFINITIONS,
                         gen_item=True):
     """
     Generate an assessment object.
@@ -103,7 +102,7 @@ def generate_assessment(type, period, asmt_year, subject, grade, id_gen, from_da
         raise KeyError("Subject '%s' not found in claim definitions" % subject)
 
     claims = claim_definitions[subject]
-    asmt_scale_scores = sbac_config.ASMT_SCALE_SCORE[subject][grade]
+    asmt_scale_scores = cfg.ASMT_SCALE_SCORE[subject][grade]
 
     # Run the General generator
     sa = gen_asmt_generator.generate_assessment(Assessment)
@@ -130,18 +129,18 @@ def generate_assessment(type, period, asmt_year, subject, grade, id_gen, from_da
     sa.type = type
     sa.period = period + ' ' + str((asmt_year - year_adj))
     sa.year = asmt_year
-    sa.version = sbac_config.ASMT_VERSION
+    sa.version = cfg.ASMT_VERSION
     sa.subject = subject
     sa.bank_key = '200'   # TODO - handle properly
     sa.claim_1_name = claims[0]['name']
     sa.claim_2_name = claims[1]['name']
     sa.claim_3_name = claims[2]['name']
     sa.claim_4_name = claims[3]['name'] if len(claims) == 4 else None
-    sa.perf_lvl_name_1 = sbac_config.ASMT_PERF_LEVEL_NAME_1
-    sa.perf_lvl_name_2 = sbac_config.ASMT_PERF_LEVEL_NAME_2
-    sa.perf_lvl_name_3 = sbac_config.ASMT_PERF_LEVEL_NAME_3
-    sa.perf_lvl_name_4 = sbac_config.ASMT_PERF_LEVEL_NAME_4
-    sa.perf_lvl_name_5 = sbac_config.ASMT_PERF_LEVEL_NAME_5
+    sa.perf_lvl_name_1 = cfg.ASMT_PERF_LEVEL_NAME_1
+    sa.perf_lvl_name_2 = cfg.ASMT_PERF_LEVEL_NAME_2
+    sa.perf_lvl_name_3 = cfg.ASMT_PERF_LEVEL_NAME_3
+    sa.perf_lvl_name_4 = cfg.ASMT_PERF_LEVEL_NAME_4
+    sa.perf_lvl_name_5 = cfg.ASMT_PERF_LEVEL_NAME_5
     sa.overall_score_min = asmt_scale_scores[0]
     sa.overall_score_max = asmt_scale_scores[-1]
     sa.claim_1_score_min = asmt_scale_scores[0]
@@ -156,16 +155,16 @@ def generate_assessment(type, period, asmt_year, subject, grade, id_gen, from_da
     sa.claim_4_score_min = asmt_scale_scores[0] if len(claims) == 4 else None
     sa.claim_4_score_max = asmt_scale_scores[-1] if len(claims) == 4 else None
     sa.claim_4_score_weight = claims[3]['weight'] if len(claims) == 4 else None
-    sa.claim_perf_lvl_name_1 = sbac_config.CLAIM_PERF_LEVEL_NAME_1
-    sa.claim_perf_lvl_name_2 = sbac_config.CLAIM_PERF_LEVEL_NAME_2
-    sa.claim_perf_lvl_name_3 = sbac_config.CLAIM_PERF_LEVEL_NAME_3
+    sa.claim_perf_lvl_name_1 = cfg.CLAIM_PERF_LEVEL_NAME_1
+    sa.claim_perf_lvl_name_2 = cfg.CLAIM_PERF_LEVEL_NAME_2
+    sa.claim_perf_lvl_name_3 = cfg.CLAIM_PERF_LEVEL_NAME_3
     sa.overall_cut_point_1 = asmt_scale_scores[1]
     sa.overall_cut_point_2 = asmt_scale_scores[2]
     sa.overall_cut_point_3 = asmt_scale_scores[3]
     sa.effective_date = datetime.date(asmt_year - year_adj, period_month, 15)
     sa.from_date = from_date if from_date is not None else sa.effective_date
-    sa.to_date = to_date if to_date is not None else sbac_config.ASMT_TO_DATE
-    gen_asmt_generator.generate_segment_and_item_bank(sa, gen_item, sbac_config.ASMT_ITEM_BANK_SIZE, id_gen)
+    sa.to_date = to_date if to_date is not None else cfg.ASMT_TO_DATE
+    gen_asmt_generator.generate_segment_and_item_bank(sa, gen_item, cfg.ASMT_ITEM_BANK_SIZE, id_gen)
 
     return sa
 
@@ -227,7 +226,7 @@ def generate_assessment_outcome(student: Student, assessment: Assessment, inst_h
     sao.overall_score_range_min = max(assessment.overall_score_min, sao.overall_score - overall_range_min)
     sao.overall_score_range_max = min(assessment.overall_score_max, sao.overall_score + overall_range_max)
 
-    claims = sbac_config.CLAIM_DEFINITIONS[assessment.subject]
+    claims = cfg.CLAIM_DEFINITIONS[assessment.subject]
     claim_weights = [claim['weight'] for claim in claims]
     claim_scores = random_claims(sao.overall_score, claim_weights, assessment.overall_score_min, assessment.overall_score_max)
 
@@ -266,35 +265,35 @@ def generate_assessment_outcome(student: Student, assessment: Assessment, inst_h
 
     # Create accommodations details
     sao.acc_asl_video_embed = _pick_default_accommodation_code(
-        sbac_config.ACCOMMODATIONS['acc_asl_video_embed'][assessment.subject])
+        cfg.ACCOMMODATIONS['acc_asl_video_embed'][assessment.subject])
     sao.acc_print_on_demand_items_nonembed = _pick_default_accommodation_code(
-        sbac_config.ACCOMMODATIONS['acc_print_on_demand_items_nonembed'][assessment.subject])
+        cfg.ACCOMMODATIONS['acc_print_on_demand_items_nonembed'][assessment.subject])
     sao.acc_noise_buffer_nonembed = _pick_default_accommodation_code(
-        sbac_config.ACCOMMODATIONS['acc_noise_buffer_nonembed'][assessment.subject])
+        cfg.ACCOMMODATIONS['acc_noise_buffer_nonembed'][assessment.subject])
     sao.acc_braile_embed = _pick_default_accommodation_code(
-        sbac_config.ACCOMMODATIONS['acc_braile_embed'][assessment.subject])
+        cfg.ACCOMMODATIONS['acc_braile_embed'][assessment.subject])
     sao.acc_closed_captioning_embed = _pick_default_accommodation_code(
-        sbac_config.ACCOMMODATIONS['acc_closed_captioning_embed'][assessment.subject])
+        cfg.ACCOMMODATIONS['acc_closed_captioning_embed'][assessment.subject])
     sao.acc_text_to_speech_embed = _pick_default_accommodation_code(
-        sbac_config.ACCOMMODATIONS['acc_text_to_speech_embed'][assessment.subject])
+        cfg.ACCOMMODATIONS['acc_text_to_speech_embed'][assessment.subject])
     sao.acc_abacus_nonembed = _pick_default_accommodation_code(
-        sbac_config.ACCOMMODATIONS['acc_abacus_nonembed'][assessment.subject])
+        cfg.ACCOMMODATIONS['acc_abacus_nonembed'][assessment.subject])
     sao.acc_alternate_response_options_nonembed = _pick_default_accommodation_code(
-        sbac_config.ACCOMMODATIONS['acc_alternate_response_options_nonembed'][assessment.subject])
+        cfg.ACCOMMODATIONS['acc_alternate_response_options_nonembed'][assessment.subject])
     sao.acc_calculator_nonembed = _pick_default_accommodation_code(
-        sbac_config.ACCOMMODATIONS['acc_calculator_nonembed'][assessment.subject])
+        cfg.ACCOMMODATIONS['acc_calculator_nonembed'][assessment.subject])
     sao.acc_multiplication_table_nonembed = _pick_default_accommodation_code(
-        sbac_config.ACCOMMODATIONS['acc_multiplication_table_nonembed'][assessment.subject])
+        cfg.ACCOMMODATIONS['acc_multiplication_table_nonembed'][assessment.subject])
     sao.acc_print_on_demand_nonembed = _pick_default_accommodation_code(
-        sbac_config.ACCOMMODATIONS['acc_asl_video_embed'][assessment.subject])
+        cfg.ACCOMMODATIONS['acc_asl_video_embed'][assessment.subject])
     sao.acc_read_aloud_nonembed = _pick_default_accommodation_code(
-        sbac_config.ACCOMMODATIONS['acc_read_aloud_nonembed'][assessment.subject])
+        cfg.ACCOMMODATIONS['acc_read_aloud_nonembed'][assessment.subject])
     sao.acc_scribe_nonembed = _pick_default_accommodation_code(
-        sbac_config.ACCOMMODATIONS['acc_scribe_nonembed'][assessment.subject])
+        cfg.ACCOMMODATIONS['acc_scribe_nonembed'][assessment.subject])
     sao.acc_speech_to_text_nonembed = _pick_default_accommodation_code(
-        sbac_config.ACCOMMODATIONS['acc_speech_to_text_nonembed'][assessment.subject])
+        cfg.ACCOMMODATIONS['acc_speech_to_text_nonembed'][assessment.subject])
     sao.acc_streamline_mode = _pick_default_accommodation_code(
-        sbac_config.ACCOMMODATIONS['acc_streamline_mode'][assessment.subject])
+        cfg.ACCOMMODATIONS['acc_streamline_mode'][assessment.subject])
 
     return sao
 

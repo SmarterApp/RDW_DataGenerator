@@ -1,5 +1,5 @@
 """
-Unit tests for the sbac_data_generation.generators.assessement module.
+Unit tests for the assessment module.
 
 """
 
@@ -7,11 +7,13 @@ import datetime
 
 from nose.tools import assert_raises
 
-import data_generator.config.cfg as sbac_config
+import data_generator.config.cfg as cfg
+import data_generator.generators.hierarchy as hier_gen
+import data_generator.generators.population as pop_gen
 import data_generator.generators.summative_or_ica_assessment as asmt_gen
 import data_generator.model.itemdata as item_lvl_data
-import data_generator.sbac_generators.hierarchy as hier_gen
-import data_generator.sbac_generators.population as pop_gen
+from data_generator.generators.assessment import generate_response
+from data_generator.model.item import AssessmentItem
 from data_generator.util.id_gen import IDGen
 
 ID_GEN = IDGen()
@@ -149,7 +151,7 @@ def test_generate_assessment_outcome_default_status():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, state, 2015)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
     institution_hierarchy = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
     asmt_out = asmt_gen.generate_assessment_outcome(student, asmt, institution_hierarchy, ID_GEN)
 
@@ -163,7 +165,7 @@ def test_generate_assessment_outcome_scores():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, state, 2015)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
     institution_hierarchy = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
     asmt_out = asmt_gen.generate_assessment_outcome(student, asmt, institution_hierarchy, ID_GEN)
 
@@ -188,7 +190,7 @@ def test_generate_assessment_outcome_summative_taken_date():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, state, 2015)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
     institution_hierarchy = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
     asmt_out = asmt_gen.generate_assessment_outcome(student, asmt, institution_hierarchy, ID_GEN)
 
@@ -202,7 +204,7 @@ def test_generate_assessment_outcome_interim_fall_taken_date():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, state, 2015)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
     institution_hierarchy = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
     asmt_out = asmt_gen.generate_assessment_outcome(student, asmt, institution_hierarchy, ID_GEN)
 
@@ -216,7 +218,7 @@ def test_generate_assessment_outcome_interim_winter_taken_date():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, state, 2015)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
     institution_hierarchy = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
     asmt_out = asmt_gen.generate_assessment_outcome(student, asmt, institution_hierarchy, ID_GEN)
 
@@ -230,7 +232,7 @@ def test_generate_assessment_outcome_interim_spring_taken_date():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, state, 2015)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
     institution_hierarchy = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
     asmt_out = asmt_gen.generate_assessment_outcome(student, asmt, institution_hierarchy, ID_GEN)
 
@@ -244,7 +246,7 @@ def test_generate_assessment_outcome_accommodations_ela():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, state, 2015)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
     institution_hierarchy = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
     asmt_out = asmt_gen.generate_assessment_outcome(student, asmt, institution_hierarchy, ID_GEN)
 
@@ -272,7 +274,7 @@ def test_generate_assessment_outcome_accommodations_math():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, state, 2015)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
     institution_hierarchy = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
     asmt_out = asmt_gen.generate_assessment_outcome(student, asmt, institution_hierarchy, ID_GEN)
 
@@ -355,7 +357,7 @@ def test_create_assessment_object_interim_spring():
 
 def test_create_assessment_object_item_data():
     asmt = asmt_gen.generate_assessment('INTERIM COMPREHENSIVE', 'Spring', 2015, 'ELA', 8, ID_GEN, gen_item=True)
-    assert len(asmt.item_bank) == sbac_config.ASMT_ITEM_BANK_SIZE
+    assert len(asmt.item_bank) == cfg.ASMT_ITEM_BANK_SIZE
 
 
 def test_create_assessment_object_no_item_data():
@@ -380,7 +382,7 @@ def test_create_assessment_outcome_object_item_data():
 
     # Tests
     assert len(outcomes) == 1
-    assert len(outcomes[asmt.guid_sr][0].item_data) == sbac_config.ASMT_ITEM_BANK_SIZE
+    assert len(outcomes[asmt.guid_sr][0].item_data) == cfg.ASMT_ITEM_BANK_SIZE
 
 
 def test_create_assessment_outcome_object_skipped():
@@ -852,6 +854,98 @@ def test_create_assessment_outcome_objects_interim_update_second_delete_results(
     assert outcomes[interim_asmts[2].guid_sr][1].assessment.type == 'INTERIM COMPREHENSIVE'
     assert outcomes[interim_asmts[2].guid_sr][1].result_status == 'D'
     assert outcomes[interim_asmts[2].guid_sr][1].date_taken == datetime.date(2015, 3, 15)
+
+
+def test_generate_response_for_mc():
+    item = AssessmentItem()
+    item.type = 'MC'
+    item.options_count = 4
+    item.answer_key = 'B'
+    item.max_score = 1
+    item.difficulty = 2
+
+    aid = item_lvl_data.AssessmentOutcomeItemData()
+    generate_response(aid, item)
+
+    assert aid.is_selected == '1'
+    assert aid.page_time > 0
+    if aid.score == 0:
+        assert aid.response_value != 'B'
+    else:
+        assert aid.score == 1
+        assert aid.response_value == 'B'
+
+
+def test_generate_response_for_ms():
+    item = AssessmentItem()
+    item.type = 'MS'
+    item.options_count = 6
+    item.answer_key = 'B,F'
+    item.max_score = 2
+    item.difficulty = 2
+
+    for _ in range(0, 100):
+        aid = item_lvl_data.AssessmentOutcomeItemData()
+        generate_response(aid, item)
+
+        assert aid.is_selected == '1'
+        assert aid.page_time > 0
+        if aid.score == 0:
+            assert 'B' not in aid.response_value
+        else:
+            assert aid.score == 2
+            assert aid.response_value == 'B,F'
+
+
+def test_generate_response_for_sa():
+    item = AssessmentItem()
+    item.type = 'SA'
+    item.max_score = 2
+    item.difficulty = 2
+
+    for _ in range(0, 100):
+        aid = item_lvl_data.AssessmentOutcomeItemData()
+        generate_response(aid, item)
+
+        assert aid.is_selected == '1'
+        assert aid.page_time > 1000
+        assert len(aid.response_value) > 80
+        assert aid.score in (0,2)
+
+
+def test_generate_response_for_wer():
+    item = AssessmentItem()
+    item.type = 'WER'
+    item.max_score = 6
+    item.difficulty = 2
+
+    for _ in range(0, 100):
+        aid = item_lvl_data.AssessmentOutcomeItemData()
+        generate_response(aid, item)
+
+        assert aid.is_selected == '1'
+        assert aid.page_time > 1000
+        assert len(aid.response_value) > 80
+        assert aid.score in (0,1,2,3,4,5,6)
+        assert len(aid.sub_scores) == 3
+
+
+def test_generate_response_for_other():
+    item = AssessmentItem()
+    item.type = 'EQ'
+    item.max_score = 1
+    item.difficulty = 2
+
+    aid = item_lvl_data.AssessmentOutcomeItemData()
+    generate_response(aid, item)
+
+    assert aid.is_selected == '1'
+    assert aid.page_time > 1000
+    if aid.score == 0:
+        assert 'good' not in aid.response_value
+    else:
+        assert aid.score == 1
+        assert 'good' in aid.response_value
 
 
 # Helper to replace removed method

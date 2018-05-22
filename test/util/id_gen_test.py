@@ -16,7 +16,7 @@ def test_rec_id():
     idg = IDGen()
     id = idg.get_rec_id('some_object_type')
     assert_is_instance(id, int)
-    assert id == 100000000000
+    assert id == 1000000000
 
 
 def test_group_id():
@@ -34,8 +34,8 @@ def test_rec_id_from_two_types():
 
 def test_rec_id_from_two_types_bigger():
     idg = IDGen()
-    assert idg.get_rec_id('some_object_type_1') == 100000000000
-    assert idg.get_rec_id('some_object_type_2') == 100000000000
+    assert idg.get_rec_id('some_object_type_1') == 1000000000
+    assert idg.get_rec_id('some_object_type_2') == 1000000000
 
 
 def test_guid():
@@ -46,3 +46,18 @@ def test_guid():
 def test_sr_uuid():
     idg = IDGen()
     assert_regexp_matches(idg.get_sr_uuid(), SR_GUID_REGEX)
+
+
+def test_district_id():
+    idg = IDGen()
+
+    for _ in range(0,10):
+        assert_regexp_matches(idg.get_district_id('06'), '^06[0-9]{5}$')
+
+
+def test_school_id():
+    idg = IDGen()
+    assert_regexp_matches(idg.get_school_id('88800120000000'), '^8880012[0-9]{7}$')
+    for _ in range(0,10):
+        assert_regexp_matches(idg.get_school_id('0603465'), '^0603465[0-9]{5}$')
+

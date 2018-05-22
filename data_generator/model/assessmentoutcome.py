@@ -5,7 +5,7 @@ Model the core of an assessment outcome (an instance of a student taking an asse
 
 import datetime
 
-import data_generator.config.cfg as sbac_config
+import data_generator.config.cfg as cfg
 
 
 class AssessmentOutcome:
@@ -38,7 +38,7 @@ class AssessmentOutcome:
         self.submit_date = None
         self.rec_id = None
         self.inst_hierarchy = None
-        self.result_status = sbac_config.ASMT_STATUS_ACTIVE
+        self.result_status = cfg.ASMT_STATUS_ACTIVE
         self.server = 'ip-10-113-148-45'    # TODO - randomly generate?
         self.database = 'session'           # TODO - ?
         self.client_name = 'SBAC'
@@ -81,7 +81,7 @@ class AssessmentOutcome:
         self.acc_scribe_nonembed = 0
         self.acc_speech_to_text_nonembed = 0
         self.acc_streamline_mode = 0
-        self.from_date = sbac_config.HIERARCHY_FROM_DATE
+        self.from_date = cfg.HIERARCHY_FROM_DATE
         self.to_date = datetime.date(9999, 12, 31)
         self.item_data = []
 

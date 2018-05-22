@@ -1,11 +1,11 @@
 """
-Unit tests for sbac_data_generation.model.* modules.
+Unit tests for model modules.
 
 """
 
+import data_generator.generators.hierarchy as hier_gen
+import data_generator.generators.population as pop_gen
 import data_generator.generators.summative_or_ica_assessment as asmt_gen
-import data_generator.sbac_generators.hierarchy as hier_gen
-import data_generator.sbac_generators.population as pop_gen
 import data_generator.model.itemdata as item_lvl_data
 from data_generator.util.id_gen import IDGen
 
@@ -32,7 +32,7 @@ def test_assessment_outcome_get_object_set():
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
     ih = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
     asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', 3, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, state)
+    student = pop_gen.generate_student(school, 3, ID_GEN)
     asmt_out = asmt_gen.generate_assessment_outcome(student, asmt, ih, ID_GEN)
 
     # Tests
@@ -108,7 +108,7 @@ def test_student_get_object_set():
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
     reg_sys = hier_gen.generate_registration_system(2015, '2014-02-27', ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, state)
+    student = pop_gen.generate_student(school, 3, ID_GEN)
     student.reg_sys = reg_sys
 
     # Tests
