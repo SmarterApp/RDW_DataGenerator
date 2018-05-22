@@ -11,7 +11,6 @@ class RegistrationSystem:
 
     def __init__(self):
         self.guid = None
-        self.guid_sr = None
         self.sys_guid = None
         self.academic_year = None
         self.extract_date = None

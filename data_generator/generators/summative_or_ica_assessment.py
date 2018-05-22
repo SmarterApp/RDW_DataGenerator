@@ -48,12 +48,12 @@ def create_assessment_outcome_object(student, asmt, inst_hier, id_gen, assessmen
         return
 
     # Make sure the assessment is known in the results
-    if asmt.guid_sr not in assessment_results:
-        assessment_results[asmt.guid_sr] = []
+    if asmt.guid not in assessment_results:
+        assessment_results[asmt.guid] = []
 
     # Create the original outcome object
     ao = generate_assessment_outcome(student, asmt, inst_hier, id_gen, gen_item=gen_item)
-    assessment_results[asmt.guid_sr].append(ao)
+    assessment_results[asmt.guid].append(ao)
 
     # Decide if something special is happening
     special_random = random.random()
@@ -62,14 +62,14 @@ def create_assessment_outcome_object(student, asmt, inst_hier, id_gen, assessmen
         ao.result_status = cfg.ASMT_STATUS_INACTIVE
         ao2 = generate_assessment_outcome(student, asmt, inst_hier, id_gen,
                                           gen_item=gen_item)
-        assessment_results[asmt.guid_sr].append(ao2)
+        assessment_results[asmt.guid].append(ao2)
         ao2.date_taken += datetime.timedelta(days=5)
     elif special_random < update_rate:
         # Set the original outcome object to deleted and create a new outcome
         ao.result_status = cfg.ASMT_STATUS_DELETED
         ao2 = generate_assessment_outcome(student, asmt, inst_hier, id_gen,
                                           gen_item=gen_item)
-        assessment_results[asmt.guid_sr].append(ao2)
+        assessment_results[asmt.guid].append(ao2)
 
         # See if the updated record should be deleted
         if random.random() < delete_rate:
@@ -125,7 +125,6 @@ def generate_assessment(type, period, asmt_year, subject, grade, id_gen, from_da
     sa.subject = subject
     sa.grade = grade
     sa.rec_id = id_gen.get_rec_id('assessment')
-    sa.guid_sr = id_gen.get_sr_uuid()
     sa.type = type
     sa.period = period + ' ' + str((asmt_year - year_adj))
     sa.year = asmt_year
@@ -207,7 +206,7 @@ def generate_assessment_outcome(student: Student, assessment: Assessment, inst_h
 
     # Generate assessment outcome Item-level data
     sao.item_data = [] if not gen_item else \
-        gen_asmt_generator.generate_item_data(assessment.item_bank, student.guid_sr, sao.date_taken)
+        gen_asmt_generator.generate_item_data(assessment.item_bank, sao.date_taken)
 
     # set timestamps for the opportunity
     gen_asmt_generator.set_opportunity_dates(sao)

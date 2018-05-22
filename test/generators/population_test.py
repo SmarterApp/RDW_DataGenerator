@@ -15,8 +15,6 @@ from data_generator.util.id_gen import IDGen
 ID_GEN = IDGen()
 
 GUID_REGEX = '[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}'
-SR_GUID_REGEX = '[a-f0-9]{30}'
-EXT_GUID_REGEX = GUID_REGEX + 'ext'
 
 
 def test_generate_staff():
@@ -38,9 +36,8 @@ def test_generate_student():
 
     # Tests
     assert_is_instance(student, Student)
-    assert_regexp_matches(student.guid_sr, SR_GUID_REGEX)
-    assert_regexp_matches(student.external_ssid, EXT_GUID_REGEX)
-    assert_regexp_matches(student.external_ssid_sr, SR_GUID_REGEX)
+    assert_regexp_matches(student.id, '[0-9]+')
+    assert_regexp_matches(student.external_ssid, '[a-f0-9]+')
     assert student.school_entry_date.year == 2003
     assert student.school_entry_date.month in [8, 9]
 

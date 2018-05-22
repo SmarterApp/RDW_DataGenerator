@@ -12,13 +12,11 @@ class Assessment:
 
     # using slots here only to avoid bugs due to typos etc.
     __slots__ = ('guid', 'id', 'name', 'subject', 'grade', 'contract', 'mode',
-                 'rec_id', 'guid_sr', 'type', 'period', 'year', 'version', 'bank_key',
+                 'rec_id', 'type', 'period', 'year', 'version', 'bank_key',
                  'claim_1_name', 'claim_2_name', 'claim_3_name', 'claim_4_name',
                  'perf_lvl_name_1', 'perf_lvl_name_2', 'perf_lvl_name_3', 'perf_lvl_name_4', 'perf_lvl_name_5',
-                 'overall_score_min', 'claim_1_score_min', 'claim_2_score_min', 'claim_3_score_min',
-                 'claim_4_score_min',
-                 'overall_score_max', 'claim_1_score_max', 'claim_2_score_max', 'claim_3_score_max',
-                 'claim_4_score_max',
+                 'overall_score_min', 'claim_1_score_min', 'claim_2_score_min', 'claim_3_score_min', 'claim_4_score_min',
+                 'overall_score_max', 'claim_1_score_max', 'claim_2_score_max', 'claim_3_score_max', 'claim_4_score_max',
                  'claim_1_score_weight', 'claim_2_score_weight', 'claim_3_score_weight', 'claim_4_score_weight',
                  'claim_perf_lvl_name_1', 'claim_perf_lvl_name_2', 'claim_perf_lvl_name_3',
                  'overall_cut_point_1', 'overall_cut_point_2', 'overall_cut_point_3',
@@ -32,8 +30,7 @@ class Assessment:
         self.grade = None       # integer
         self.contract = 'SBAC'
         self.mode = 'online'
-        self.rec_id = None
-        self.guid_sr = None
+        self.rec_id = None      # record id, used to link output records
         self.type = None        # SUMMATIVE, INTERIM COMPREHENSIVE, INTERIM ASSESSMENT BLOCK
         self.period = None      # testing period, proxy for date-taken, sort of; shouldn't be here
         self.year = None        # academic year, e.g. 2017 for 2016-2017

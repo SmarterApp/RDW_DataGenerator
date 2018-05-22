@@ -4,6 +4,8 @@ Generate IDs that conform to student registration (SBAC) requirements.
 """
 
 import multiprocessing
+
+from random import randrange
 from uuid import uuid4
 
 
@@ -75,6 +77,17 @@ class IDGen():
         else:
             return "{d}{s:05}".format(d=district_id, s=school_id)
 
+    def get_student_id(self):
+        """
+        Generate an SSID-like id for a student. Because each state has their own scheme
+        (for CA it is a 10-digit number, for OH it is a 9 character string (2 alpha + 7 digits), etc.)
+        know that this method will generate a CA-style string.
+
+        :return: next SSID-like id
+        """
+        # to make it more random looking, we'll use an 8-digit sequence and wrap it with random values
+        return "{a}{d:08}{b}".format(a=randrange(1,10), d=self.__get_next_rec_id('ssid', init=0), b=randrange(0,10))
+
     @staticmethod
     def get_uuid():
         """
@@ -83,12 +96,3 @@ class IDGen():
         @returns: New UUID
         """
         return str(uuid4())
-
-    @staticmethod
-    def get_sr_uuid():
-        """
-        Get a UUID that conforms to student registration requirements.
-
-        @returns: New UUID for student registration
-        """
-        return uuid4().hex[:30]

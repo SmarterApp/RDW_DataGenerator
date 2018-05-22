@@ -10,7 +10,6 @@ class AssessmentOutcomeItemData:
     """
 
     def __init__(self):
-        self.student_id = None
         self.item = None
         self.admin_date = None
         self.number_visits = None

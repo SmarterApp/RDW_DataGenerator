@@ -95,7 +95,7 @@ def generate_segment_and_item_bank(asmt: Assessment, gen_item, size, id_gen: IDG
     asmt.item_total_score = sum(map(lambda i: i.max_score, item_bank))
 
 
-def generate_item_data(items: [AssessmentItem], student_id, date_taken):
+def generate_item_data(items: [AssessmentItem], date_taken):
     # given items, generate item response data
     if not items or len(items) == 0:
         return []
@@ -109,7 +109,6 @@ def generate_item_data(items: [AssessmentItem], student_id, date_taken):
     for item in items:
         aid = AssessmentOutcomeItemData()
         aid.item = item
-        aid.student_id = student_id
         aid.number_visits = 1
         aid.page_number = 1
         aid.page_visits = 1

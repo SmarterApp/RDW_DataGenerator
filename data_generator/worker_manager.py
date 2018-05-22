@@ -43,12 +43,14 @@ class WorkerManager(Worker):
         self.out_path_root = args.out_dir
         self.state_cfg = {'name': args.state_name, 'code': args.state_code, 'type': args.state_type}
 
-        # Save output flags
+        # Set up output
         self.workers = []
         if args.pg_out:
             self.workers.append(PgWorker(args.pg_host, 5432, 'edware', 'edware', args.pg_pass, args.pg_schema))
         if args.star_out:
             self.workers.append(CSVStarWorker(self.out_path_root))
+            if args.gen_item:
+                self.workers.append(CSVItemLevelDataWorker(self.out_path_root))
         if args.lz_out:
             self.workers.append(LzWorker(self.out_path_root))
         if args.xml_out:
@@ -63,9 +65,6 @@ class WorkerManager(Worker):
         self.gen_ica = args.gen_ica
         self.gen_iab = args.gen_iab
         self.gen_item = args.gen_item
-
-        if self.gen_item:
-            self.workers.append(CSVItemLevelDataWorker(self.out_path_root))
 
         self.org_source = args.org_source
 
@@ -336,7 +335,7 @@ class WorkerManager(Worker):
             for guid, student in students.items():
                 # Assign the registration system and bump up the record ID
                 student.reg_sys = reg_system
-                student.rec_id_sr = self.id_gen.get_rec_id('sr_student')
+                student.rec_id = self.id_gen.get_rec_id('student')
 
                 # Move the student forward (false from the advance method means the student disappears)
                 if pop_gen.advance_student(student, schools_by_grade):
@@ -408,7 +407,7 @@ class WorkerManager(Worker):
                     sr_students.append(student)
 
         # Write out the school
-        self.__write_school_data(year, reg_system.guid_sr, dim_students, sr_students, assessment_results, iab_results, state.code, district.guid)
+        self.__write_school_data(year, reg_system.guid, dim_students, sr_students, assessment_results, iab_results, state.code, district.guid)
 
         del dim_students
         del sr_students

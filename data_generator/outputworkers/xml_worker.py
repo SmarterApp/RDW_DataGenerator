@@ -99,8 +99,8 @@ class XmlWorker(Worker):
         examinee.set('key', str(student.rec_id))
 
         contextDateStr = outcome.status_date.isoformat()
-        self.add_examinee_attribute(examinee, 'StudentIdentifier', student.guid_sr, contextDateStr)
-        self.add_examinee_attribute(examinee, 'AlternateSSID', student.external_ssid_sr, contextDateStr)
+        self.add_examinee_attribute(examinee, 'StudentIdentifier', student.id, contextDateStr)
+        self.add_examinee_attribute(examinee, 'AlternateSSID', student.external_ssid, contextDateStr)
         self.add_examinee_attribute(examinee, 'Birthdate', student.dob, contextDateStr)
         self.add_examinee_attribute(examinee, 'FirstName', student.first_name, contextDateStr)
         self.add_examinee_attribute(examinee, 'MiddleName', student.middle_name, contextDateStr)
@@ -152,7 +152,7 @@ class XmlWorker(Worker):
         opportunity.set('status', outcome.status)
         opportunity.set('completeness', outcome.completeness)
         opportunity.set('completeStatus', outcome.completeness)
-        opportunity.set('key', outcome.guid)
+        opportunity.set('key', str(outcome.rec_id))
         opportunity.set('oppId', str(outcome.rec_id))
         opportunity.set('opportunity', '5')         # TODO
         opportunity.set('startDate', outcome.start_date.isoformat())
@@ -231,7 +231,7 @@ class XmlWorker(Worker):
 
     def file_path_for_outcome(self, outcome: AssessmentOutcome):
         """
-        Build file path for this outcome from state, district, school, and outcome guid 
+        Build file path for this outcome from state, district, school, and outcome rec id
         Make sure parent folders exist.
         
         :param outcome: 
@@ -242,7 +242,7 @@ class XmlWorker(Worker):
                             outcome.inst_hierarchy.district.id,
                             outcome.inst_hierarchy.school.id)
         os.makedirs(path, exist_ok=True)
-        return os.path.join(path, outcome.guid) + '.xml'
+        return os.path.join(path, str(outcome.rec_id)) + '.xml'
 
     def add_examinee_attribute(self, parent, name, value, contextDateStr):
         if value:

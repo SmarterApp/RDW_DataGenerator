@@ -32,13 +32,11 @@ def test_generate_assessment():
 
 def test_generate_item_data():
     item_data = item_lvl_data.AssessmentOutcomeItemData()
-    item_data.student_id = '0b43854416674ec8961b9db797bca2'
     item_data.key = 1938
     item_data.segment_id = '(SBAC)SBAC-MG110PT-S2-ELA-7-Spring-2014-2015'
     item_data.position = 19
     item_data.format = 'MC'
 
-    assert item_data.student_id == '0b43854416674ec8961b9db797bca2'
     assert item_data.key == 1938
     assert item_data.segment_id == '(SBAC)SBAC-MG110PT-S2-ELA-7-Spring-2014-2015'
     assert item_data.position == 19
@@ -382,7 +380,7 @@ def test_create_assessment_outcome_object_item_data():
 
     # Tests
     assert len(outcomes) == 1
-    assert len(outcomes[asmt.guid_sr][0].item_data) == cfg.ASMT_ITEM_BANK_SIZE
+    assert len(outcomes[asmt.guid][0].item_data) == cfg.ASMT_ITEM_BANK_SIZE
 
 
 def test_create_assessment_outcome_object_skipped():
@@ -420,8 +418,8 @@ def test_create_assessment_outcome_object_one_active_result():
 
     # Tests
     assert len(outcomes) == 1
-    assert outcomes[asmt.guid_sr][0].result_status == 'C'
-    assert outcomes[asmt.guid_sr][0].date_taken == datetime.date(2015, 5, 15)
+    assert outcomes[asmt.guid][0].result_status == 'C'
+    assert outcomes[asmt.guid][0].date_taken == datetime.date(2015, 5, 15)
 
 
 def test_create_assessment_outcome_object_retake_results():
@@ -440,10 +438,10 @@ def test_create_assessment_outcome_object_retake_results():
 
     # Tests
     assert len(outcomes) == 1
-    assert outcomes[asmt.guid_sr][0].result_status == 'I'
-    assert outcomes[asmt.guid_sr][0].date_taken == datetime.date(2015, 5, 15)
-    assert outcomes[asmt.guid_sr][1].result_status == 'C'
-    assert outcomes[asmt.guid_sr][1].date_taken == datetime.date(2015, 5, 20)
+    assert outcomes[asmt.guid][0].result_status == 'I'
+    assert outcomes[asmt.guid][0].date_taken == datetime.date(2015, 5, 15)
+    assert outcomes[asmt.guid][1].result_status == 'C'
+    assert outcomes[asmt.guid][1].date_taken == datetime.date(2015, 5, 20)
 
 
 def test_create_assessment_outcome_object_one_deleted_result():
@@ -462,8 +460,8 @@ def test_create_assessment_outcome_object_one_deleted_result():
 
     # Tests
     assert len(outcomes) == 1
-    assert outcomes[asmt.guid_sr][0].result_status == 'D'
-    assert outcomes[asmt.guid_sr][0].date_taken == datetime.date(2015, 5, 15)
+    assert outcomes[asmt.guid][0].result_status == 'D'
+    assert outcomes[asmt.guid][0].date_taken == datetime.date(2015, 5, 15)
 
 
 def test_create_assessment_outcome_object_update_no_second_delete_results():
@@ -482,10 +480,10 @@ def test_create_assessment_outcome_object_update_no_second_delete_results():
 
     # Tests
     assert len(outcomes) == 1
-    assert outcomes[asmt.guid_sr][0].result_status == 'D'
-    assert outcomes[asmt.guid_sr][0].date_taken == datetime.date(2015, 5, 15)
-    assert outcomes[asmt.guid_sr][1].result_status == 'C'
-    assert outcomes[asmt.guid_sr][1].date_taken == datetime.date(2015, 5, 15)
+    assert outcomes[asmt.guid][0].result_status == 'D'
+    assert outcomes[asmt.guid][0].date_taken == datetime.date(2015, 5, 15)
+    assert outcomes[asmt.guid][1].result_status == 'C'
+    assert outcomes[asmt.guid][1].date_taken == datetime.date(2015, 5, 15)
 
 
 def test_create_assessment_outcome_object_update_second_delete_results():
@@ -504,10 +502,10 @@ def test_create_assessment_outcome_object_update_second_delete_results():
 
     # Tests
     assert len(outcomes) == 1
-    assert outcomes[asmt.guid_sr][0].result_status == 'D'
-    assert outcomes[asmt.guid_sr][0].date_taken == datetime.date(2015, 5, 15)
-    assert outcomes[asmt.guid_sr][1].result_status == 'D'
-    assert outcomes[asmt.guid_sr][1].date_taken == datetime.date(2015, 5, 15)
+    assert outcomes[asmt.guid][0].result_status == 'D'
+    assert outcomes[asmt.guid][0].date_taken == datetime.date(2015, 5, 15)
+    assert outcomes[asmt.guid][1].result_status == 'D'
+    assert outcomes[asmt.guid][1].date_taken == datetime.date(2015, 5, 15)
 
 
 def test_create_assessment_outcome_objects_no_interims_skipped():
@@ -544,8 +542,8 @@ def test_create_assessment_outcome_objects_no_interims_one_active_result():
 
     # Tests
     assert len(outcomes) == 1
-    assert outcomes[asmt_summ.guid_sr][0].result_status == 'C'
-    assert outcomes[asmt_summ.guid_sr][0].date_taken == datetime.date(2015, 5, 15)
+    assert outcomes[asmt_summ.guid][0].result_status == 'C'
+    assert outcomes[asmt_summ.guid][0].date_taken == datetime.date(2015, 5, 15)
 
 
 def test_create_assessment_outcome_objects_no_interims_retake_results():
@@ -564,10 +562,10 @@ def test_create_assessment_outcome_objects_no_interims_retake_results():
 
     # Tests
     assert len(outcomes) == 1
-    assert outcomes[asmt_summ.guid_sr][0].result_status == 'I'
-    assert outcomes[asmt_summ.guid_sr][0].date_taken == datetime.date(2015, 5, 15)
-    assert outcomes[asmt_summ.guid_sr][1].result_status == 'C'
-    assert outcomes[asmt_summ.guid_sr][1].date_taken == datetime.date(2015, 5, 20)
+    assert outcomes[asmt_summ.guid][0].result_status == 'I'
+    assert outcomes[asmt_summ.guid][0].date_taken == datetime.date(2015, 5, 15)
+    assert outcomes[asmt_summ.guid][1].result_status == 'C'
+    assert outcomes[asmt_summ.guid][1].date_taken == datetime.date(2015, 5, 20)
 
 
 def test_create_assessment_outcome_objects_no_interim_one_deleted_result():
@@ -586,8 +584,8 @@ def test_create_assessment_outcome_objects_no_interim_one_deleted_result():
 
     # Tests
     assert len(outcomes) == 1
-    assert outcomes[asmt_summ.guid_sr][0].result_status == 'D'
-    assert outcomes[asmt_summ.guid_sr][0].date_taken == datetime.date(2015, 5, 15)
+    assert outcomes[asmt_summ.guid][0].result_status == 'D'
+    assert outcomes[asmt_summ.guid][0].date_taken == datetime.date(2015, 5, 15)
 
 
 def test_create_assessment_outcome_objects_no_interim_update_no_second_delete_results():
@@ -606,10 +604,10 @@ def test_create_assessment_outcome_objects_no_interim_update_no_second_delete_re
 
     # Tests
     assert len(outcomes) == 1
-    assert outcomes[asmt_summ.guid_sr][0].result_status == 'D'
-    assert outcomes[asmt_summ.guid_sr][0].date_taken == datetime.date(2015, 5, 15)
-    assert outcomes[asmt_summ.guid_sr][1].result_status == 'C'
-    assert outcomes[asmt_summ.guid_sr][1].date_taken == datetime.date(2015, 5, 15)
+    assert outcomes[asmt_summ.guid][0].result_status == 'D'
+    assert outcomes[asmt_summ.guid][0].date_taken == datetime.date(2015, 5, 15)
+    assert outcomes[asmt_summ.guid][1].result_status == 'C'
+    assert outcomes[asmt_summ.guid][1].date_taken == datetime.date(2015, 5, 15)
 
 
 def test_create_assessment_outcome_objects_no_interim_update_second_delete_results():
@@ -628,10 +626,10 @@ def test_create_assessment_outcome_objects_no_interim_update_second_delete_resul
 
     # Tests
     assert len(outcomes) == 1
-    assert outcomes[asmt_summ.guid_sr][0].result_status == 'D'
-    assert outcomes[asmt_summ.guid_sr][0].date_taken == datetime.date(2015, 5, 15)
-    assert outcomes[asmt_summ.guid_sr][1].result_status == 'D'
-    assert outcomes[asmt_summ.guid_sr][1].date_taken == datetime.date(2015, 5, 15)
+    assert outcomes[asmt_summ.guid][0].result_status == 'D'
+    assert outcomes[asmt_summ.guid][0].date_taken == datetime.date(2015, 5, 15)
+    assert outcomes[asmt_summ.guid][1].result_status == 'D'
+    assert outcomes[asmt_summ.guid][1].date_taken == datetime.date(2015, 5, 15)
 
 
 def test_create_assessment_outcome_objects_interims_skipped():
@@ -674,18 +672,18 @@ def test_create_assessment_outcome_objects_interims_one_active_result():
 
     # Tests
     assert len(outcomes) == 4
-    assert outcomes[asmt_summ.guid_sr][0].assessment.type == 'SUMMATIVE'
-    assert outcomes[asmt_summ.guid_sr][0].result_status == 'C'
-    assert outcomes[asmt_summ.guid_sr][0].date_taken == datetime.date(2015, 5, 15)
-    assert outcomes[interim_asmts[0].guid_sr][0].assessment.type == 'INTERIM COMPREHENSIVE'
-    assert outcomes[interim_asmts[0].guid_sr][0].result_status == 'C'
-    assert outcomes[interim_asmts[0].guid_sr][0].date_taken == datetime.date(2014, 9, 15)
-    assert outcomes[interim_asmts[1].guid_sr][0].assessment.type == 'INTERIM COMPREHENSIVE'
-    assert outcomes[interim_asmts[1].guid_sr][0].result_status == 'C'
-    assert outcomes[interim_asmts[1].guid_sr][0].date_taken == datetime.date(2014, 12, 15)
-    assert outcomes[interim_asmts[2].guid_sr][0].assessment.type == 'INTERIM COMPREHENSIVE'
-    assert outcomes[interim_asmts[2].guid_sr][0].result_status == 'C'
-    assert outcomes[interim_asmts[2].guid_sr][0].date_taken == datetime.date(2015, 3, 15)
+    assert outcomes[asmt_summ.guid][0].assessment.type == 'SUMMATIVE'
+    assert outcomes[asmt_summ.guid][0].result_status == 'C'
+    assert outcomes[asmt_summ.guid][0].date_taken == datetime.date(2015, 5, 15)
+    assert outcomes[interim_asmts[0].guid][0].assessment.type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[0].guid][0].result_status == 'C'
+    assert outcomes[interim_asmts[0].guid][0].date_taken == datetime.date(2014, 9, 15)
+    assert outcomes[interim_asmts[1].guid][0].assessment.type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[1].guid][0].result_status == 'C'
+    assert outcomes[interim_asmts[1].guid][0].date_taken == datetime.date(2014, 12, 15)
+    assert outcomes[interim_asmts[2].guid][0].assessment.type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[2].guid][0].result_status == 'C'
+    assert outcomes[interim_asmts[2].guid][0].date_taken == datetime.date(2015, 3, 15)
 
 
 def test_create_assessment_outcome_objects_interims_retake_results():
@@ -707,30 +705,30 @@ def test_create_assessment_outcome_objects_interims_retake_results():
 
     # Tests
     assert len(outcomes) == 4
-    assert outcomes[asmt_summ.guid_sr][0].assessment.type == 'SUMMATIVE'
-    assert outcomes[asmt_summ.guid_sr][0].result_status == 'I'
-    assert outcomes[asmt_summ.guid_sr][0].date_taken == datetime.date(2015, 5, 15)
-    assert outcomes[asmt_summ.guid_sr][1].assessment.type == 'SUMMATIVE'
-    assert outcomes[asmt_summ.guid_sr][1].result_status == 'C'
-    assert outcomes[asmt_summ.guid_sr][1].date_taken == datetime.date(2015, 5, 20)
-    assert outcomes[interim_asmts[0].guid_sr][0].assessment.type == 'INTERIM COMPREHENSIVE'
-    assert outcomes[interim_asmts[0].guid_sr][0].result_status == 'I'
-    assert outcomes[interim_asmts[0].guid_sr][0].date_taken == datetime.date(2014, 9, 15)
-    assert outcomes[interim_asmts[0].guid_sr][1].assessment.type == 'INTERIM COMPREHENSIVE'
-    assert outcomes[interim_asmts[0].guid_sr][1].result_status == 'C'
-    assert outcomes[interim_asmts[0].guid_sr][1].date_taken == datetime.date(2014, 9, 20)
-    assert outcomes[interim_asmts[1].guid_sr][0].assessment.type == 'INTERIM COMPREHENSIVE'
-    assert outcomes[interim_asmts[1].guid_sr][0].result_status == 'I'
-    assert outcomes[interim_asmts[1].guid_sr][0].date_taken == datetime.date(2014, 12, 15)
-    assert outcomes[interim_asmts[1].guid_sr][1].assessment.type == 'INTERIM COMPREHENSIVE'
-    assert outcomes[interim_asmts[1].guid_sr][1].result_status == 'C'
-    assert outcomes[interim_asmts[1].guid_sr][1].date_taken == datetime.date(2014, 12, 20)
-    assert outcomes[interim_asmts[2].guid_sr][0].assessment.type == 'INTERIM COMPREHENSIVE'
-    assert outcomes[interim_asmts[2].guid_sr][0].result_status == 'I'
-    assert outcomes[interim_asmts[2].guid_sr][0].date_taken == datetime.date(2015, 3, 15)
-    assert outcomes[interim_asmts[2].guid_sr][1].assessment.type == 'INTERIM COMPREHENSIVE'
-    assert outcomes[interim_asmts[2].guid_sr][1].result_status == 'C'
-    assert outcomes[interim_asmts[2].guid_sr][1].date_taken == datetime.date(2015, 3, 20)
+    assert outcomes[asmt_summ.guid][0].assessment.type == 'SUMMATIVE'
+    assert outcomes[asmt_summ.guid][0].result_status == 'I'
+    assert outcomes[asmt_summ.guid][0].date_taken == datetime.date(2015, 5, 15)
+    assert outcomes[asmt_summ.guid][1].assessment.type == 'SUMMATIVE'
+    assert outcomes[asmt_summ.guid][1].result_status == 'C'
+    assert outcomes[asmt_summ.guid][1].date_taken == datetime.date(2015, 5, 20)
+    assert outcomes[interim_asmts[0].guid][0].assessment.type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[0].guid][0].result_status == 'I'
+    assert outcomes[interim_asmts[0].guid][0].date_taken == datetime.date(2014, 9, 15)
+    assert outcomes[interim_asmts[0].guid][1].assessment.type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[0].guid][1].result_status == 'C'
+    assert outcomes[interim_asmts[0].guid][1].date_taken == datetime.date(2014, 9, 20)
+    assert outcomes[interim_asmts[1].guid][0].assessment.type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[1].guid][0].result_status == 'I'
+    assert outcomes[interim_asmts[1].guid][0].date_taken == datetime.date(2014, 12, 15)
+    assert outcomes[interim_asmts[1].guid][1].assessment.type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[1].guid][1].result_status == 'C'
+    assert outcomes[interim_asmts[1].guid][1].date_taken == datetime.date(2014, 12, 20)
+    assert outcomes[interim_asmts[2].guid][0].assessment.type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[2].guid][0].result_status == 'I'
+    assert outcomes[interim_asmts[2].guid][0].date_taken == datetime.date(2015, 3, 15)
+    assert outcomes[interim_asmts[2].guid][1].assessment.type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[2].guid][1].result_status == 'C'
+    assert outcomes[interim_asmts[2].guid][1].date_taken == datetime.date(2015, 3, 20)
 
 
 def test_create_assessment_outcome_objects_interim_one_deleted_result():
@@ -752,18 +750,18 @@ def test_create_assessment_outcome_objects_interim_one_deleted_result():
 
     # Tests
     assert len(outcomes) == 4
-    assert outcomes[asmt_summ.guid_sr][0].assessment.type == 'SUMMATIVE'
-    assert outcomes[asmt_summ.guid_sr][0].result_status == 'D'
-    assert outcomes[asmt_summ.guid_sr][0].date_taken == datetime.date(2015, 5, 15)
-    assert outcomes[interim_asmts[0].guid_sr][0].assessment.type == 'INTERIM COMPREHENSIVE'
-    assert outcomes[interim_asmts[0].guid_sr][0].result_status == 'D'
-    assert outcomes[interim_asmts[0].guid_sr][0].date_taken == datetime.date(2014, 9, 15)
-    assert outcomes[interim_asmts[1].guid_sr][0].assessment.type == 'INTERIM COMPREHENSIVE'
-    assert outcomes[interim_asmts[1].guid_sr][0].result_status == 'D'
-    assert outcomes[interim_asmts[1].guid_sr][0].date_taken == datetime.date(2014, 12, 15)
-    assert outcomes[interim_asmts[2].guid_sr][0].assessment.type == 'INTERIM COMPREHENSIVE'
-    assert outcomes[interim_asmts[2].guid_sr][0].result_status == 'D'
-    assert outcomes[interim_asmts[2].guid_sr][0].date_taken == datetime.date(2015, 3, 15)
+    assert outcomes[asmt_summ.guid][0].assessment.type == 'SUMMATIVE'
+    assert outcomes[asmt_summ.guid][0].result_status == 'D'
+    assert outcomes[asmt_summ.guid][0].date_taken == datetime.date(2015, 5, 15)
+    assert outcomes[interim_asmts[0].guid][0].assessment.type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[0].guid][0].result_status == 'D'
+    assert outcomes[interim_asmts[0].guid][0].date_taken == datetime.date(2014, 9, 15)
+    assert outcomes[interim_asmts[1].guid][0].assessment.type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[1].guid][0].result_status == 'D'
+    assert outcomes[interim_asmts[1].guid][0].date_taken == datetime.date(2014, 12, 15)
+    assert outcomes[interim_asmts[2].guid][0].assessment.type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[2].guid][0].result_status == 'D'
+    assert outcomes[interim_asmts[2].guid][0].date_taken == datetime.date(2015, 3, 15)
 
 
 def test_create_assessment_outcome_objects_interim_update_no_second_delete_results():
@@ -785,30 +783,30 @@ def test_create_assessment_outcome_objects_interim_update_no_second_delete_resul
 
     # Tests
     assert len(outcomes) == 4
-    assert outcomes[asmt_summ.guid_sr][0].assessment.type == 'SUMMATIVE'
-    assert outcomes[asmt_summ.guid_sr][0].result_status == 'D'
-    assert outcomes[asmt_summ.guid_sr][0].date_taken == datetime.date(2015, 5, 15)
-    assert outcomes[asmt_summ.guid_sr][1].assessment.type == 'SUMMATIVE'
-    assert outcomes[asmt_summ.guid_sr][1].result_status == 'C'
-    assert outcomes[asmt_summ.guid_sr][1].date_taken == datetime.date(2015, 5, 15)
-    assert outcomes[interim_asmts[0].guid_sr][0].assessment.type == 'INTERIM COMPREHENSIVE'
-    assert outcomes[interim_asmts[0].guid_sr][0].result_status == 'D'
-    assert outcomes[interim_asmts[0].guid_sr][0].date_taken == datetime.date(2014, 9, 15)
-    assert outcomes[interim_asmts[0].guid_sr][1].assessment.type == 'INTERIM COMPREHENSIVE'
-    assert outcomes[interim_asmts[0].guid_sr][1].result_status == 'C'
-    assert outcomes[interim_asmts[0].guid_sr][1].date_taken == datetime.date(2014, 9, 15)
-    assert outcomes[interim_asmts[1].guid_sr][0].assessment.type == 'INTERIM COMPREHENSIVE'
-    assert outcomes[interim_asmts[1].guid_sr][0].result_status == 'D'
-    assert outcomes[interim_asmts[1].guid_sr][0].date_taken == datetime.date(2014, 12, 15)
-    assert outcomes[interim_asmts[1].guid_sr][1].assessment.type == 'INTERIM COMPREHENSIVE'
-    assert outcomes[interim_asmts[1].guid_sr][1].result_status == 'C'
-    assert outcomes[interim_asmts[1].guid_sr][1].date_taken == datetime.date(2014, 12, 15)
-    assert outcomes[interim_asmts[2].guid_sr][0].assessment.type == 'INTERIM COMPREHENSIVE'
-    assert outcomes[interim_asmts[2].guid_sr][0].result_status == 'D'
-    assert outcomes[interim_asmts[2].guid_sr][0].date_taken == datetime.date(2015, 3, 15)
-    assert outcomes[interim_asmts[2].guid_sr][1].assessment.type == 'INTERIM COMPREHENSIVE'
-    assert outcomes[interim_asmts[2].guid_sr][1].result_status == 'C'
-    assert outcomes[interim_asmts[2].guid_sr][1].date_taken == datetime.date(2015, 3, 15)
+    assert outcomes[asmt_summ.guid][0].assessment.type == 'SUMMATIVE'
+    assert outcomes[asmt_summ.guid][0].result_status == 'D'
+    assert outcomes[asmt_summ.guid][0].date_taken == datetime.date(2015, 5, 15)
+    assert outcomes[asmt_summ.guid][1].assessment.type == 'SUMMATIVE'
+    assert outcomes[asmt_summ.guid][1].result_status == 'C'
+    assert outcomes[asmt_summ.guid][1].date_taken == datetime.date(2015, 5, 15)
+    assert outcomes[interim_asmts[0].guid][0].assessment.type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[0].guid][0].result_status == 'D'
+    assert outcomes[interim_asmts[0].guid][0].date_taken == datetime.date(2014, 9, 15)
+    assert outcomes[interim_asmts[0].guid][1].assessment.type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[0].guid][1].result_status == 'C'
+    assert outcomes[interim_asmts[0].guid][1].date_taken == datetime.date(2014, 9, 15)
+    assert outcomes[interim_asmts[1].guid][0].assessment.type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[1].guid][0].result_status == 'D'
+    assert outcomes[interim_asmts[1].guid][0].date_taken == datetime.date(2014, 12, 15)
+    assert outcomes[interim_asmts[1].guid][1].assessment.type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[1].guid][1].result_status == 'C'
+    assert outcomes[interim_asmts[1].guid][1].date_taken == datetime.date(2014, 12, 15)
+    assert outcomes[interim_asmts[2].guid][0].assessment.type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[2].guid][0].result_status == 'D'
+    assert outcomes[interim_asmts[2].guid][0].date_taken == datetime.date(2015, 3, 15)
+    assert outcomes[interim_asmts[2].guid][1].assessment.type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[2].guid][1].result_status == 'C'
+    assert outcomes[interim_asmts[2].guid][1].date_taken == datetime.date(2015, 3, 15)
 
 
 def test_create_assessment_outcome_objects_interim_update_second_delete_results():
@@ -830,30 +828,30 @@ def test_create_assessment_outcome_objects_interim_update_second_delete_results(
 
     # Tests
     assert len(outcomes) == 4
-    assert outcomes[asmt_summ.guid_sr][0].assessment.type == 'SUMMATIVE'
-    assert outcomes[asmt_summ.guid_sr][0].result_status == 'D'
-    assert outcomes[asmt_summ.guid_sr][0].date_taken == datetime.date(2015, 5, 15)
-    assert outcomes[asmt_summ.guid_sr][1].assessment.type == 'SUMMATIVE'
-    assert outcomes[asmt_summ.guid_sr][1].result_status == 'D'
-    assert outcomes[asmt_summ.guid_sr][1].date_taken == datetime.date(2015, 5, 15)
-    assert outcomes[interim_asmts[0].guid_sr][0].assessment.type == 'INTERIM COMPREHENSIVE'
-    assert outcomes[interim_asmts[0].guid_sr][0].result_status == 'D'
-    assert outcomes[interim_asmts[0].guid_sr][0].date_taken == datetime.date(2014, 9, 15)
-    assert outcomes[interim_asmts[0].guid_sr][1].assessment.type == 'INTERIM COMPREHENSIVE'
-    assert outcomes[interim_asmts[0].guid_sr][1].result_status == 'D'
-    assert outcomes[interim_asmts[0].guid_sr][1].date_taken == datetime.date(2014, 9, 15)
-    assert outcomes[interim_asmts[1].guid_sr][0].assessment.type == 'INTERIM COMPREHENSIVE'
-    assert outcomes[interim_asmts[1].guid_sr][0].result_status == 'D'
-    assert outcomes[interim_asmts[1].guid_sr][0].date_taken == datetime.date(2014, 12, 15)
-    assert outcomes[interim_asmts[1].guid_sr][1].assessment.type == 'INTERIM COMPREHENSIVE'
-    assert outcomes[interim_asmts[1].guid_sr][1].result_status == 'D'
-    assert outcomes[interim_asmts[1].guid_sr][1].date_taken == datetime.date(2014, 12, 15)
-    assert outcomes[interim_asmts[2].guid_sr][0].assessment.type == 'INTERIM COMPREHENSIVE'
-    assert outcomes[interim_asmts[2].guid_sr][0].result_status == 'D'
-    assert outcomes[interim_asmts[2].guid_sr][0].date_taken == datetime.date(2015, 3, 15)
-    assert outcomes[interim_asmts[2].guid_sr][1].assessment.type == 'INTERIM COMPREHENSIVE'
-    assert outcomes[interim_asmts[2].guid_sr][1].result_status == 'D'
-    assert outcomes[interim_asmts[2].guid_sr][1].date_taken == datetime.date(2015, 3, 15)
+    assert outcomes[asmt_summ.guid][0].assessment.type == 'SUMMATIVE'
+    assert outcomes[asmt_summ.guid][0].result_status == 'D'
+    assert outcomes[asmt_summ.guid][0].date_taken == datetime.date(2015, 5, 15)
+    assert outcomes[asmt_summ.guid][1].assessment.type == 'SUMMATIVE'
+    assert outcomes[asmt_summ.guid][1].result_status == 'D'
+    assert outcomes[asmt_summ.guid][1].date_taken == datetime.date(2015, 5, 15)
+    assert outcomes[interim_asmts[0].guid][0].assessment.type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[0].guid][0].result_status == 'D'
+    assert outcomes[interim_asmts[0].guid][0].date_taken == datetime.date(2014, 9, 15)
+    assert outcomes[interim_asmts[0].guid][1].assessment.type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[0].guid][1].result_status == 'D'
+    assert outcomes[interim_asmts[0].guid][1].date_taken == datetime.date(2014, 9, 15)
+    assert outcomes[interim_asmts[1].guid][0].assessment.type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[1].guid][0].result_status == 'D'
+    assert outcomes[interim_asmts[1].guid][0].date_taken == datetime.date(2014, 12, 15)
+    assert outcomes[interim_asmts[1].guid][1].assessment.type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[1].guid][1].result_status == 'D'
+    assert outcomes[interim_asmts[1].guid][1].date_taken == datetime.date(2014, 12, 15)
+    assert outcomes[interim_asmts[2].guid][0].assessment.type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[2].guid][0].result_status == 'D'
+    assert outcomes[interim_asmts[2].guid][0].date_taken == datetime.date(2015, 3, 15)
+    assert outcomes[interim_asmts[2].guid][1].assessment.type == 'INTERIM COMPREHENSIVE'
+    assert outcomes[interim_asmts[2].guid][1].result_status == 'D'
+    assert outcomes[interim_asmts[2].guid][1].date_taken == datetime.date(2015, 3, 15)
 
 
 def test_generate_response_for_mc():
@@ -909,7 +907,7 @@ def test_generate_response_for_sa():
 
         assert aid.is_selected == '1'
         assert aid.page_time > 1000
-        assert len(aid.response_value) > 80
+        assert len(aid.response_value) > 40
         assert aid.score in (0,2)
 
 

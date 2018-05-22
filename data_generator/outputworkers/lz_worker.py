@@ -19,25 +19,25 @@ class LzWorker(Worker):
     def write_student_registration_config(self, year: int, rs: RegistrationSystem):
         # Create the JSON file
         file_name = out_cfg.REGISTRATION_SYSTEM_FORMAT['name']
-        file_name = file_name.replace('<YEAR>', str(year)).replace('<GUID>', rs.guid_sr)
+        file_name = file_name.replace('<YEAR>', str(year)).replace('<GUID>', rs.guid)
         json_writer.write_object_to_file(file_name, out_cfg.REGISTRATION_SYSTEM_FORMAT['layout'], rs, self.root_path)
 
         # Prepare the SR CSV file
-        file_name = out_cfg.SR_FORMAT['name'].replace('<YEAR>', str(year)).replace('<GUID>', rs.guid_sr)
+        file_name = out_cfg.SR_FORMAT['name'].replace('<YEAR>', str(year)).replace('<GUID>', rs.guid)
         csv_writer.prepare_csv_file(file_name, out_cfg.SR_FORMAT['columns'], self.root_path)
 
     def write_iab(self, asmt: Assessment):
-        file_name = out_cfg.IAB_JSON_FORMAT['name'].replace('<GUID>', asmt.guid_sr)
+        file_name = out_cfg.IAB_JSON_FORMAT['name'].replace('<GUID>', asmt.guid)
         json_writer.write_object_to_file(file_name, out_cfg.IAB_JSON_FORMAT['layout'], asmt, self.root_path)
 
-        file_name = out_cfg.LZ_REALDATA_FORMAT['name'].replace('<GUID>', asmt.guid_sr)
+        file_name = out_cfg.LZ_REALDATA_FORMAT['name'].replace('<GUID>', asmt.guid)
         csv_writer.prepare_csv_file(file_name, out_cfg.LZ_REALDATA_FORMAT['columns'], self.root_path)
 
     def write_assessment(self, asmt: Assessment):
-        file_name = out_cfg.ASMT_JSON_FORMAT['name'].replace('<GUID>', asmt.guid_sr)
+        file_name = out_cfg.ASMT_JSON_FORMAT['name'].replace('<GUID>', asmt.guid)
         json_writer.write_object_to_file(file_name, out_cfg.ASMT_JSON_FORMAT['layout'], asmt,
                                          root_path=self.root_path)
-        file_name = out_cfg.LZ_REALDATA_FORMAT['name'].replace('<GUID>', asmt.guid_sr)
+        file_name = out_cfg.LZ_REALDATA_FORMAT['name'].replace('<GUID>', asmt.guid)
         csv_writer.prepare_csv_file(file_name, out_cfg.LZ_REALDATA_FORMAT['columns'], root_path=self.root_path)
 
     def write_students_reg(self, students: [Student], rs_guid, asmt_year):

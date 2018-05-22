@@ -27,6 +27,7 @@ def create_iab_outcome_object(date_taken: datetime.date,
                               gen_item=True):
     """
 
+    :param date_taken:
     :param student:
     :param iab_asmt:
     :param inst_hier:
@@ -36,12 +37,12 @@ def create_iab_outcome_object(date_taken: datetime.date,
     :return:
     """
     # Make sure the assessment is known in the results
-    if iab_asmt.guid_sr not in iab_results:
-        iab_results[iab_asmt.guid_sr] = []
+    if iab_asmt.guid not in iab_results:
+        iab_results[iab_asmt.guid] = []
 
     # Create the original outcome object
     ao = generate_interim_assessment_outcome(date_taken, student, iab_asmt, inst_hier, id_gen, gen_item=gen_item)
-    iab_results[iab_asmt.guid_sr].append(ao)
+    iab_results[iab_asmt.guid].append(ao)
 
 
 def generate_interim_assessment(asmt_year: int,
@@ -75,7 +76,6 @@ def generate_interim_assessment(asmt_year: int,
 
     # Set other specifics
     sa.rec_id = id_gen.get_rec_id('assessment')
-    sa.guid_sr = id_gen.get_sr_uuid()
     sa.type = 'INTERIM ASSESSMENT BLOCK'
     sa.period = str(asmt_year-1)
     sa.year = asmt_year
@@ -151,8 +151,7 @@ def generate_interim_assessment_outcome(date_taken: datetime.date,
     gen_asmt_generator.generate_session(sao)
 
     # Generate assessment outcome Item-level data
-    sao.item_data = [] if not gen_item else \
-        gen_asmt_generator.generate_item_data(assessment.item_bank, student.guid_sr, sao.date_taken)
+    sao.item_data = [] if not gen_item else gen_asmt_generator.generate_item_data(assessment.item_bank, sao.date_taken)
 
     # set timestamps for the opportunity
     gen_asmt_generator.set_opportunity_dates(sao)

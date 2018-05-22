@@ -10,8 +10,8 @@ class InstitutionHierarchy:
     """
 
     def __init__(self):
-        self.rec_id = None
         self.guid = None
+        self.rec_id = None      # record id, used to link output records
         self.state = None
         self.district = None
         self.school = None

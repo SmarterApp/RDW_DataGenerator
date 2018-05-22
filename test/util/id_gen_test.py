@@ -43,11 +43,6 @@ def test_guid():
     assert re.match(GUID_REGEX, idg.get_uuid())
 
 
-def test_sr_uuid():
-    idg = IDGen()
-    assert_regexp_matches(idg.get_sr_uuid(), SR_GUID_REGEX)
-
-
 def test_district_id():
     idg = IDGen()
 
@@ -60,4 +55,10 @@ def test_school_id():
     assert_regexp_matches(idg.get_school_id('88800120000000'), '^8880012[0-9]{7}$')
     for _ in range(0,10):
         assert_regexp_matches(idg.get_school_id('0603465'), '^0603465[0-9]{5}$')
+
+
+def test_student_id():
+    idg = IDGen()
+    for _ in range(0,10):
+        assert_regexp_matches(idg.get_student_id(), '^[1-9][0-9]{9}$')
 

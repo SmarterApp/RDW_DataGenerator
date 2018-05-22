@@ -36,14 +36,12 @@ class Student:
         self.prg_econ_disad = None
         self.held_back = False
 
-        self.rec_id = None
-        self.rec_id_sr = None
+        self.id = None              # unique natural id for student (ssid)
+        self.external_ssid = None
+        self.rec_id = None          # record id, used to link output records
         self.state = None
         self.district = None
         self.reg_sys = None
-        self.guid_sr = None
-        self.external_ssid = None
-        self.external_ssid_sr = None
         self.school_entry_date = None
         self.prg_migrant = None
         self.prg_idea = None

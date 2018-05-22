@@ -4,7 +4,9 @@ Generate population elements.
 
 import calendar
 import datetime
+import hashlib
 import random
+
 from math import ceil
 
 import data_generator.config.cfg as cfg
@@ -19,7 +21,7 @@ from data_generator.util.id_gen import IDGen
 from data_generator.util.weighted_choice import weighted_choice
 
 
-def generate_district_staff_member(district: District, id_gen=IDGen, sub_class=None):
+def generate_district_staff_member(district: District, id_gen: IDGen=IDGen, sub_class=None):
     """Generate a district-level staff member.
 
     :param district: The district the staff member belongs to
@@ -35,10 +37,11 @@ def generate_district_staff_member(district: District, id_gen=IDGen, sub_class=N
     return s
 
 
-def generate_teaching_staff_member(school: School, id_gen=IDGen, sub_class=None):
+def generate_teaching_staff_member(school: School, id_gen: IDGen=IDGen, sub_class=None):
     """Generate a teacher in a given school.
 
     :param school: The school the teacher teaches in
+    :param id_gen: id generator
     :param sub_class: The sub-class of teaching staff to create (if requested, must be subclass of TeachingStaff)
     :returns: The staff member
     """
@@ -50,7 +53,7 @@ def generate_teaching_staff_member(school: School, id_gen=IDGen, sub_class=None)
     return s
 
 
-def generate_student(school: School, grade, id_gen=IDGen, acad_year=datetime.datetime.now().year, sub_class=None,
+def generate_student(school: School, grade, id_gen: IDGen=IDGen, acad_year=datetime.datetime.now().year, sub_class=None,
                      has_email_address_rate=pop_config.HAS_EMAIL_ADDRESS_RATE,
                      has_physical_address_rate=pop_config.HAS_PHYSICAL_ADDRESS_RATE,
                      has_address_line_2_rate=pop_config.HAS_ADDRESS_LINE_2_RATE):
@@ -59,6 +62,7 @@ def generate_student(school: School, grade, id_gen=IDGen, acad_year=datetime.dat
 
     :param school: The school the student belongs to
     :param grade: The grade the student belongs to
+    :param id_gen: id generator
     :param acad_year: The current academic year this student is being created for (optional, defaults to your machine
                       clock's current year)
     :param sub_class: The sub-class of student to create (if requested, must be subclass of Student)
@@ -120,11 +124,9 @@ def generate_student(school: School, grade, id_gen=IDGen, acad_year=datetime.dat
     # Set other specifics
     s.state = school.district.state
     s.district = school.district
+    s.id = id_gen.get_student_id()
+    s.external_ssid = hashlib.md5(s.id.encode('utf-8')).hexdigest()
     s.rec_id = id_gen.get_rec_id('student')
-    s.rec_id_sr = id_gen.get_rec_id('sr_student')
-    s.guid_sr = id_gen.get_sr_uuid()
-    s.external_ssid = s.guid + 'ext'
-    s.external_ssid_sr = id_gen.get_sr_uuid()
     s.school_entry_date = _generate_date_enter_us_school(s.grade, acad_year)
     s.derived_demographic = _generate_derived_demographic(s)
     s.prg_migrant = determine_demo_option_selected(demo_config['migrant'])
@@ -321,7 +323,7 @@ def repopulate_school_grade(school: School, grade, grade_students, id_gen, reg_s
         grade_students.append(s)
 
 
-def assign_student_groups(school, grade, grade_students, id_gen=IDGen, subjects=cfg.SUBJECTS):
+def assign_student_groups(school, grade, grade_students, id_gen: IDGen=IDGen, subjects=cfg.SUBJECTS):
     """
     Assign students to groups.
     Each student is assigned to one group per subject. The groups assigned correspond
