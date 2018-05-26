@@ -96,8 +96,6 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
 
         # TODO - standard? what's in there?
         # TODO - claim/target? they'll need to be trimmed (trailing tab)
-        # TODO - derive accommodations from 'ASL', 'Braille', 'AllowCalculator'?
-        # TODO   currently the model doesn't have any accommodation info in Assessment
 
         # this is silly but adheres to the way the generation framework currently works:
         # the assessment package has a period and that is used as the date taken; so we'll
@@ -141,6 +139,16 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
             asmt.segment.id = IDGen.get_uuid()
             asmt.item_bank = []
             asmt.item_total_score = 0
+
+    # infer allowed accommodations even if not parsing items
+    if len(row['ASL']) > 0:
+        asmt.accommodations.add('AmericanSignLanguage')
+    if len(row['Braille']) > 0:
+        asmt.accommodations.add('Braille')
+    if len(row['AllowCalculator']) > 0:
+        asmt.accommodations.add('Calculator')
+    if len(row['Spanish']) > 0:
+        asmt.accommodations.add('Spanish')
 
     if parse_item:
         item = AssessmentItem()

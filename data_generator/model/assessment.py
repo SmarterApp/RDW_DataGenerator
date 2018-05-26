@@ -20,7 +20,8 @@ class Assessment:
                  'claim_1_score_weight', 'claim_2_score_weight', 'claim_3_score_weight', 'claim_4_score_weight',
                  'claim_perf_lvl_name_1', 'claim_perf_lvl_name_2', 'claim_perf_lvl_name_3',
                  'overall_cut_point_1', 'overall_cut_point_2', 'overall_cut_point_3',
-                 'from_date', 'to_date', 'effective_date', 'segment', 'item_bank', 'item_total_score')
+                 'from_date', 'to_date', 'effective_date', 'segment', 'accommodations',
+                 'item_bank', 'item_total_score')
 
     def __init__(self):
         self.guid = None
@@ -69,8 +70,9 @@ class Assessment:
         self.to_date = None
         self.effective_date = None
         self.segment = None
+        self.accommodations = set()     # set of allowed accommodations
         self.item_bank = None
-        self.item_total_score = None   # cache of sum of item score
+        self.item_total_score = None    # cache of sum of item score
 
     def get_object_set(self):
         """Get the set of objects that this exposes to a CSV or JSON writer.

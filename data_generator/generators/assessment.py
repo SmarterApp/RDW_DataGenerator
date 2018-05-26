@@ -34,20 +34,59 @@ def generate_assessment(sub_class=None):
     return a
 
 
-def generate_assessment_outcome(student: Student, assessment: Assessment, sub_class=None):
+def generate_assessment_outcome(student: Student, assessment: Assessment, id_gen: IDGen):
     """Generate an assessment outcome for a given student.
 
     :param student: The student to create the outcome for
     :param assessment: The assessment to create the outcome for
-    :param sub_class: The sub-class of assessment outcome to create (if requested, must be subclass of
-                      AssessmentOutcome)
+    :param id_gen: ID generator
     :returns: The assessment outcome
     """
     # Create the object
-    ao = AssessmentOutcome() if sub_class is None else sub_class()
+    ao = AssessmentOutcome()
     ao.guid = IDGen.get_uuid()
     ao.student = student
     ao.assessment = assessment
+
+    # Set common behaviors 
+    # Be careful, there is some order dependency that mean most of this happens in the sub-generators
+    ao.rec_id = id_gen.get_rec_id('assessment_outcome')
+
+    # Create legacy accommodations details
+    ao.acc_asl_video_embed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_asl_video_embed'][assessment.subject])
+    ao.acc_print_on_demand_items_nonembed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_print_on_demand_items_nonembed'][assessment.subject])
+    ao.acc_noise_buffer_nonembed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_noise_buffer_nonembed'][assessment.subject])
+    ao.acc_braile_embed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_braile_embed'][assessment.subject])
+    ao.acc_closed_captioning_embed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_closed_captioning_embed'][assessment.subject])
+    ao.acc_text_to_speech_embed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_text_to_speech_embed'][assessment.subject])
+    ao.acc_abacus_nonembed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_abacus_nonembed'][assessment.subject])
+    ao.acc_alternate_response_options_nonembed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_alternate_response_options_nonembed'][assessment.subject])
+    ao.acc_calculator_nonembed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_calculator_nonembed'][assessment.subject])
+    ao.acc_multiplication_table_nonembed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_multiplication_table_nonembed'][assessment.subject])
+    ao.acc_print_on_demand_nonembed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_asl_video_embed'][assessment.subject])
+    ao.acc_read_aloud_nonembed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_read_aloud_nonembed'][assessment.subject])
+    ao.acc_scribe_nonembed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_scribe_nonembed'][assessment.subject])
+    ao.acc_speech_to_text_nonembed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_speech_to_text_nonembed'][assessment.subject])
+    ao.acc_streamline_mode = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_streamline_mode'][assessment.subject])
+
+    # Create real accommodations based on assessment and other data.
+    # Yeah, this should be driven by configuration at some point but for now, let's get a couple emitted ...
+    # FYI, student disability codes:
+    # DB (Deaf-blindness)
+    # HI (Hearing impairment)
+    # MD (multiple disabilities)
+    # SLI (speech or language impairment)
+    # VI (visual impairment)
+    if 'AmericanSignLanguage' in assessment.accommodations and student.prg_primary_disability in ('DB', 'HI', 'MD'):
+        ao.accommodations.append(('AmericanSignLanguage', 'TDS_ASL1', 'Show ASL videos'))
+    if 'Braille' in assessment.accommodations and student.prg_primary_disability in ('DB', 'MD', 'VI'):
+        ao.accommodations.append(('BrailleType', 'TDS_BT_UCT', 'UEB'))
+    if 'Calculator' in assessment.accommodations:
+        ao.accommodations.append(('Calculator', 'TDS_CalcBasic', 'Calculator on'))
+        ao.accommodations.append(('Non-Embedded Accommodations', 'NEA_Calc', 'Calculator'))
+    if 'Spanish' in assessment.accommodations and student.lang_code == 'esp':
+        ao.accommodations.append(('Language', 'ESN', 'Spanish'))
+        ao.accommodations.append(('Translation', 'TDS_WL_ESNGlossary', 'Spanish'))
 
     return ao
 
@@ -219,3 +258,19 @@ def generate_response(aid: AssessmentOutcomeItemData, item: AssessmentItem):
 def generate_wer_response(paragraphs):
     rt = RandomText()
     return '\n\n'.join(('<p>\n' + rt.paragraph() + '\n</p>') for _ in range(paragraphs))
+
+
+def _pick_accommodation_code(default_code):
+    """
+    Pick a random accommodation code between 4 and 26 inclusive if default_code is 4.
+    If code is 0 return 0.
+
+    @param default_code: The default code from configuration
+    @return: Generated random code
+    """
+    if default_code == 0:
+        return 0
+    elif default_code == 4:
+        return randint(4, 26)
+    else:
+        raise ValueError('invalid default_code \'%s\' (must be 0 or 4)' % (default_code,))

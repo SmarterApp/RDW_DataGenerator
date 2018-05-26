@@ -172,12 +172,18 @@ class XmlWorker(Worker):
         opportunity.set('assessmentParticipantSessionPlatformUserAgent', '')
         opportunity.set('effectiveDate', asmt.effective_date.isoformat())
 
-        if outcome.assessment.segment:
+        if asmt.segment:
             segment = SubElement(opportunity, 'Segment')
-            segment.set('id', outcome.assessment.segment.id)
-            segment.set('position', str(outcome.assessment.segment.position))
-            segment.set('algorithm', outcome.assessment.segment.algorithm)
-            segment.set('algorithmVersion', outcome.assessment.segment.algorithm_version)
+            segment.set('id', asmt.segment.id)
+            segment.set('position', str(asmt.segment.position))
+            segment.set('algorithm', asmt.segment.algorithm)
+            segment.set('algorithmVersion', asmt.segment.algorithm_version)
+
+        for (type, code, value) in outcome.accommodations:
+            accommodation = SubElement(opportunity, 'Accommodation')
+            accommodation.set('type', type)
+            accommodation.set('code', code)
+            accommodation.set('value', value)
 
         self.add_scale_score(opportunity, 'Overall',
             outcome.overall_score, outcome.overall_score_range_min, outcome.overall_perf_lvl)

@@ -13,7 +13,7 @@ EXTERNAL_DISTRICTS = {}  # map of unused district id -> json for organization
 EXTERNAL_SCHOOLS = {}  # map of unused school id -> json for organization
 HIERARCHY_MAP = {}  # map of district/school id -> (id, name)
 
-LEP_LANGUAGE_CODES = ['fre', 'ben', 'ger', 'chi', 'kor', 'jpn', 'rus']
+LEP_LANGUAGE_CODES = ['esp', 'fre', 'ben', 'ger', 'chi', 'kor', 'jpn', 'rus']
 LEP_PROFICIENCY_LEVELS = ['very poor', 'poor', 'adequate', 'good', 'very good']
 LEP_PROFICIENCY_LEVELS_EXIT = ['good', 'very good']
 LEP_TITLE_3_PROGRAMS = [None, None,  # Allow blanks and give them higher weight
@@ -22,6 +22,7 @@ LEP_TITLE_3_PROGRAMS = [None, None,  # Allow blanks and give them higher weight
                         'ContentBasedESL', 'PullOutESL', 'Other']
 LEP_HAS_ENTRY_DATE_RATE = .9
 
+# CEDS codes: https://ceds.ed.gov/v6/element/000218
 PRG_DISABILITY_TYPES = [None, None,  # Allow blanks and give them higher weight
                         'AUT', 'DB', 'DD', 'EMN', 'HI', 'ID', 'MD', 'OI', 'OHI', 'SLD', 'SLI', 'TBI', 'VI']
 
@@ -96,7 +97,8 @@ CLAIM_DEFINITIONS = {'Math': [{'name': 'Concepts & Procedures', 'weight': .4},
                              {'name': 'Research & Inquiry', 'weight': .30}]
                      }
 
-ACCOMMODATIONS = {  # 0: range is 0; 4: range is 4-26
+# Legacy accommodations handling in the data generator involves randomly assigning settings to the outcomes
+LEGACY_ACCOMMODATIONS = {  # 0: range is 0; 4: range is 4-26
     'acc_abacus_nonembed': {'ELA': 0, 'Math': 4},
     'acc_alternate_response_options_nonembed': {'ELA': 4, 'Math': 4},
     'acc_asl_video_embed': {'ELA': 4, 'Math': 4},
@@ -229,19 +231,16 @@ LEVELS_BY_GRADE_BY_SUBJ = {
         1: GradeLevels((14.0, 30.0, 49.0, 7.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(45.0, 37.0, 17.0, 1.0),
-                            False: Stats(11.304347826086957, 29.391304347826086, 51.78260869565217,
-                                         7.521739130434782)}),
+                            False: Stats(11.30, 29.39, 51.78, 7.53)}),
                        dmg_prg_tt1=DemographicLevels(
                            {True: Stats(20.0, 38.0, 39.0, 3.0),
-                            False: Stats(6.363636363636363, 19.818181818181817, 61.72727272727273,
-                                         12.090909090909092)}),
+                            False: Stats(6.36, 19.82, 61.73, 12.09)}),
                        dmg_prg_iep=DemographicLevels(
                            {True: Stats(45.0, 37.0, 17.0, 1.0),
-                            False: Stats(8.529411764705882, 28.764705882352942, 54.64705882352941, 8.058823529411764)}),
+                            False: Stats(8.53, 28.76, 54.65, 8.06)}),
                        dmg_prg_lep=DemographicLevels(
                            {True: Stats(38.0, 43.0, 19.0, 0.0),
-                            False: Stats(11.626373626373626, 28.714285714285715, 51.967032967032964,
-                                         7.6923076923076925)}),
+                            False: Stats(11.63, 28.71, 51.97, 7.69)}),
                        gender=DemographicLevels(
                            female=Stats(11.0, 29.0, 52.0, 8.0),
                            male=Stats(16.0, 33.0, 46.0, 5.0),
@@ -259,19 +258,16 @@ LEVELS_BY_GRADE_BY_SUBJ = {
         2: GradeLevels((14.0, 30.0, 49.0, 7.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(45.0, 37.0, 17.0, 1.0),
-                            False: Stats(11.304347826086957, 29.391304347826086, 51.78260869565217,
-                                         7.521739130434782)}),
+                            False: Stats(11.30, 29.39, 51.78, 7.53)}),
                        dmg_prg_tt1=DemographicLevels(
                            {True: Stats(20.0, 38.0, 39.0, 3.0),
-                            False: Stats(6.363636363636363, 19.818181818181817, 61.72727272727273,
-                                         12.090909090909092)}),
+                            False: Stats(6.36, 19.82, 61.73, 12.09)}),
                        dmg_prg_iep=DemographicLevels(
                            {True: Stats(45.0, 37.0, 17.0, 1.0),
-                            False: Stats(8.529411764705882, 28.764705882352942, 54.64705882352941, 8.058823529411764)}),
+                            False: Stats(8.53, 28.76, 54.65, 8.06)}),
                        dmg_prg_lep=DemographicLevels(
                            {True: Stats(38.0, 43.0, 19.0, 0.0),
-                            False: Stats(11.626373626373626, 28.714285714285715, 51.967032967032964,
-                                         7.6923076923076925)}),
+                            False: Stats(11.63, 28.71, 51.97, 7.69)}),
                        gender=DemographicLevels(
                            female=Stats(11.0, 29.0, 52.0, 8.0),
                            male=Stats(16.0, 33.0, 46.0, 5.0),
@@ -289,19 +285,16 @@ LEVELS_BY_GRADE_BY_SUBJ = {
         3: GradeLevels((14.0, 30.0, 49.0, 7.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(45.0, 37.0, 17.0, 1.0),
-                            False: Stats(11.304347826086957, 29.391304347826086, 51.78260869565217,
-                                         7.521739130434782)}),
+                            False: Stats(11.30, 29.39, 51.78, 7.53)}),
                        dmg_prg_tt1=DemographicLevels(
                            {True: Stats(20.0, 38.0, 39.0, 3.0),
-                            False: Stats(6.363636363636363, 19.818181818181817, 61.72727272727273,
-                                         12.090909090909092)}),
+                            False: Stats(6.36, 19.82, 61.73, 12.09)}),
                        dmg_prg_iep=DemographicLevels(
                            {True: Stats(45.0, 37.0, 17.0, 1.0),
-                            False: Stats(8.529411764705882, 28.764705882352942, 54.64705882352941, 8.058823529411764)}),
+                            False: Stats(8.53, 28.76, 54.65, 8.06)}),
                        dmg_prg_lep=DemographicLevels(
                            {True: Stats(38.0, 43.0, 19.0, 0.0),
-                            False: Stats(11.626373626373626, 28.714285714285715, 51.967032967032964,
-                                         7.6923076923076925)}),
+                            False: Stats(11.63, 28.71, 51.97, 7.69)}),
                        gender=DemographicLevels(
                            female=Stats(11.0, 29.0, 52.0, 8.0),
                            male=Stats(16.0, 33.0, 46.0, 5.0),
@@ -319,17 +312,16 @@ LEVELS_BY_GRADE_BY_SUBJ = {
         4: GradeLevels((9.0, 32.0, 54.0, 5.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(35.0, 45.0, 20.0, 0.0),
-                            False: Stats(6.739130434782608, 30.869565217391305, 56.95652173913044, 5.434782608695652)}),
+                            False: Stats(6.74, 30.87, 56.96, 5.43)}),
                        dmg_prg_tt1=DemographicLevels(
                            {True: Stats(13.0, 41.0, 44.0, 2.0),
-                            False: Stats(3.909090909090909, 20.545454545454547, 66.72727272727273, 8.818181818181818)}),
+                            False: Stats(3.91, 20.54, 66.73, 8.82)}),
                        dmg_prg_iep=DemographicLevels(
                            {True: Stats(35.0, 45.0, 20.0, 0.0),
-                            False: Stats(4.0476190476190474, 29.523809523809526, 60.476190476190474,
-                                         5.9523809523809526)}),
+                            False: Stats(4.05, 29.52, 60.48, 5.95)}),
                        dmg_prg_lep=DemographicLevels(
                            {True: Stats(30.0, 52.0, 18.0, 0.0),
-                            False: Stats(7.173913043478261, 30.26086956521739, 57.130434782608695, 5.434782608695652)}),
+                            False: Stats(7.17, 30.26, 57.13, 5.44)}),
                        gender=DemographicLevels(
                            female=Stats(7.0, 29.0, 58.0, 6.0),
                            male=Stats(12.0, 33.0, 52.0, 3.0),
@@ -347,18 +339,16 @@ LEVELS_BY_GRADE_BY_SUBJ = {
         5: GradeLevels((11.0, 31.0, 53.0, 5.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(39.0, 44.0, 17.0, 0.0),
-                            False: Stats(8.565217391304348, 29.869565217391305, 56.130434782608695,
-                                         5.434782608695652)}),
+                            False: Stats(8.57, 29.87, 56.13, 5.43)}),
                        dmg_prg_tt1=DemographicLevels(
                            {True: Stats(15.0, 40.0, 43.0, 2.0),
-                            False: Stats(6.111111111111111, 20.0, 65.22222222222223, 8.666666666666666)}),
+                            False: Stats(6.11, 20.0, 65.22, 8.67)}),
                        dmg_prg_iep=DemographicLevels(
                            {True: Stats(39.0, 44.0, 17.0, 0.0),
-                            False: Stats(5.666666666666667, 28.523809523809526, 59.857142857142854,
-                                         5.9523809523809526)}),
+                            False: Stats(5.67, 28.52, 59.86, 5.95)}),
                        dmg_prg_lep=DemographicLevels(
                            {True: Stats(39.0, 48.0, 13.0, 0.0),
-                            False: Stats(8.89247311827957, 29.72043010752688, 56.01075268817204, 5.376344086021505)}),
+                            False: Stats(8.89, 29.72, 56.01, 5.38)}),
                        gender=DemographicLevels(
                            female=Stats(8.0, 30.0, 56.0, 6.0),
                            male=Stats(13.0, 33.0, 51.0, 3.0),
@@ -376,17 +366,16 @@ LEVELS_BY_GRADE_BY_SUBJ = {
         6: GradeLevels((11.0, 33.0, 54.0, 2.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(38.0, 47.0, 15.0, 0.0),
-                            False: Stats(8.652173913043478, 31.782608695652176, 57.391304347826086,
-                                         2.1739130434782608)}),
+                            False: Stats(8.65, 31.78, 57.39, 2.18)}),
                        dmg_prg_tt1=DemographicLevels(
                            {True: Stats(16.0, 43.0, 40.0, 1.0),
-                            False: Stats(5.130434782608695, 21.26086956521739, 70.43478260869566, 3.1739130434782608)}),
+                            False: Stats(5.13, 21.26, 70.44, 3.17)}),
                        dmg_prg_iep=DemographicLevels(
                            {True: Stats(38.0, 47.0, 15.0, 0.0),
-                            False: Stats(5.857142857142857, 30.333333333333332, 61.42857142857143, 2.380952380952381)}),
+                            False: Stats(5.86, 30.33, 61.43, 2.38)}),
                        dmg_prg_lep=DemographicLevels(
                            {True: Stats(51.0, 44.0, 5.0, 0.0),
-                            False: Stats(8.446808510638299, 32.297872340425535, 57.12765957446808, 2.127659574468085)}),
+                            False: Stats(8.45, 32.30, 57.13, 2.12)}),
                        gender=DemographicLevels(
                            female=Stats(8.0, 31.0, 58.0, 3.0),
                            male=Stats(13.0, 36.0, 49.0, 2.0),
@@ -404,19 +393,16 @@ LEVELS_BY_GRADE_BY_SUBJ = {
         7: GradeLevels((8.0, 40.0, 48.0, 4.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(33.0, 55.0, 12.0, 0.0),
-                            False: Stats(5.826086956521739, 38.69565217391305, 51.130434782608695,
-                                         4.3478260869565215)}),
+                            False: Stats(5.83, 38.70, 51.13, 4.34)}),
                        dmg_prg_tt1=DemographicLevels(
                            {True: Stats(13.0, 50.0, 36.0, 1.0),
-                            False: Stats(2.3617021276595747, 28.72340425531915, 61.53191489361702, 7.382978723404255)}),
+                            False: Stats(2.36, 28.72, 61.53, 7.39)}),
                        dmg_prg_iep=DemographicLevels(
                            {True: Stats(33.0, 55.0, 12.0, 0.0),
-                            False: Stats(3.238095238095238, 37.142857142857146, 54.857142857142854,
-                                         4.761904761904762)}),
+                            False: Stats(3.24, 37.14, 54.86, 4.76)}),
                        dmg_prg_lep=DemographicLevels(
                            {True: Stats(42.0, 54.0, 4.0, 0.0),
-                            False: Stats(6.2105263157894735, 39.26315789473684, 50.31578947368421,
-                                         4.2105263157894735)}),
+                            False: Stats(6.21, 39.26, 50.32, 4.21)}),
                        gender=DemographicLevels(
                            female=Stats(6.0, 36.0, 53.0, 5.0),
                            male=Stats(11.0, 42.0, 44.0, 3.0),
@@ -434,18 +420,16 @@ LEVELS_BY_GRADE_BY_SUBJ = {
         8: GradeLevels((7.0, 43.0, 48.0, 2.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(29.0, 60.0, 11.0, 0.0),
-                            False: Stats(5.086956521739131, 41.52173913043478, 51.21739130434783, 2.1739130434782608)}),
+                            False: Stats(5.09, 41.52, 51.22, 2.17)}),
                        dmg_prg_tt1=DemographicLevels(
                            {True: Stats(11.0, 54.0, 34.0, 1.0),
-                            False: Stats(2.6666666666666665, 31.083333333333332, 63.166666666666664,
-                                         3.0833333333333335)}),
+                            False: Stats(2.67, 31.08, 63.17, 3.08)}),
                        dmg_prg_iep=DemographicLevels(
                            {True: Stats(29.0, 60.0, 11.0, 0.0),
-                            False: Stats(2.8095238095238093, 39.76190476190476, 55.04761904761905, 2.380952380952381)}),
+                            False: Stats(2.81, 39.76, 55.05, 2.38)}),
                        dmg_prg_lep=DemographicLevels(
                            {True: Stats(43.0, 54.0, 3.0, 0.0),
-                            False: Stats(5.105263157894737, 42.421052631578945, 50.36842105263158,
-                                         2.1052631578947367)}),
+                            False: Stats(5.11, 42.42, 50.37, 2.10)}),
                        gender=DemographicLevels(
                            female=Stats(5.0, 39.0, 53.0, 3.0),
                            male=Stats(9.0, 46.0, 44.0, 1.0),
@@ -463,19 +447,16 @@ LEVELS_BY_GRADE_BY_SUBJ = {
         9: GradeLevels((14.0, 30.0, 49.0, 7.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(45.0, 37.0, 17.0, 1.0),
-                            False: Stats(11.304347826086957, 29.391304347826086, 51.78260869565217,
-                                         7.521739130434782)}),
+                            False: Stats(11.30, 29.39, 51.78, 7.53)}),
                        dmg_prg_tt1=DemographicLevels(
                            {True: Stats(20.0, 38.0, 39.0, 3.0),
-                            False: Stats(6.363636363636363, 19.818181818181817, 61.72727272727273,
-                                         12.090909090909092)}),
+                            False: Stats(6.36, 19.82, 61.73, 12.09)}),
                        dmg_prg_iep=DemographicLevels(
                            {True: Stats(45.0, 37.0, 17.0, 1.0),
-                            False: Stats(8.529411764705882, 28.764705882352942, 54.64705882352941, 8.058823529411764)}),
+                            False: Stats(8.53, 28.76, 54.65, 8.06)}),
                        dmg_prg_lep=DemographicLevels(
                            {True: Stats(38.0, 43.0, 19.0, 0.0),
-                            False: Stats(11.626373626373626, 28.714285714285715, 51.967032967032964,
-                                         7.6923076923076925)}),
+                            False: Stats(11.63, 28.71, 51.97, 7.69)}),
                        gender=DemographicLevels(
                            female=Stats(11.0, 29.0, 52.0, 8.0),
                            male=Stats(16.0, 33.0, 46.0, 5.0),
@@ -493,20 +474,16 @@ LEVELS_BY_GRADE_BY_SUBJ = {
         10: GradeLevels((14.0, 30.0, 49.0, 7.0),
                         dmg_prg_504=DemographicLevels(
                             {True: Stats(45.0, 37.0, 17.0, 1.0),
-                             False: Stats(11.304347826086957, 29.391304347826086, 51.78260869565217,
-                                          7.521739130434782)}),
+                             False: Stats(11.30, 29.39, 51.78, 7.53)}),
                         dmg_prg_tt1=DemographicLevels(
                             {True: Stats(20.0, 38.0, 39.0, 3.0),
-                             False: Stats(6.363636363636363, 19.818181818181817, 61.72727272727273,
-                                          12.090909090909092)}),
+                             False: Stats(6.36, 19.82, 61.73, 12.09)}),
                         dmg_prg_iep=DemographicLevels(
                             {True: Stats(45.0, 37.0, 17.0, 1.0),
-                             False: Stats(8.529411764705882, 28.764705882352942, 54.64705882352941,
-                                          8.058823529411764)}),
+                             False: Stats(8.53, 28.76, 54.65, 8.06)}),
                         dmg_prg_lep=DemographicLevels(
                             {True: Stats(38.0, 43.0, 19.0, 0.0),
-                             False: Stats(11.626373626373626, 28.714285714285715, 51.967032967032964,
-                                          7.6923076923076925)}),
+                             False: Stats(11.63, 28.71, 51.97, 7.69)}),
                         gender=DemographicLevels(
                             female=Stats(11.0, 29.0, 52.0, 8.0),
                             male=Stats(16.0, 33.0, 46.0, 5.0),
@@ -524,20 +501,16 @@ LEVELS_BY_GRADE_BY_SUBJ = {
         11: GradeLevels((7.0, 43.0, 48.0, 2.0),
                         dmg_prg_504=DemographicLevels(
                             {True: Stats(29.0, 60.0, 11.0, 0.0),
-                             False: Stats(5.086956521739131, 41.52173913043478, 51.21739130434783,
-                                          2.1739130434782608)}),
+                             False: Stats(5.09, 41.52, 51.22, 2.17)}),
                         dmg_prg_tt1=DemographicLevels(
                             {True: Stats(11.0, 54.0, 34.0, 1.0),
-                             False: Stats(2.6666666666666665, 31.083333333333332, 63.166666666666664,
-                                          3.0833333333333335)}),
+                             False: Stats(2.67, 31.08, 63.17, 3.08)}),
                         dmg_prg_iep=DemographicLevels(
                             {True: Stats(29.0, 60.0, 11.0, 0.0),
-                             False: Stats(2.8095238095238093, 39.76190476190476, 55.04761904761905,
-                                          2.380952380952381)}),
+                             False: Stats(2.81, 39.76, 55.05, 2.38)}),
                         dmg_prg_lep=DemographicLevels(
                             {True: Stats(43.0, 54.0, 3.0, 0.0),
-                             False: Stats(5.105263157894737, 42.421052631578945, 50.36842105263158,
-                                          2.1052631578947367)}),
+                             False: Stats(5.11, 42.42, 50.37, 2.10)}),
                         gender=DemographicLevels(
                             female=Stats(5.0, 39.0, 53.0, 3.0),
                             male=Stats(9.0, 46.0, 44.0, 1.0),
@@ -555,20 +528,16 @@ LEVELS_BY_GRADE_BY_SUBJ = {
         12: GradeLevels((14.0, 30.0, 49.0, 7.0),
                         dmg_prg_504=DemographicLevels(
                             {True: Stats(45.0, 37.0, 17.0, 1.0),
-                             False: Stats(11.304347826086957, 29.391304347826086, 51.78260869565217,
-                                          7.521739130434782)}),
+                             False: Stats(11.30, 29.39, 51.78, 7.51)}),
                         dmg_prg_tt1=DemographicLevels(
                             {True: Stats(20.0, 38.0, 39.0, 3.0),
-                             False: Stats(6.363636363636363, 19.818181818181817, 61.72727272727273,
-                                          12.090909090909092)}),
+                             False: Stats(6.36, 19.82, 61.73, 12.09)}),
                         dmg_prg_iep=DemographicLevels(
                             {True: Stats(45.0, 37.0, 17.0, 1.0),
-                             False: Stats(8.529411764705882, 28.764705882352942, 54.64705882352941,
-                                          8.058823529411764)}),
+                             False: Stats(8.53, 28.76, 54.65, 8.06)}),
                         dmg_prg_lep=DemographicLevels(
                             {True: Stats(38.0, 43.0, 19.0, 0.0),
-                             False: Stats(11.626373626373626, 28.714285714285715, 51.967032967032964,
-                                          7.6923076923076925)}),
+                             False: Stats(11.63, 28.71, 51.97, 7.69)}),
                         gender=DemographicLevels(
                             female=Stats(11.0, 29.0, 52.0, 8.0),
                             male=Stats(16.0, 33.0, 46.0, 5.0),
@@ -588,18 +557,16 @@ LEVELS_BY_GRADE_BY_SUBJ = {
         1: GradeLevels((9.0, 30.0, 48.0, 13.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(29.0, 42.0, 26.0, 3.0),
-                            False: Stats(7.494623655913978, 29.096774193548388, 49.655913978494624,
-                                         13.75268817204301)}),
+                            False: Stats(7.49, 29.10, 49.66, 13.75)}),
                        dmg_prg_tt1=DemographicLevels(
                            {True: Stats(13.0, 37.0, 42.0, 8.0),
-                            False: Stats(3.697674418604651, 20.72093023255814, 55.95348837209303, 19.627906976744185)}),
+                            False: Stats(3.70, 20.72, 55.95, 19.63)}),
                        dmg_prg_iep=DemographicLevels(
                            {True: Stats(29.0, 42.0, 26.0, 3.0),
-                            False: Stats(5.470588235294118, 27.88235294117647, 51.88235294117647, 14.764705882352942)}),
+                            False: Stats(5.47, 27.88, 51.88, 14.77)}),
                        dmg_prg_lep=DemographicLevels(
                            {True: Stats(23.0, 42.0, 32.0, 3.0),
-                            False: Stats(7.615384615384615, 28.813186813186814, 49.582417582417584,
-                                         13.989010989010989)}),
+                            False: Stats(7.62, 28.81, 49.58, 13.99)}),
                        gender=DemographicLevels(
                            female=Stats(8.0, 31.0, 49.0, 12.0),
                            male=Stats(10.0, 29.0, 47.0, 14.0),
@@ -617,18 +584,16 @@ LEVELS_BY_GRADE_BY_SUBJ = {
         2: GradeLevels((9.0, 30.0, 48.0, 13.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(29.0, 42.0, 26.0, 3.0),
-                            False: Stats(7.494623655913978, 29.096774193548388, 49.655913978494624,
-                                         13.75268817204301)}),
+                            False: Stats(7.49, 29.10, 49.66, 13.75)}),
                        dmg_prg_tt1=DemographicLevels(
                            {True: Stats(13.0, 37.0, 42.0, 8.0),
-                            False: Stats(3.697674418604651, 20.72093023255814, 55.95348837209303, 19.627906976744185)}),
+                            False: Stats(3.70, 20.72, 55.95, 19.63)}),
                        dmg_prg_iep=DemographicLevels(
                            {True: Stats(29.0, 42.0, 26.0, 3.0),
-                            False: Stats(5.470588235294118, 27.88235294117647, 51.88235294117647, 14.764705882352942)}),
+                            False: Stats(5.47, 27.88, 51.88, 14.77)}),
                        dmg_prg_lep=DemographicLevels(
                            {True: Stats(23.0, 42.0, 32.0, 3.0),
-                            False: Stats(7.615384615384615, 28.813186813186814, 49.582417582417584,
-                                         13.989010989010989)}),
+                            False: Stats(7.62, 28.81, 49.58, 13.99)}),
                        gender=DemographicLevels(
                            female=Stats(8.0, 31.0, 49.0, 12.0),
                            male=Stats(10.0, 29.0, 47.0, 14.0),
@@ -646,18 +611,16 @@ LEVELS_BY_GRADE_BY_SUBJ = {
         3: GradeLevels((9.0, 30.0, 48.0, 13.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(29.0, 42.0, 26.0, 3.0),
-                            False: Stats(7.494623655913978, 29.096774193548388, 49.655913978494624,
-                                         13.75268817204301)}),
+                            False: Stats(7.49, 29.10, 49.66, 13.75)}),
                        dmg_prg_tt1=DemographicLevels(
                            {True: Stats(13.0, 37.0, 42.0, 8.0),
-                            False: Stats(3.697674418604651, 20.72093023255814, 55.95348837209303, 19.627906976744185)}),
+                            False: Stats(3.70, 20.72, 55.95, 19.63)}),
                        dmg_prg_iep=DemographicLevels(
                            {True: Stats(29.0, 42.0, 26.0, 3.0),
-                            False: Stats(5.470588235294118, 27.88235294117647, 51.88235294117647, 14.764705882352942)}),
+                            False: Stats(5.47, 27.88, 51.88, 14.77)}),
                        dmg_prg_lep=DemographicLevels(
                            {True: Stats(23.0, 42.0, 32.0, 3.0),
-                            False: Stats(7.615384615384615, 28.813186813186814, 49.582417582417584,
-                                         13.989010989010989)}),
+                            False: Stats(7.62, 28.81, 49.58, 13.99)}),
                        gender=DemographicLevels(
                            female=Stats(8.0, 31.0, 49.0, 12.0),
                            male=Stats(10.0, 29.0, 47.0, 14.0),
@@ -675,18 +638,16 @@ LEVELS_BY_GRADE_BY_SUBJ = {
         4: GradeLevels((5.0, 26.0, 39.0, 30.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(21.0, 44.0, 26.0, 9.0),
-                            False: Stats(3.608695652173913, 24.434782608695652, 40.130434782608695,
-                                         31.82608695652174)}),
+                            False: Stats(3.61, 24.43, 40.13, 31.83)}),
                        dmg_prg_tt1=DemographicLevels(
                            {True: Stats(8.0, 33.0, 38.0, 21.0),
-                            False: Stats(1.1818181818181819, 17.09090909090909, 40.27272727272727, 41.45454545454545)}),
+                            False: Stats(1.18, 17.09, 40.27, 41.46)}),
                        dmg_prg_iep=DemographicLevels(
                            {True: Stats(21.0, 44.0, 26.0, 9.0),
-                            False: Stats(1.9523809523809523, 22.571428571428573, 41.476190476190474, 34.0)}),
+                            False: Stats(1.95, 22.57, 41.48, 34.0)}),
                        dmg_prg_lep=DemographicLevels(
                            {True: Stats(15.0, 42.0, 33.0, 10.0),
-                            False: Stats(4.010989010989011, 24.417582417582416, 39.59340659340659,
-                                         31.978021978021978)}),
+                            False: Stats(4.01, 24.42, 39.59, 31.98)}),
                        gender=DemographicLevels(
                            female=Stats(5.0, 26.0, 39.0, 30.0),
                            male=Stats(5.0, 26.0, 39.0, 30.0),
@@ -704,18 +665,16 @@ LEVELS_BY_GRADE_BY_SUBJ = {
         5: GradeLevels((7.0, 26.0, 39.0, 28.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(27.0, 42.0, 25.0, 6.0),
-                            False: Stats(5.260869565217392, 24.608695652173914, 40.21739130434783, 29.91304347826087)}),
+                            False: Stats(5.26, 24.61, 40.22, 29.91)}),
                        dmg_prg_tt1=DemographicLevels(
                            {True: Stats(10.0, 33.0, 37.0, 20.0),
-                            False: Stats(3.1818181818181817, 17.09090909090909, 41.54545454545455, 38.18181818181818)}),
+                            False: Stats(3.18, 17.09, 41.55, 38.18)}),
                        dmg_prg_iep=DemographicLevels(
                            {True: Stats(27.0, 42.0, 25.0, 6.0),
-                            False: Stats(3.1904761904761907, 22.952380952380953, 41.666666666666664,
-                                         32.19047619047619)}),
+                            False: Stats(3.19, 22.95, 41.67, 32.19)}),
                        dmg_prg_lep=DemographicLevels(
                            {True: Stats(21.0, 42.0, 28.0, 9.0),
-                            False: Stats(5.782608695652174, 24.608695652173914, 39.95652173913044,
-                                         29.652173913043477)}),
+                            False: Stats(5.78, 24.61, 39.96, 29.65)}),
                        gender=DemographicLevels(
                            female=Stats(7.0, 25.0, 40.0, 28.0),
                            male=Stats(7.1, 26.9, 37.64, 28.36),
@@ -729,24 +688,22 @@ LEVELS_BY_GRADE_BY_SUBJ = {
                            dmg_eth_hsp=Stats(10.0, 33.0, 38.0, 19.0),
                            dmg_eth_nst=Stats(4.0, 47.0, 31.0, 18.0),
                            dmg_eth_pcf=Stats(2.0, 15.0, 53.0, 30.0),
-                           dmg_eth_wht=Stats(4.8542, 21.145799999999998, 41.4167, 32.5833), ), ),
+                           dmg_eth_wht=Stats(4.85, 21.15, 41.42, 32.58), ), ),
         6: GradeLevels((8.0, 27.0, 34.0, 31.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(29.0, 44.0, 21.0, 6.0),
-                            False: Stats(6.173913043478261, 25.52173913043478, 35.130434782608695, 33.17391304347826)}),
+                            False: Stats(6.17, 25.53, 35.13, 33.17)}),
                        dmg_prg_tt1=DemographicLevels(
                            {True: Stats(12.0, 35.0, 33.0, 20.0),
-                            False: Stats(3.3043478260869565, 17.608695652173914, 35.17391304347826,
-                                         43.91304347826087)}),
+                            False: Stats(3.30, 17.61, 35.17, 43.92)}),
                        dmg_prg_iep=DemographicLevels(
                            {True: Stats(29.0, 44.0, 21.0, 6.0),
-                            False: Stats(4.0, 23.761904761904763, 36.476190476190474, 35.76190476190476)}),
+                            False: Stats(4.0, 23.76, 36.48, 35.76)}),
                        dmg_prg_lep=DemographicLevels(
                            {True: Stats(27.0, 44.0, 21.0, 8.0),
-                            False: Stats(6.787234042553192, 25.914893617021278, 34.829787234042556,
-                                         32.46808510638298)}),
+                            False: Stats(6.79, 25.91, 34.83, 32.47)}),
                        gender=DemographicLevels(
-                           female=Stats(7.0, 26.0, 34.6735, 32.3265),
+                           female=Stats(7.0, 26.0, 34.67, 32.33),
                            male=Stats(9.0, 28.0, 33.0, 30.0),
                            non_binary=Stats(9.0, 28.0, 33.0, 30.0),
                            not_stated=Stats(9.0, 30.0, 51.0, 10.0), ),
@@ -754,29 +711,28 @@ LEVELS_BY_GRADE_BY_SUBJ = {
                            dmg_eth_2mr=Stats(7.0, 30.0, 32.0, 31.0),
                            dmg_eth_ami=Stats(12.0, 35.0, 34.0, 19.0),
                            dmg_eth_asn=Stats(3.0, 11.0, 26.0, 60.0),
-                           dmg_eth_blk=Stats(14.6842, 38.3158, 32.0, 15.0),
+                           dmg_eth_blk=Stats(14.68, 38.32, 32.0, 15.0),
                            dmg_eth_hsp=Stats(12.0, 36.0, 34.0, 18.0),
                            dmg_eth_nst=Stats(4.0, 47.0, 31.0, 18.0),
                            dmg_eth_pcf=Stats(2.0, 15.0, 53.0, 30.0),
-                           dmg_eth_wht=Stats(5.0, 21.2553, 35.7021, 38.0426), ), ),
+                           dmg_eth_wht=Stats(5.0, 21.26, 35.70, 38.04), ), ),
         7: GradeLevels((9.0, 26.0, 34.0, 31.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(31.0, 43.0, 21.0, 5.0),
-                            False: Stats(7.086956521739131, 24.52173913043478, 35.130434782608695, 33.26086956521739)}),
+                            False: Stats(7.09, 24.52, 35.13, 33.26)}),
                        dmg_prg_tt1=DemographicLevels(
                            {True: Stats(13.0, 35.0, 33.0, 19.0),
-                            False: Stats(4.48936170212766, 15.851063829787234, 35.12765957446808, 44.53191489361702)}),
+                            False: Stats(4.49, 15.85, 35.13, 44.53)}),
                        dmg_prg_iep=DemographicLevels(
                            {True: Stats(31.0, 43.0, 21.0, 5.0),
-                            False: Stats(4.809523809523809, 22.761904761904763, 36.476190476190474,
-                                         35.95238095238095)}),
+                            False: Stats(4.81, 22.76, 36.48, 35.95)}),
                        dmg_prg_lep=DemographicLevels(
                            {True: Stats(30.0, 43.0, 20.0, 7.0),
-                            False: Stats(7.659574468085107, 24.914893617021278, 34.8936170212766, 32.53191489361702)}),
+                            False: Stats(7.66, 24.92, 34.89, 32.53)}),
                        gender=DemographicLevels(
                            female=Stats(8.0, 26.0, 35.0, 31.0),
                            male=Stats(10.0, 26.0, 32.7255, 31.2745),
-                           non_binary=Stats(10.0, 26.0, 32.7255, 31.2745),
+                           non_binary=Stats(10.0, 26.0, 32.73, 31.27),
                            not_stated=Stats(9.0, 30.0, 51.0, 10.0), ),
                        race=DemographicLevels(
                            dmg_eth_2mr=Stats(7.0, 28.0, 34.0, 31.0),
@@ -790,19 +746,16 @@ LEVELS_BY_GRADE_BY_SUBJ = {
         8: GradeLevels((7.0, 32.0, 41.0, 20.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(27.0, 50.0, 21.0, 2.0),
-                            False: Stats(5.260869565217392, 30.434782608695652, 42.73913043478261,
-                                         21.565217391304348)}),
+                            False: Stats(5.26, 30.43, 42.74, 21.57)}),
                        dmg_prg_tt1=DemographicLevels(
                            {True: Stats(11.0, 40.0, 37.0, 12.0),
-                            False: Stats(2.6666666666666665, 23.333333333333332, 45.333333333333336,
-                                         28.666666666666668)}),
+                            False: Stats(2.67, 23.33, 45.33, 28.67)}),
                        dmg_prg_iep=DemographicLevels(
                            {True: Stats(27.0, 50.0, 21.0, 2.0),
-                            False: Stats(3.1904761904761907, 28.571428571428573, 44.80952380952381,
-                                         23.428571428571427)}),
+                            False: Stats(3.19, 28.57, 44.81, 23.43)}),
                        dmg_prg_lep=DemographicLevels(
                            {True: Stats(22.0, 45.0, 27.0, 6.0),
-                            False: Stats(6.042553191489362, 31.170212765957448, 41.8936170212766, 20.893617021276597)}),
+                            False: Stats(6.05, 31.17, 41.89, 20.89)}),
                        gender=DemographicLevels(
                            female=Stats(6.0, 31.0, 41.8163, 21.1837),
                            male=Stats(8.0, 33.0, 40.0, 19.0),
@@ -816,22 +769,20 @@ LEVELS_BY_GRADE_BY_SUBJ = {
                            dmg_eth_hsp=Stats(11.0, 40.0, 39.0, 10.0),
                            dmg_eth_nst=Stats(4.0, 47.0, 31.0, 18.0),
                            dmg_eth_pcf=Stats(2.0, 15.0, 53.0, 30.0),
-                           dmg_eth_wht=Stats(4.0, 26.5625, 45.0625, 24.375), ), ),
+                           dmg_eth_wht=Stats(4.0, 26.56, 45.06, 24.38), ), ),
         9: GradeLevels((9.0, 30.0, 48.0, 13.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(29.0, 42.0, 26.0, 3.0),
-                            False: Stats(7.494623655913978, 29.096774193548388, 49.655913978494624,
-                                         13.75268817204301)}),
+                            False: Stats(7.49, 29.10, 49.66, 13.75)}),
                        dmg_prg_tt1=DemographicLevels(
                            {True: Stats(13.0, 37.0, 42.0, 8.0),
-                            False: Stats(3.697674418604651, 20.72093023255814, 55.95348837209303, 19.627906976744185)}),
+                            False: Stats(3.70, 20.72, 55.95, 19.63)}),
                        dmg_prg_iep=DemographicLevels(
                            {True: Stats(29.0, 42.0, 26.0, 3.0),
-                            False: Stats(5.470588235294118, 27.88235294117647, 51.88235294117647, 14.764705882352942)}),
+                            False: Stats(5.47, 27.88, 51.88, 14.77)}),
                        dmg_prg_lep=DemographicLevels(
                            {True: Stats(23.0, 42.0, 32.0, 3.0),
-                            False: Stats(7.615384615384615, 28.813186813186814, 49.582417582417584,
-                                         13.989010989010989)}),
+                            False: Stats(7.62, 28.81, 49.58, 13.99)}),
                        gender=DemographicLevels(
                            female=Stats(8.0, 31.0, 49.0, 12.0),
                            male=Stats(10.0, 29.0, 47.0, 14.0),
@@ -849,20 +800,16 @@ LEVELS_BY_GRADE_BY_SUBJ = {
         10: GradeLevels((9.0, 30.0, 48.0, 13.0),
                         dmg_prg_504=DemographicLevels(
                             {True: Stats(29.0, 42.0, 26.0, 3.0),
-                             False: Stats(7.494623655913978, 29.096774193548388, 49.655913978494624,
-                                          13.75268817204301)}),
+                             False: Stats(7.49, 29.10, 49.66, 13.75)}),
                         dmg_prg_tt1=DemographicLevels(
                             {True: Stats(13.0, 37.0, 42.0, 8.0),
-                             False: Stats(3.697674418604651, 20.72093023255814, 55.95348837209303,
-                                          19.627906976744185)}),
+                             False: Stats(3.70, 20.72, 55.95, 19.63)}),
                         dmg_prg_iep=DemographicLevels(
                             {True: Stats(29.0, 42.0, 26.0, 3.0),
-                             False: Stats(5.470588235294118, 27.88235294117647, 51.88235294117647,
-                                          14.764705882352942)}),
+                             False: Stats(5.47, 27.88, 51.88, 14.77)}),
                         dmg_prg_lep=DemographicLevels(
                             {True: Stats(23.0, 42.0, 32.0, 3.0),
-                             False: Stats(7.615384615384615, 28.813186813186814, 49.582417582417584,
-                                          13.989010989010989)}),
+                             False: Stats(7.62, 28.81, 49.58, 13.99)}),
                         gender=DemographicLevels(
                             female=Stats(8.0, 31.0, 49.0, 12.0),
                             male=Stats(10.0, 29.0, 47.0, 14.0),
@@ -880,51 +827,43 @@ LEVELS_BY_GRADE_BY_SUBJ = {
         11: GradeLevels((7.0, 32.0, 41.0, 20.0),
                         dmg_prg_504=DemographicLevels(
                             {True: Stats(27.0, 50.0, 21.0, 2.0),
-                             False: Stats(5.260869565217392, 30.434782608695652, 42.73913043478261,
-                                          21.565217391304348)}),
+                             False: Stats(5.26, 30.43, 42.74, 21.57)}),
                         dmg_prg_tt1=DemographicLevels(
                             {True: Stats(11.0, 40.0, 37.0, 12.0),
-                             False: Stats(2.6666666666666665, 23.333333333333332, 45.333333333333336,
-                                          28.666666666666668)}),
+                             False: Stats(2.67, 23.33, 45.33, 28.67)}),
                         dmg_prg_iep=DemographicLevels(
                             {True: Stats(27.0, 50.0, 21.0, 2.0),
-                             False: Stats(3.1904761904761907, 28.571428571428573, 44.80952380952381,
-                                          23.428571428571427)}),
+                             False: Stats(3.19, 28.57, 44.81, 23.43)}),
                         dmg_prg_lep=DemographicLevels(
                             {True: Stats(22.0, 45.0, 27.0, 6.0),
-                             False: Stats(6.042553191489362, 31.170212765957448, 41.8936170212766,
-                                          20.893617021276597)}),
+                             False: Stats(6.05, 31.17, 41.89, 20.89)}),
                         gender=DemographicLevels(
                             female=Stats(6.0, 31.0, 43.0, 20.0),
-                            male=Stats(8.0, 33.0, 38.7647, 20.2353),
-                            non_binary=Stats(8.0, 33.0, 38.7647, 20.2353),
+                            male=Stats(8.0, 33.0, 38.76, 20.24),
+                            non_binary=Stats(8.0, 33.0, 38.76, 20.24),
                             not_stated=Stats(9.0, 30.0, 51.0, 10.0), ),
                         race=DemographicLevels(
                             dmg_eth_2mr=Stats(9.0, 31.0, 47.0, 13.0),
                             dmg_eth_ami=Stats(9.0, 40.0, 39.0, 12.0),
                             dmg_eth_asn=Stats(2.0, 14.0, 37.0, 47.0),
-                            dmg_eth_blk=Stats(12.9474, 46.052600000000005, 34.0, 7.0),
+                            dmg_eth_blk=Stats(12.95, 46.05, 34.0, 7.0),
                             dmg_eth_hsp=Stats(11.0, 40.0, 39.0, 10.0),
                             dmg_eth_nst=Stats(4.0, 47.0, 31.0, 18.0),
                             dmg_eth_pcf=Stats(2.0, 15.0, 53.0, 30.0),
-                            dmg_eth_wht=Stats(4.0, 25.9149, 45.1915, 24.893600000000003), ), ),
+                            dmg_eth_wht=Stats(4.0, 25.92, 45.19, 24.89), ), ),
         12: GradeLevels((9.0, 30.0, 48.0, 13.0),
                         dmg_prg_504=DemographicLevels(
                             {True: Stats(29.0, 42.0, 26.0, 3.0),
-                             False: Stats(7.494623655913978, 29.096774193548388, 49.655913978494624,
-                                          13.75268817204301)}),
+                             False: Stats(7.49, 29.10, 49.66, 13.75)}),
                         dmg_prg_tt1=DemographicLevels(
                             {True: Stats(13.0, 37.0, 42.0, 8.0),
-                             False: Stats(3.697674418604651, 20.72093023255814, 55.95348837209303,
-                                          19.627906976744185)}),
+                             False: Stats(3.70, 20.72, 55.95, 19.63)}),
                         dmg_prg_iep=DemographicLevels(
                             {True: Stats(29.0, 42.0, 26.0, 3.0),
-                             False: Stats(5.470588235294118, 27.88235294117647, 51.88235294117647,
-                                          14.764705882352942)}),
+                             False: Stats(5.47, 27.88, 51.88, 14.77)}),
                         dmg_prg_lep=DemographicLevels(
                             {True: Stats(23.0, 42.0, 32.0, 3.0),
-                             False: Stats(7.615384615384615, 28.813186813186814, 49.582417582417584,
-                                          13.989010989010989)}),
+                             False: Stats(7.62, 28.81, 49.58, 13.99)}),
                         gender=DemographicLevels(
                             female=Stats(8.0, 31.0, 49.0, 12.0),
                             male=Stats(10.0, 29.0, 47.0, 14.0),

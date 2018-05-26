@@ -12,7 +12,7 @@ import data_generator.generators.hierarchy as hier_gen
 import data_generator.generators.population as pop_gen
 import data_generator.generators.summative_or_ica_assessment as asmt_gen
 import data_generator.model.itemdata as item_lvl_data
-from data_generator.generators.assessment import generate_response
+from data_generator.generators.assessment import generate_response, _pick_accommodation_code
 from data_generator.model.item import AssessmentItem
 from data_generator.util.id_gen import IDGen
 
@@ -295,20 +295,20 @@ def test_generate_assessment_outcome_accommodations_math():
 
 
 def test_pick_default_accommodation_code_negative():
-    assert_raises(ValueError, asmt_gen._pick_default_accommodation_code, -1)
+    assert_raises(ValueError, _pick_accommodation_code, -1)
 
 
 def test_pick_default_accommodation_code_too_big():
-    assert_raises(ValueError, asmt_gen._pick_default_accommodation_code, 5)
+    assert_raises(ValueError, _pick_accommodation_code, 5)
 
 
 def test_pick_default_accommodation_code_0():
-    code = asmt_gen._pick_default_accommodation_code(0)
+    code = _pick_accommodation_code(0)
     assert code == 0
 
 
 def test_pick_default_accommodation_code_four():
-    assert 4 <= asmt_gen._pick_default_accommodation_code(4) <= 26
+    assert 4 <= _pick_accommodation_code(4) <= 26
 
 
 def test_create_assessment_object():

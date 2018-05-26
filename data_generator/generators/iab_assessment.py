@@ -3,14 +3,12 @@ An assessment generator
 """
 
 import datetime
-import random
 
 import data_generator.config.cfg as cfg
 import data_generator.generators.assessment as gen_asmt_generator
 from data_generator.generators.hierarchy import InstitutionHierarchy
 from data_generator.generators.population import generate_perf_lvl
 from data_generator.model.assessment import Assessment
-from data_generator.model.assessmentoutcome import AssessmentOutcome
 from data_generator.model.interimassessment import InterimAssessment
 from data_generator.model.interimassessmentoutcome import InterimAssessmentOutcome
 from data_generator.model.student import Student
@@ -141,10 +139,9 @@ def generate_interim_assessment_outcome(date_taken: datetime.date,
     """
 
     # Run the General generator
-    sao = gen_asmt_generator.generate_assessment_outcome(student, assessment, AssessmentOutcome)
+    sao = gen_asmt_generator.generate_assessment_outcome(student, assessment, id_gen)
 
     # Set other specifics
-    sao.rec_id = id_gen.get_rec_id('assessment_outcome')
     sao.inst_hierarchy = inst_hier
     sao.date_taken = date_taken
     sao.admin_condition = 'NS'
@@ -178,52 +175,4 @@ def generate_interim_assessment_outcome(date_taken: datetime.date,
     sao.claim_1_score_range_max = sao.overall_score_range_max
     sao.claim_1_perf_lvl = sao.overall_perf_lvl
 
-    # Create accommodations details
-    sao.acc_asl_video_embed = _pick_default_accommodation_code(
-        cfg.ACCOMMODATIONS['acc_asl_video_embed'][assessment.subject])
-    sao.acc_print_on_demand_items_nonembed = _pick_default_accommodation_code(
-        cfg.ACCOMMODATIONS['acc_print_on_demand_items_nonembed'][assessment.subject])
-    sao.acc_noise_buffer_nonembed = _pick_default_accommodation_code(
-        cfg.ACCOMMODATIONS['acc_noise_buffer_nonembed'][assessment.subject])
-    sao.acc_braile_embed = _pick_default_accommodation_code(
-        cfg.ACCOMMODATIONS['acc_braile_embed'][assessment.subject])
-    sao.acc_closed_captioning_embed = _pick_default_accommodation_code(
-        cfg.ACCOMMODATIONS['acc_closed_captioning_embed'][assessment.subject])
-    sao.acc_text_to_speech_embed = _pick_default_accommodation_code(
-        cfg.ACCOMMODATIONS['acc_text_to_speech_embed'][assessment.subject])
-    sao.acc_abacus_nonembed = _pick_default_accommodation_code(
-        cfg.ACCOMMODATIONS['acc_abacus_nonembed'][assessment.subject])
-    sao.acc_alternate_response_options_nonembed = _pick_default_accommodation_code(
-        cfg.ACCOMMODATIONS['acc_alternate_response_options_nonembed'][assessment.subject])
-    sao.acc_calculator_nonembed = _pick_default_accommodation_code(
-        cfg.ACCOMMODATIONS['acc_calculator_nonembed'][assessment.subject])
-    sao.acc_multiplication_table_nonembed = _pick_default_accommodation_code(
-        cfg.ACCOMMODATIONS['acc_multiplication_table_nonembed'][assessment.subject])
-    sao.acc_print_on_demand_nonembed = _pick_default_accommodation_code(
-        cfg.ACCOMMODATIONS['acc_asl_video_embed'][assessment.subject])
-    sao.acc_read_aloud_nonembed = _pick_default_accommodation_code(
-        cfg.ACCOMMODATIONS['acc_read_aloud_nonembed'][assessment.subject])
-    sao.acc_scribe_nonembed = _pick_default_accommodation_code(
-        cfg.ACCOMMODATIONS['acc_scribe_nonembed'][assessment.subject])
-    sao.acc_speech_to_text_nonembed = _pick_default_accommodation_code(
-        cfg.ACCOMMODATIONS['acc_speech_to_text_nonembed'][assessment.subject])
-    sao.acc_streamline_mode = _pick_default_accommodation_code(
-        cfg.ACCOMMODATIONS['acc_streamline_mode'][assessment.subject])
-
     return sao
-
-
-def _pick_default_accommodation_code(default_code):
-    """
-    Pick a random accommodation code between 4 and 26 inclusive if default_code is 4.
-    If code is 0 return 0.
-
-    @param default_code: The default code from configuration
-    @return: Generated random code
-    """
-    if default_code == 0:
-        return 0
-    elif default_code == 4:
-        return random.randint(4, 26)
-    else:
-        raise ValueError('invalid default_code \'%s\' (must be 0 or 4)' % (default_code,))

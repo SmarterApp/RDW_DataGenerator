@@ -25,8 +25,7 @@ class AssessmentOutcome:
                  'acc_closed_captioning_embed acc_text_to_speech_embed acc_abacus_nonembed '
                  'acc_alternate_response_options_nonembed acc_calculator_nonembed acc_multiplication_table_nonembed '
                  'acc_print_on_demand_nonembed acc_read_aloud_nonembed acc_scribe_nonembed acc_speech_to_text_nonembed '
-                 'acc_streamline_mode '
-                 'from_date to_date item_data'.split())
+                 'acc_streamline_mode from_date to_date accommodations item_data'.split())
 
     def __init__(self):
         self.guid = None  # aka oppId? or key?
@@ -83,6 +82,7 @@ class AssessmentOutcome:
         self.acc_streamline_mode = 0
         self.from_date = cfg.HIERARCHY_FROM_DATE
         self.to_date = datetime.date(9999, 12, 31)
+        self.accommodations = []    # list of (type, code, value), e.g. ('Calculator', 'TDS_Calc0', 'None')
         self.item_data = []
 
     def get_object_set(self):
