@@ -94,6 +94,8 @@ def generate_student(school: School, grade, id_gen: IDGen=IDGen, acad_year=datet
         s.eth_hispanic = True
     if 'asian' in ethnicities:
         s.eth_asian = True
+    if 'filipino' in ethnicities:
+        s.eth_filipino = True
     if 'pac_isl' in ethnicities:
         s.eth_pacific = True
     if 'white' in ethnicities:
@@ -239,7 +241,7 @@ def _determine_demographics(config):
     # Pick more ethnicities if needed
     if ethnicity == 'multi':
         eth1 = 'multi'
-        eth2 = 'mutli'
+        eth2 = 'multi'
         while eth1 == 'multi' or eth2 == 'multi':
             eth1 = _pick_demo_option(config['ethnicity']) if eth1 == 'multi' else eth1
             eth2 = _pick_demo_option(config['ethnicity']) if eth2 == 'multi' else eth2
@@ -275,6 +277,7 @@ def generate_perf_lvl(student: Student, subject):
     student_race = ('dmg_eth_2mr' if student.eth_multi else
                     'dmg_eth_ami' if student.eth_amer_ind else
                     'dmg_eth_asn' if student.eth_asian else
+                    'dmg_eth_asn' if student.eth_filipino else   # yes, treating filipino as asian for perf
                     'dmg_eth_blk' if student.eth_black else
                     'dmg_eth_hsp' if student.eth_hispanic else
                     'dmg_eth_pcf' if student.eth_pacific else
@@ -379,14 +382,13 @@ def _generate_derived_demographic(student):
     @returns: Derived demographic value
     """
     try:
-        # TODO: need to decide the value. is it true/false, or f/t, or others
         if student.eth_hispanic is True:
             return 3
 
         else:
             demos = {0: student.eth_none,
                      1: student.eth_black,
-                     2: student.eth_asian,
+                     2: student.eth_asian or student.eth_filipino,
                      4: student.eth_amer_ind,
                      5: student.eth_pacific,
                      6: student.eth_white}

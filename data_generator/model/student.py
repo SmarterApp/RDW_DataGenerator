@@ -25,10 +25,10 @@ class Student:
         self.eth_black = False
         self.eth_hispanic = False
         self.eth_asian = False
+        self.eth_filipino = False
         self.eth_pacific = False
         self.eth_amer_ind = False
         self.eth_multi = False
-        self.eth_filipino = False
         self.eth_none = False
         self.prg_iep = None
         self.prg_sec504 = None
