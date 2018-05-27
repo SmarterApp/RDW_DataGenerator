@@ -160,6 +160,7 @@ def advance_student(student: Student, schools_by_grade, hold_back_rate=pop_confi
                           boundaries
     :returns: True if the student still exists in the system, False if they do not
     """
+
     # Now check if this student should be advanced
     if random.random() < hold_back_rate:
         # The student is not being advanced
@@ -184,7 +185,10 @@ def advance_student(student: Student, schools_by_grade, hold_back_rate=pop_confi
 
     # If the new grade of the student is not available in the school, pick a new school
     if student.grade not in student.school.grades or random.random() < transfer_rate:
+        student.transfer = True
         student.school = random.choice(schools_by_grade[student.grade])
+    else:
+        student.transfer = False
 
     # TODO: Change things like LEP status or IEP status, etc
 
@@ -296,7 +300,7 @@ def generate_perf_lvl(student: Student, subject):
 
 def repopulate_school_grade(school: School, grade, grade_students, id_gen, reg_sys,
                             acad_year=datetime.datetime.now().year,
-                            additional_student_choice=cfg.REPOPULATE_ADDITIONAL_STUDENTS):
+                            additional_student_choice=pop_config.REPOPULATE_ADDITIONAL_STUDENTS):
     """
     Take a school grade and make sure it has enough students. The list of students is updated in-place.
 

@@ -6,9 +6,11 @@ HAS_EMAIL_ADDRESS_RATE = .8
 HAS_PHYSICAL_ADDRESS_RATE = .95
 HAS_ADDRESS_LINE_2_RATE = .3
 
-STUDENT_HOLD_BACK_RATE = .02  # 2% of students will be held back in their grade for a new year
-STUDENT_DROP_OUT_RATE = .5  # 50% of students drop out if not advanced to the next grade
-STUDENT_TRANSFER_RATE = .05  # 5% of students will move to a new school in the district without needing to
+STUDENT_HOLD_BACK_RATE = .015   # 1.5% of students will be held back in their grade for a new year
+STUDENT_DROP_OUT_RATE = .5      # 50% of students drop out if not advanced to the next grade
+STUDENT_TRANSFER_RATE = .05     # 5% of students will move to a new school in the district without needing to
+
+REPOPULATE_ADDITIONAL_STUDENTS = [0, 0, 1, 2, 3, 4]
 
 DEMOGRAPHICS = {
     'california':

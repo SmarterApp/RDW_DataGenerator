@@ -135,6 +135,7 @@ class XmlWorker(Worker):
         self.add_examinee_attribute(examinee, 'StudentGroupName', student.group_8_text, contextDateStr)
         self.add_examinee_attribute(examinee, 'StudentGroupName', student.group_9_text, contextDateStr)
         self.add_examinee_attribute(examinee, 'StudentGroupName', student.group_10_text, contextDateStr)
+        self.add_examinee_attribute(examinee, 'Advancement', self.map_advancement(student), contextDateStr)
 
         hierarchy = outcome.inst_hierarchy
         self.add_examinee_relationship(examinee, 'StateAbbreviation', hierarchy.state.code, contextDateStr)
@@ -304,3 +305,8 @@ class XmlWorker(Worker):
 
     def map_yes_no(self, value):
         return 'Yes' if value else 'No'
+
+    def map_advancement(self, student):
+        if student.held_back: return 'HeldBack'
+        if student.transfer: return 'Transfer'
+        return 'Normal'

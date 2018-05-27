@@ -341,8 +341,8 @@ class WorkerManager(Worker):
                 if pop_gen.advance_student(student, schools_by_grade):
                     schools_with_grades[student.school][student.grade].append(student)
 
-            # With the students moved around, we will re-populate empty grades and create assessments with outcomes for
-            # the students
+            # With the students moved around, we will re-populate empty grades
+            # and create assessments with outcomes for the students
             for school, grades in schools_with_grades.items():
                 # Process the whole school
                 student_count += self.__process_school(grades, school, students, unique_students, state, district,

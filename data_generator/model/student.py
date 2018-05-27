@@ -35,6 +35,7 @@ class Student:
         self.prg_lep = None
         self.prg_econ_disad = None
         self.held_back = False
+        self.transfer = False
 
         self.id = None              # unique natural id for student (ssid)
         self.external_ssid = None

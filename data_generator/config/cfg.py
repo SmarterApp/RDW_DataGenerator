@@ -28,11 +28,6 @@ PRG_DISABILITY_TYPES = [None, None,  # Allow blanks and give them higher weight
 
 HAS_ASMT_RESULT_IN_SR_FILE_RATE = .985  # The rate at which students with assessment results are in the SR CSV file
 
-HOLD_BACK_RATE = .01
-NOT_ADVANCED_DROP_OUT_RATE = .4
-TRANSFER_RATE = .03
-REPOPULATE_ADDITIONAL_STUDENTS = [0, 0, 1, 2, 3, 4]
-
 SUBJECTS = ['ELA', 'Math']
 
 ASMT_TO_DATE = datetime.date(9999, 12, 31)
