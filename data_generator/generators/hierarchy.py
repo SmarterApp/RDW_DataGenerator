@@ -88,6 +88,7 @@ def generate_school(school_type, district: District, id_gen=IDGen, school_types=
 
     :param school_type: The type of school to generate
     :param district: The district the school belongs to
+    :param id_gen: ID generator
     :param school_types: The school types configuration object
     :param interim_asmt_rate: The rate (chance) that students in this school will take interim assessments
     :returns: The school
