@@ -86,6 +86,20 @@ class Student:
         else:
             return self.first_name + ' ' + self.last_name
 
+    def reset_ethnicity(self):
+        """Clears all the ethnicity fields, setting them false
+        """
+        self.eth_white = False
+        self.eth_black = False
+        self.eth_hispanic = False
+        self.eth_asian = False
+        self.eth_filipino = False
+        self.eth_pacific = False
+        self.eth_amer_ind = False
+        self.eth_multi = False
+        self.eth_none = False
+
+
     def get_object_set(self):
         """Get the set of objects that this exposes to a CSV or JSON writer.
         """

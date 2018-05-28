@@ -15,6 +15,7 @@ CLAIM_MEASURES = {
     'ELA': ['SOCK_R', '2-W', 'SOCK_LS', '4-CR']
 }
 
+
 class XmlWorker(Worker):
     def __init__(self, out_path_root):
         self.out_path_root = out_path_root

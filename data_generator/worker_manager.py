@@ -101,7 +101,6 @@ class WorkerManager(Worker):
         assessments = []
 
         if self.pkg_source == 'generate':
-            assessments.extend(self.__generate_iabs())
             assessments.extend(self.__generate_assessments())
             for worker in self.workers:
                 worker.write_assessments(assessments)
@@ -160,78 +159,40 @@ class WorkerManager(Worker):
         # Print completion of state
         print('State %s created with average of %i students/year and %i total unique' % (state.name, student_avg_count, student_unique_count))
 
-    def __generate_iabs(self):
-        """
-        generate iab assessment objects
-        :return: generate assessments
-        """
-        assessments = []
-
-        if not self.iab_pkg:
-            return assessments
-
-        # set up a progress bar
-        progress_max = 0
-        for subject, grade in itertools.product(cfg.SUBJECTS, GRADES_OF_CONCERN):
-            progress_max += len(ASMT_YEARS) * len(cfg.IAB_NAMES[subject][grade]) * len(cfg.IAB_EFFECTIVE_DATES)
-        bar = pyprind.ProgBar(progress_max, stream=sys.stdout, title='Generating IAB assessments')
-
-        # generate iabs
-        for subject, grade in itertools.product(cfg.SUBJECTS, GRADES_OF_CONCERN):
-            for year, block in itertools.product(ASMT_YEARS, cfg.IAB_NAMES[subject][grade]):
-
-                assessments.append(iab_asmt_gen.generate_interim_assessment(year, subject, block, grade, self.id_gen,
-                                                                            gen_item=self.gen_item))
-                # Output to requested mediums
-                for worker in self.workers:
-                    worker.write_iab(assessments[-1])
-                bar.update()
-
-        return assessments
-
     def __generate_assessments(self):
         """
-        generate summative and ica assessment objects
         :return: generate assessments
         """
         assessments = []
 
-        if not (self.sum_pkg or self.ica_pkg):
+        if not (self.sum_pkg or self.ica_pkg or self.iab_pkg):
             return assessments
 
         # set up a progress bar
         progress_max = len(ASMT_YEARS) * len(cfg.SUBJECTS) * len(GRADES_OF_CONCERN)
-        bar = pyprind.ProgBar(progress_max, stream=sys.stdout, title='Generating Summative and ICA Assessments')
+        bar = pyprind.ProgBar(progress_max, stream=sys.stdout, title='Generating Assessments')
 
-        for year in ASMT_YEARS:
-            for subject in cfg.SUBJECTS:
-                for grade in GRADES_OF_CONCERN:
-                    if self.sum_pkg:
-                        # Create the summative assessment
-                        assessments.append(self.__create_and_write_assessment('SUMMATIVE', 'Spring', year, subject, grade))
+        for year, subject, grade in itertools.product(ASMT_YEARS, cfg.SUBJECTS, GRADES_OF_CONCERN):
+            if self.sum_pkg:
+                assessments.append(self.__create_and_write_assessment('SUMMATIVE', 'Spring', year, subject, grade))
+            if self.ica_pkg:
+                for period in INTERIM_ASMT_PERIODS:
+                    assessments.append(self.__create_and_write_assessment('INTERIM COMPREHENSIVE', period, year, subject, grade))
+            if self.iab_pkg:
+                for block in cfg.IAB_NAMES[subject][grade]:
+                    assessments.append(self.__create_and_write_iab_assessment(block, year, subject, grade))
+            bar.update()
 
-                    if self.ica_pkg:
-                        # Create the interim assessments
-                        for period in INTERIM_ASMT_PERIODS:
-                            assessments.append(self.__create_and_write_assessment('INTERIM COMPREHENSIVE', period, year, subject, grade))
-
-                    bar.update()
         return assessments
 
+    def __create_and_write_iab_assessment(self, block, year, subject, grade):
+        asmt = iab_asmt_gen.generate_interim_assessment(year, subject, block, grade, self.id_gen, gen_item=self.gen_item)
+        for worker in self.workers:
+            worker.write_iab(asmt)
+        return asmt
+
     def __create_and_write_assessment(self, type, period, year, subject, grade):
-        """
-        Create a new assessment object and write it out
-
-        @param type: Type of assessment to create
-        @param period: Period (month) of assessment to create
-        @param year: Year of assessment to create
-        @param subject: Subject of assessment to create
-        @param grade: Grade of assessment to create
-        @returns: New assessment object
-        """
-        # Create assessment
         asmt = asmt_gen.generate_assessment(type, period, year, subject, grade, self.id_gen, gen_item=self.gen_item)
-
         for worker in self.workers:
             worker.write_assessment(asmt)
         return asmt

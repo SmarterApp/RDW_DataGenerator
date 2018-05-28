@@ -160,14 +160,7 @@ def test_generate_derived_demographic_no_ethnicities():
     district = hier_gen.generate_district('Big Average', state, ID_GEN)
     school = hier_gen.generate_school('High School', district, ID_GEN, interim_asmt_rate=1)
     student = pop_gen.generate_student(school, 11, ID_GEN, 2015)
-    student.eth_amer_ind = False
-    student.eth_asian = False
-    student.eth_black = False
-    student.eth_hispanic = False
-    student.eth_multi = False
-    student.eth_none = False
-    student.eth_pacific = False
-    student.eth_white = False
+    student.reset_ethnicity()
 
     # Test
     assert pop_gen._generate_derived_demographic(student) == -1
@@ -179,14 +172,8 @@ def test_generate_derived_demographic_amer_ind():
     district = hier_gen.generate_district('Big Average', state, ID_GEN)
     school = hier_gen.generate_school('High School', district, ID_GEN, interim_asmt_rate=1)
     student = pop_gen.generate_student(school, 11, ID_GEN, 2015)
+    student.reset_ethnicity()
     student.eth_amer_ind = True
-    student.eth_asian = False
-    student.eth_black = False
-    student.eth_hispanic = False
-    student.eth_multi = False
-    student.eth_none = False
-    student.eth_pacific = False
-    student.eth_white = False
 
     # Test
     assert pop_gen._generate_derived_demographic(student) == 4
@@ -198,14 +185,21 @@ def test_generate_derived_demographic_asian():
     district = hier_gen.generate_district('Big Average', state, ID_GEN)
     school = hier_gen.generate_school('High School', district, ID_GEN, interim_asmt_rate=1)
     student = pop_gen.generate_student(school, 11, ID_GEN, 2015)
-    student.eth_amer_ind = False
+    student.reset_ethnicity()
     student.eth_asian = True
-    student.eth_black = False
-    student.eth_hispanic = False
-    student.eth_multi = False
-    student.eth_none = False
-    student.eth_pacific = False
-    student.eth_white = False
+
+    # Test
+    assert pop_gen._generate_derived_demographic(student) == 2
+
+
+def test_generate_derived_demographic_filipino():
+    # Create objects
+    state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
+    district = hier_gen.generate_district('Big Average', state, ID_GEN)
+    school = hier_gen.generate_school('High School', district, ID_GEN, interim_asmt_rate=1)
+    student = pop_gen.generate_student(school, 11, ID_GEN, 2015)
+    student.reset_ethnicity()
+    student.eth_filipino = True
 
     # Test
     assert pop_gen._generate_derived_demographic(student) == 2
@@ -217,14 +211,8 @@ def test_generate_derived_demographic_black():
     district = hier_gen.generate_district('Big Average', state, ID_GEN)
     school = hier_gen.generate_school('High School', district, ID_GEN, interim_asmt_rate=1)
     student = pop_gen.generate_student(school, 11, ID_GEN, 2015)
-    student.eth_amer_ind = False
-    student.eth_asian = False
+    student.reset_ethnicity()
     student.eth_black = True
-    student.eth_hispanic = False
-    student.eth_multi = False
-    student.eth_none = False
-    student.eth_pacific = False
-    student.eth_white = False
 
     # Test
     assert pop_gen._generate_derived_demographic(student) == 1
@@ -236,14 +224,8 @@ def test_generate_derived_demographic_hispanic():
     district = hier_gen.generate_district('Big Average', state, ID_GEN)
     school = hier_gen.generate_school('High School', district, ID_GEN, interim_asmt_rate=1)
     student = pop_gen.generate_student(school, 11, ID_GEN, 2015)
-    student.eth_amer_ind = False
-    student.eth_asian = False
-    student.eth_black = False
+    student.reset_ethnicity()
     student.eth_hispanic = True
-    student.eth_multi = False
-    student.eth_none = False
-    student.eth_pacific = False
-    student.eth_white = False
 
     # Test
     assert pop_gen._generate_derived_demographic(student) == 3
@@ -255,14 +237,10 @@ def test_generate_derived_demographic_multi():
     district = hier_gen.generate_district('Big Average', state, ID_GEN)
     school = hier_gen.generate_school('High School', district, ID_GEN, interim_asmt_rate=1)
     student = pop_gen.generate_student(school, 11, ID_GEN, 2015)
-    student.eth_amer_ind = False
-    student.eth_asian = False
-    student.eth_black = True
-    student.eth_hispanic = False
+    student.reset_ethnicity()
     student.eth_multi = True
-    student.eth_none = False
+    student.eth_black = True
     student.eth_pacific = True
-    student.eth_white = False
 
     # Test
     assert pop_gen._generate_derived_demographic(student) == 7
@@ -274,14 +252,10 @@ def test_generate_derived_demographic_multi_hispanic():
     district = hier_gen.generate_district('Big Average', state, ID_GEN)
     school = hier_gen.generate_school('High School', district, ID_GEN, interim_asmt_rate=1)
     student = pop_gen.generate_student(school, 11, ID_GEN, 2015)
-    student.eth_amer_ind = False
-    student.eth_asian = False
-    student.eth_black = False
-    student.eth_hispanic = True
+    student.reset_ethnicity()
     student.eth_multi = True
-    student.eth_none = False
+    student.eth_hispanic = True
     student.eth_pacific = True
-    student.eth_white = False
 
     # Test
     assert pop_gen._generate_derived_demographic(student) == 3
@@ -293,14 +267,8 @@ def test_generate_derived_demographic_none():
     district = hier_gen.generate_district('Big Average', state, ID_GEN)
     school = hier_gen.generate_school('High School', district, ID_GEN, interim_asmt_rate=1)
     student = pop_gen.generate_student(school, 11, ID_GEN, 2015)
-    student.eth_amer_ind = False
-    student.eth_asian = False
-    student.eth_black = False
-    student.eth_hispanic = False
-    student.eth_multi = False
+    student.reset_ethnicity()
     student.eth_none = True
-    student.eth_pacific = False
-    student.eth_white = False
 
     # Test
     assert pop_gen._generate_derived_demographic(student) == 0
@@ -312,14 +280,8 @@ def test_generate_derived_demographic_pacific():
     district = hier_gen.generate_district('Big Average', state, ID_GEN)
     school = hier_gen.generate_school('High School', district, ID_GEN, interim_asmt_rate=1)
     student = pop_gen.generate_student(school, 11, ID_GEN, 2015)
-    student.eth_amer_ind = False
-    student.eth_asian = False
-    student.eth_black = False
-    student.eth_hispanic = False
-    student.eth_multi = False
-    student.eth_none = False
+    student.reset_ethnicity()
     student.eth_pacific = True
-    student.eth_white = False
 
     # Test
     assert pop_gen._generate_derived_demographic(student) == 5
@@ -331,13 +293,7 @@ def test_generate_derived_demographic_white():
     district = hier_gen.generate_district('Big Average', state, ID_GEN)
     school = hier_gen.generate_school('High School', district, ID_GEN, interim_asmt_rate=1)
     student = pop_gen.generate_student(school, 11, ID_GEN, 2015)
-    student.eth_amer_ind = False
-    student.eth_asian = False
-    student.eth_black = False
-    student.eth_hispanic = False
-    student.eth_multi = False
-    student.eth_none = False
-    student.eth_pacific = False
+    student.reset_ethnicity()
     student.eth_white = True
 
     # Test
