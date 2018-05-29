@@ -11,14 +11,21 @@ import data_generator.config.hierarchy as hierarchy_config
 import data_generator.generators.assessment as gen_asmt_generator
 from data_generator.generators.population import generate_perf_lvl
 from data_generator.model.assessment import Assessment
+from data_generator.model.assessmentoutcome import AssessmentOutcome
 from data_generator.model.institutionhierarchy import InstitutionHierarchy
 from data_generator.model.student import Student
 from data_generator.util.assessment_stats import adjust_score, random_claim_error, claim_perf_lvl
 from data_generator.util.assessment_stats import random_claims
 from data_generator.util.assessment_stats import random_score_given_level
+from data_generator.util.id_gen import IDGen
 
 
-def create_assessment_outcome_object(student, asmt, inst_hier, id_gen, assessment_results,
+def create_assessment_outcome_object(date_taken: datetime.date,
+                                     student: Student,
+                                     asmt: Assessment,
+                                     inst_hier: InstitutionHierarchy,
+                                     id_gen: IDGen,
+                                     assessment_results: {str: AssessmentOutcome},
                                      skip_rate=cfg.ASMT_SKIP_RATE,
                                      retake_rate=cfg.ASMT_RETAKE_RATE,
                                      delete_rate=cfg.ASMT_DELETE_RATE,
@@ -30,6 +37,7 @@ def create_assessment_outcome_object(student, asmt, inst_hier, id_gen, assessmen
     outcome is also created. A second outcome will be created if the assessment is re-taken or updated. If the
     assessment is determined to have been deleted, no second record will be created.
 
+    @param date_taken: date taken
     @param student: The student to create an outcome for
     @param asmt: The assessment to create an outcome for
     @param inst_hier: The institution hierarchy this assessment relates to
@@ -51,7 +59,7 @@ def create_assessment_outcome_object(student, asmt, inst_hier, id_gen, assessmen
         assessment_results[asmt.guid] = []
 
     # Create the original outcome object
-    ao = generate_assessment_outcome(student, asmt, inst_hier, id_gen, gen_item=gen_item)
+    ao = generate_assessment_outcome(date_taken, student, asmt, inst_hier, id_gen, gen_item=gen_item)
     assessment_results[asmt.guid].append(ao)
 
     # Decide if something special is happening
@@ -59,15 +67,12 @@ def create_assessment_outcome_object(student, asmt, inst_hier, id_gen, assessmen
     if special_random < retake_rate:
         # Set the original outcome object to inactive, create a new outcome (with an advanced date take), and return
         ao.result_status = cfg.ASMT_STATUS_INACTIVE
-        ao2 = generate_assessment_outcome(student, asmt, inst_hier, id_gen,
-                                          gen_item=gen_item)
+        ao2 = generate_assessment_outcome(date_taken + datetime.timedelta(days=7), student, asmt, inst_hier, id_gen, gen_item=gen_item)
         assessment_results[asmt.guid].append(ao2)
-        ao2.date_taken += datetime.timedelta(days=5)
     elif special_random < update_rate:
         # Set the original outcome object to deleted and create a new outcome
         ao.result_status = cfg.ASMT_STATUS_DELETED
-        ao2 = generate_assessment_outcome(student, asmt, inst_hier, id_gen,
-                                          gen_item=gen_item)
+        ao2 = generate_assessment_outcome(date_taken, student, asmt, inst_hier, id_gen, gen_item=gen_item)
         assessment_results[asmt.guid].append(ao2)
 
         # See if the updated record should be deleted
@@ -78,14 +83,12 @@ def create_assessment_outcome_object(student, asmt, inst_hier, id_gen, assessmen
         ao.result_status = cfg.ASMT_STATUS_DELETED
 
 
-def generate_assessment(type, period, asmt_year, subject, grade, id_gen, from_date=None, to_date=None,
-                        claim_definitions=cfg.CLAIM_DEFINITIONS,
-                        gen_item=True):
+def generate_assessment(type, asmt_year, subject, grade, id_gen, from_date=None, to_date=None,
+                        claim_definitions=cfg.CLAIM_DEFINITIONS, gen_item=True):
     """
     Generate an assessment object.
 
     @param type: Assessment type
-    @param period: Period within assessment year
     @param asmt_year: Assessment year
     @param subject: Assessment subject
     @param grade: Assessment grade
@@ -106,30 +109,17 @@ def generate_assessment(type, period, asmt_year, subject, grade, id_gen, from_da
     # Run the General generator
     sa = gen_asmt_generator.generate_assessment(Assessment)
 
-    # Determine the period month
-    year_adj = 1
-    period_month = 9
-    if type == 'SUMMATIVE':
-        year_adj = 0
-        period_month = 5
-    elif 'Winter' in period:
-        period_month = 12
-    elif 'Spring' in period:
-        year_adj = 0
-        period_month = 3
-
-    # Set other specifics
+    # Set other specifics based on SmarterBalanced conventions
     sa.name = 'SBAC-{}-{}'.format(subject, grade)
-    sa.id = '(SBAC){}-{}-{}-{}'.format(sa.name, period, asmt_year-1, asmt_year)
+    sa.id = '(SBAC){}-{}-{}-{}'.format(sa.name, 'Spring' if type == 'SUMMATIVE' else 'Winter', asmt_year-1, asmt_year)
     sa.subject = subject
     sa.grade = grade
     sa.rec_id = id_gen.get_rec_id('assessment')
     sa.type = type
-    sa.period = period + ' ' + str((asmt_year - year_adj))
     sa.year = asmt_year
     sa.version = cfg.ASMT_VERSION
     sa.subject = subject
-    sa.bank_key = '200'   # TODO - handle properly
+    sa.bank_key = '200'
     sa.claim_1_name = claims[0]['name']
     sa.claim_2_name = claims[1]['name']
     sa.claim_3_name = claims[2]['name']
@@ -159,7 +149,7 @@ def generate_assessment(type, period, asmt_year, subject, grade, id_gen, from_da
     sa.overall_cut_point_1 = asmt_scale_scores[1]
     sa.overall_cut_point_2 = asmt_scale_scores[2]
     sa.overall_cut_point_3 = asmt_scale_scores[3]
-    sa.effective_date = datetime.date(asmt_year - year_adj, period_month, 15)
+    sa.effective_date = datetime.date(asmt_year - 1, 8, 15)
     sa.from_date = from_date if from_date is not None else sa.effective_date
     sa.to_date = to_date if to_date is not None else cfg.ASMT_TO_DATE
     gen_asmt_generator.generate_segment_and_item_bank(sa, gen_item, cfg.ASMT_ITEM_BANK_SIZE, id_gen)
@@ -167,11 +157,16 @@ def generate_assessment(type, period, asmt_year, subject, grade, id_gen, from_da
     return sa
 
 
-def generate_assessment_outcome(student: Student, assessment: Assessment, inst_hier: InstitutionHierarchy,
-                                id_gen, gen_item=True):
+def generate_assessment_outcome(date_taken: datetime.date,
+                                student: Student,
+                                assessment: Assessment,
+                                inst_hier: InstitutionHierarchy,
+                                id_gen,
+                                gen_item=True):
     """
     Generate an assessment outcome for a given student.
 
+    @param date_taken: date taken
     @param student: The student to create the outcome for
     @param assessment: The assessment to create the outcome for
     @param inst_hier: The institution hierarchy this student belongs to
@@ -186,19 +181,7 @@ def generate_assessment_outcome(student: Student, assessment: Assessment, inst_h
     # Set other specifics
     sao.inst_hierarchy = inst_hier
     sao.admin_condition = 'Valid' if assessment.type == 'SUMMATIVE' else 'SD'
-
-    # Create the date taken
-    year_adj = 1
-    period_month = 9
-    if assessment.type == 'SUMMATIVE':
-        year_adj = 0
-        period_month = 5
-    elif 'Winter' in assessment.period:
-        period_month = 12
-    elif 'Spring' in assessment.period:
-        year_adj = 0
-        period_month = 3
-    sao.date_taken = datetime.date(assessment.year - year_adj, period_month, 15)
+    sao.date_taken = date_taken
 
     gen_asmt_generator.generate_session(sao)
 

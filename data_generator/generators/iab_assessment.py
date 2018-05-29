@@ -72,17 +72,16 @@ def generate_interim_assessment(asmt_year: int,
     # Run the General generator
     sa = gen_asmt_generator.generate_assessment(Assessment)
 
-    # Set other specifics
+    # Set other specifics based on SmarterBalanced conventions
     sa.rec_id = id_gen.get_rec_id('assessment')
     sa.type = 'INTERIM ASSESSMENT BLOCK'
-    sa.period = str(asmt_year-1)
     sa.year = asmt_year
     sa.version = cfg.ASMT_VERSION
     sa.name = 'SBAC-IAB-FIXED-G{}{}-{}-{}-{}'.format(grade, subject[0], ''.join(c for c in block if c.isupper()), subject, grade)
     sa.id = '(SBAC){}-{}-{}'.format(sa.name, asmt_year-1, asmt_year)
     sa.subject = subject
     sa.grade = grade
-    sa.bank_key = '200'       # TODO - handle properly
+    sa.bank_key = '200'
     sa.claim_1_name = block
     sa.claim_2_name = "Grade %s" % grade
     sa.claim_3_name = None

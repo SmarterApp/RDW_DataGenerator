@@ -220,7 +220,6 @@ def _determine_student_dob(grade, acad_year=datetime.datetime.now().year):
 
     if calendar.isleap(birth_year):
         bday_offset = random.randint(0, 365)
-
     else:
         bday_offset = random.randint(0, 364)
 

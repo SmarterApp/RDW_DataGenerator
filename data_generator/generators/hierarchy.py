@@ -83,7 +83,8 @@ def generate_district(district_type, state: State, id_gen=IDGen, district_types=
     return d
 
 
-def generate_school(school_type, district: District, id_gen=IDGen, school_types=hier_config.SCHOOL_TYPES, interim_asmt_rate=cfg.INTERIM_ASMT_RATE):
+def generate_school(school_type, district: District, id_gen=IDGen, school_types=hier_config.SCHOOL_TYPES,
+                    interim_asmt_rate=cfg.INTERIM_ASMT_RATE):
     """Generate a school specified by the parameters.
 
     :param school_type: The type of school to generate

@@ -11,9 +11,8 @@ class Assessment:
     """
 
     # using slots here only to avoid bugs due to typos etc.
-    __slots__ = ('guid', 'id', 'name', 'subject', 'grade', 'contract', 'mode',
-                 'rec_id', 'type', 'period', 'year', 'version', 'bank_key',
-                 'claim_1_name', 'claim_2_name', 'claim_3_name', 'claim_4_name',
+    __slots__ = ('guid', 'id', 'name', 'subject', 'grade', 'contract', 'mode', 'rec_id', 'type', 'year', 'version',
+                 'bank_key', 'claim_1_name', 'claim_2_name', 'claim_3_name', 'claim_4_name',
                  'perf_lvl_name_1', 'perf_lvl_name_2', 'perf_lvl_name_3', 'perf_lvl_name_4', 'perf_lvl_name_5',
                  'overall_score_min', 'claim_1_score_min', 'claim_2_score_min', 'claim_3_score_min', 'claim_4_score_min',
                  'overall_score_max', 'claim_1_score_max', 'claim_2_score_max', 'claim_3_score_max', 'claim_4_score_max',
@@ -25,7 +24,7 @@ class Assessment:
 
     def __init__(self):
         self.guid = None
-        self.id = None          # conventional SBAC assessment id, e.g. (SBAC)SBAC-Math-8-Fall-2016-2017
+        self.id = None          # conventional SBAC assessment id, e.g. (SBAC)SBAC-Math-8-Winter-2016-2017
         self.name = None        # conventional SBAC assessment name, e.g. SBAC-Math-8
         self.subject = None
         self.grade = None       # integer
@@ -33,7 +32,6 @@ class Assessment:
         self.mode = 'online'
         self.rec_id = None      # record id, used to link output records
         self.type = None        # SUMMATIVE, INTERIM COMPREHENSIVE, INTERIM ASSESSMENT BLOCK
-        self.period = None      # testing period, proxy for date-taken, sort of; shouldn't be here
         self.year = None        # academic year, e.g. 2017 for 2016-2017
         self.version = None
         self.bank_key = None
@@ -73,6 +71,15 @@ class Assessment:
         self.accommodations = set()     # set of allowed accommodations
         self.item_bank = None
         self.item_total_score = None    # cache of sum of item score
+
+    def is_summative(self):
+        return 'SUMMATIVE' in self.type
+
+    def is_interim(self):
+        return 'INTERIM' in self.type
+
+    def is_iab(self):
+        return 'BLOCK' in self.type
 
     def get_object_set(self):
         """Get the set of objects that this exposes to a CSV or JSON writer.

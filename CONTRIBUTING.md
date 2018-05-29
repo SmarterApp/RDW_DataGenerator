@@ -89,7 +89,7 @@ number of things that may need cleaning up. And there are some enhancements/impr
  - [x] Valid categories for IAB are 1-3, it returns 2-4
  - [ ] Errors during outcome generation for ICA's read from tabulator CSV.
  - [x] ICA report is missing claim scores
- - [ ] date-taken should be passed into outcome generation, not pulled from assessment.
+ - [x] date-taken should be passed into outcome generation, not pulled from assessment.
  - [x] min/max scores are silly (1200/2400, grade independent); should use LOSS/HOSS tables from SB docs. 
  - [ ] How are Section/Staff used? Can they be removed? Consider the session-based generation task.
  - [x] Combine remaining sbac_generators into generators.
@@ -101,7 +101,7 @@ making score more complex than 0/1.
  - [ ] Make some items field tests (i.e. item.operational='0')
  - [x] Improve fake answers for items; based on item type of course.
  - [x] Make item score distribution correspond to item difficulty.
- - [ ] Reuse IAB packages. Currently the system generates multiple IAB packages for a single year, each with a 
+ - [x] Reuse IAB packages. Currently the system generates multiple ICA packages for a single year, each with a
  different `period`. It makes more sense to separate the IAB packages from the date taken. So a single IAB package
  might be used more than once during the academic year. Or even in a subsequent academic year. To do this, remove
  `period` from the package; then generate the date-taken and pass it in when generating outcomes.
@@ -112,4 +112,4 @@ making score more complex than 0/1.
  - [ ] Very rarely generate admin condition IN for outcomes of summative assessments
  - [ ] Randomly generate admin condition NS for outcomes of ICA assessments
  - [ ] Make scores for a student consistent with student capability
- - [ ] Add filipino as an ethnicity for California demographics.
+ - [x] Add filipino as an ethnicity for California demographics.

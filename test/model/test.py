@@ -2,6 +2,7 @@
 Unit tests for model modules.
 
 """
+import datetime
 
 import data_generator.generators.hierarchy as hier_gen
 import data_generator.generators.population as pop_gen
@@ -14,7 +15,10 @@ ID_GEN = IDGen()
 
 def test_assessment_get_object_set():
     # Create necessary objects
-    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', 3, ID_GEN)
+    asmt = asmt_gen.generate_assessment('SUMMATIVE', 2015, 'ELA', 3, ID_GEN)
+
+    assert asmt.is_summative()
+    assert not asmt.is_iab()
 
     # Tests
     objs = asmt.get_object_set()
@@ -31,9 +35,9 @@ def test_assessment_outcome_get_object_set():
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
     ih = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
-    asmt = asmt_gen.generate_assessment('SUMMATIVE', 'Spring', 2015, 'ELA', 3, ID_GEN)
+    asmt = asmt_gen.generate_assessment('SUMMATIVE', 2015, 'ELA', 3, ID_GEN)
     student = pop_gen.generate_student(school, 3, ID_GEN)
-    asmt_out = asmt_gen.generate_assessment_outcome(student, asmt, ih, ID_GEN)
+    asmt_out = asmt_gen.generate_assessment_outcome(datetime.date(2015, 5, 15), student, asmt, ih, ID_GEN)
 
     # Tests
     objs = asmt_out.get_object_set()

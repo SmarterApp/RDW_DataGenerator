@@ -189,7 +189,7 @@ class XmlWorker(Worker):
 
         self.add_scale_score(opportunity, 'Overall',
             outcome.overall_score, outcome.overall_score_range_min, outcome.overall_perf_lvl)
-        if not self.is_iab(asmt.type):
+        if not asmt.is_iab():
             self.add_scale_score(opportunity, CLAIM_MEASURES[asmt.subject][0],
                 outcome.claim_1_score, outcome.claim_1_score_range_min, outcome.claim_1_perf_lvl)
             self.add_scale_score(opportunity, CLAIM_MEASURES[asmt.subject][1],
@@ -220,7 +220,7 @@ class XmlWorker(Worker):
             item.set('mimeType', 'text/plain')      # TODO
 
             # summative results should not have item response included (business policy)
-            if not self.is_summative(asmt.type):
+            if not asmt.is_summative():
                 response = SubElement(item, 'Response')
                 response.set('date', item_data.response_date.isoformat())
                 response.set('type', 'value')
@@ -288,12 +288,6 @@ class XmlWorker(Worker):
         scoreInfo.set('scorePoint', str(points))
         scoreInfo.set('scoreStatus', 'Scored')
         return scoreInfo
-
-    def is_iab(self, value):
-        return 'block' in value.lower()
-
-    def is_summative(self, value):
-        return 'summative' in value.lower()
 
     def map_asmt_type(self, value):
         return 'Summative' if 'summative' in value.lower() else 'Interim'

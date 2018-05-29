@@ -15,7 +15,3 @@ def test_set_configuration_regular():
     assert 2015 in generate_data.ASMT_YEARS
     assert 2016 in generate_data.ASMT_YEARS
     assert 2017 in generate_data.ASMT_YEARS
-    assert len(generate_data.INTERIM_ASMT_PERIODS) == 3
-    assert 'Fall' in generate_data.INTERIM_ASMT_PERIODS
-    assert 'Winter' in generate_data.INTERIM_ASMT_PERIODS
-    assert 'Spring' in generate_data.INTERIM_ASMT_PERIODS

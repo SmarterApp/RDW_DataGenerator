@@ -97,18 +97,9 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
         # TODO - standard? what's in there?
         # TODO - claim/target? they'll need to be trimmed (trailing tab)
 
-        # this is silly but adheres to the way the generation framework currently works:
-        # the assessment package has a period and that is used as the date taken; so we'll
-        # follow the pattern and arbitrarily pick the first effective date for this year
-        effective_date = datetime.date(asmt.year - 1, 10, 1)
-        if asmt.type == 'INTERIM ASSESSMENT BLOCK':
-            asmt.period = effective_date
-        else:
-            asmt.period = 'Spring ' + str(asmt.year)
-        # TODO - these dates should come from the assessment package, but not in CSV?
-        asmt.effective_date = effective_date
-        asmt.from_date = effective_date
-        asmt.to_date = effective_date
+        asmt.effective_date = datetime.date(asmt.year - 1, 8, 15)
+        asmt.from_date = asmt.effective_date
+        asmt.to_date = cfg.ASMT_TO_DATE
 
         # claims (this is just using the hard-coded values from generator code)
         asmt.claim_1_score_min = asmt.overall_score_min

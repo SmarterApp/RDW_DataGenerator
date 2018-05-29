@@ -29,7 +29,6 @@ from data_generator.util.id_gen import IDGen
 
 # constants used when generating assessment packages
 ASMT_YEARS = [2015, 2016, 2017]  # Expected sorted lowest to highest
-INTERIM_ASMT_PERIODS = ['Fall', 'Winter', 'Spring']  # The periods for interim assessments
 
 # These are global regardless of team
 GRADES_OF_CONCERN = {3, 4, 5, 6, 7, 8, 11}  # Made as a set for intersection later
@@ -174,10 +173,9 @@ class WorkerManager(Worker):
 
         for year, subject, grade in itertools.product(ASMT_YEARS, cfg.SUBJECTS, GRADES_OF_CONCERN):
             if self.sum_pkg:
-                assessments.append(self.__create_and_write_assessment('SUMMATIVE', 'Spring', year, subject, grade))
+                assessments.append(self.__create_and_write_assessment('SUMMATIVE', year, subject, grade))
             if self.ica_pkg:
-                for period in INTERIM_ASMT_PERIODS:
-                    assessments.append(self.__create_and_write_assessment('INTERIM COMPREHENSIVE', period, year, subject, grade))
+                assessments.append(self.__create_and_write_assessment('INTERIM COMPREHENSIVE', year, subject, grade))
             if self.iab_pkg:
                 for block in cfg.IAB_NAMES[subject][grade]:
                     assessments.append(self.__create_and_write_iab_assessment(block, year, subject, grade))
@@ -191,8 +189,8 @@ class WorkerManager(Worker):
             worker.write_iab(asmt)
         return asmt
 
-    def __create_and_write_assessment(self, type, period, year, subject, grade):
-        asmt = asmt_gen.generate_assessment(type, period, year, subject, grade, self.id_gen, gen_item=self.gen_item)
+    def __create_and_write_assessment(self, type, year, subject, grade):
+        asmt = asmt_gen.generate_assessment(type, year, subject, grade, self.id_gen, gen_item=self.gen_item)
         for worker in self.workers:
             worker.write_assessment(asmt)
         return asmt
@@ -344,28 +342,29 @@ class WorkerManager(Worker):
 
             # collect any assessments for this year and grade
             asmts = list(filter(lambda asmt: asmt.year == year and asmt.grade == grade, assessments))
-
-            # collect students, generating assessments as appropriate
-            for student in grade_students:
-                for asmt in asmts:
-                    if 'block' in asmt.type.lower():
-                        for offset_date in cfg.IAB_EFFECTIVE_DATES:
-                            date_taken = datetime.date(year + offset_date.year - 2, offset_date.month, offset_date.day)
+            for asmt in asmts:
+                # TODO - all students in a group should be in a single session with a single date
+                # TODO   until we figure out how to do that, pick a single date for each asmt (per school/grade)
+                date_taken = self.__date_taken_for_asmt(asmt)
+                for student in grade_students:
+                    if asmt.is_iab():
+                        if school.takes_interim_asmts and not student.skip_iab:
                             iab_asmt_gen.create_iab_outcome_object(date_taken, student, asmt, inst_hier,
-                                                                   self.id_gen, iab_results, gen_item=self.gen_item)
+                                self.id_gen, iab_results, gen_item=self.gen_item)
                     else:
-                        asmt_gen.create_assessment_outcome_object(student, asmt, inst_hier, self.id_gen,
-                                                                  assessment_results, asmt_skip_rates_by_subject[asmt.subject], gen_item=self.gen_item)
+                        asmt_gen.create_assessment_outcome_object(date_taken, student, asmt, inst_hier, self.id_gen,
+                            assessment_results, asmt_skip_rates_by_subject[asmt.subject], gen_item=self.gen_item)
 
-                if student.guid not in students:
-                    students[student.guid] = student
-                    dim_students.append(student)
-                if student.guid not in unique_students:
-                    unique_students[student.guid] = True
-                # if no assessments were generated for this student, always add to SR file
-                # otherwise, randomly allow some students to not be added (not really sure why this logic)
-                if len(asmts) == 0 or (random.random() < cfg.HAS_ASMT_RESULT_IN_SR_FILE_RATE):
-                    sr_students.append(student)
+                    # Make sure we have the student for the next run and for metrics
+                    # (bit repetitive to do it in the inner loop but probably okay for now)
+                    if student.guid not in students:
+                        students[student.guid] = student
+                        dim_students.append(student)
+                    if student.guid not in unique_students:
+                        unique_students[student.guid] = True
+
+            # collect all the students for registration output (randomly missing a few)
+            sr_students.extend([s for s in grade_students if random.random() < cfg.HAS_ASMT_RESULT_IN_SR_FILE_RATE])
 
         # Write out the school
         self.__write_school_data(year, reg_system.guid, dim_students, sr_students, assessment_results, iab_results, state.code, district.guid)
@@ -401,3 +400,37 @@ class WorkerManager(Worker):
         for guid, results in assessment_results.items():
             for worker in self.workers:
                 worker.write_assessment_outcome(results, guid, state_code, district_id)
+
+    def __date_taken_for_asmt(self, asmt: Assessment):
+        """
+        Generates a random date for an assessment.
+        IABs can be pretty much any time from mid-Sep to mid-March
+        ICAs will be late-January
+        Summatives will be early May
+
+        TODO - use school or something else to make these more realistic
+
+        :param asmt: assessment
+        :return: date taken
+        """
+
+        if asmt.is_iab():
+            date_taken = datetime.date(asmt.year-1, 9, 15) + datetime.timedelta(days=random.randint(0, 180))
+        elif asmt.is_summative():
+            date_taken = datetime.date(asmt.year, 5, 10)
+        else:
+            date_taken = datetime.date(asmt.year, 1, 21)
+        return self.__weekday_near(date_taken)
+
+    def __weekday_near(self, value: datetime.date):
+        """
+        Generates a random date that is near the given target date and is a weekday.
+        For now this is simple: shift date randomly +-3, then make sure it's not a weekend.
+
+        :param value: date to be near
+        :return: new date
+        """
+        value += datetime.timedelta(days=random.randint(-3, 3))
+        if value.weekday() == 5: value += datetime.timedelta(days=-1)     # Sat -> Fri
+        elif value.weekday() == 6: value += datetime.timedelta(days=+1)   # Sun -> Mon
+        return value
