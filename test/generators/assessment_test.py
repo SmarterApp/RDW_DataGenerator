@@ -378,7 +378,7 @@ def test_create_assessment_outcome_object_retake_results():
     assert outcomes[asmt.guid][0].result_status == 'I'
     assert outcomes[asmt.guid][0].date_taken == datetime.date(2015, 5, 15)
     assert outcomes[asmt.guid][1].result_status == 'C'
-    assert outcomes[asmt.guid][1].date_taken == datetime.date(2015, 5, 20)
+    assert outcomes[asmt.guid][1].date_taken == datetime.date(2015, 5, 22)
 
 
 def test_create_assessment_outcome_object_one_deleted_result():
@@ -502,7 +502,7 @@ def test_create_assessment_outcome_objects_no_interims_retake_results():
     assert outcomes[asmt_summ.guid][0].result_status == 'I'
     assert outcomes[asmt_summ.guid][0].date_taken == datetime.date(2015, 5, 15)
     assert outcomes[asmt_summ.guid][1].result_status == 'C'
-    assert outcomes[asmt_summ.guid][1].date_taken == datetime.date(2015, 5, 20)
+    assert outcomes[asmt_summ.guid][1].date_taken == datetime.date(2015, 5, 22)
 
 
 def test_create_assessment_outcome_objects_no_interim_one_deleted_result():
@@ -635,13 +635,13 @@ def test_create_assessment_outcome_objects_interims_retake_results():
     assert outcomes[asmt_summ.guid][0].date_taken == datetime.date(2015, 5, 15)
     assert outcomes[asmt_summ.guid][1].assessment.type == 'SUMMATIVE'
     assert outcomes[asmt_summ.guid][1].result_status == 'C'
-    assert outcomes[asmt_summ.guid][1].date_taken == datetime.date(2015, 5, 20)
+    assert outcomes[asmt_summ.guid][1].date_taken == datetime.date(2015, 5, 22)
     assert outcomes[interim_asmts[0].guid][0].assessment.type == 'INTERIM COMPREHENSIVE'
     assert outcomes[interim_asmts[0].guid][0].result_status == 'I'
     assert outcomes[interim_asmts[0].guid][0].date_taken == datetime.date(2015, 5, 15)
     assert outcomes[interim_asmts[0].guid][1].assessment.type == 'INTERIM COMPREHENSIVE'
     assert outcomes[interim_asmts[0].guid][1].result_status == 'C'
-    assert outcomes[interim_asmts[0].guid][1].date_taken == datetime.date(2015, 5, 20)
+    assert outcomes[interim_asmts[0].guid][1].date_taken == datetime.date(2015, 5, 22)
 
 
 def test_create_assessment_outcome_objects_interim_one_deleted_result():
