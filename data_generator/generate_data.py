@@ -21,8 +21,6 @@ if __name__ == '__main__':
     parser.add_argument('-sc', '--state_code', dest='state_code', action='store', default='CA', help='The code of the state to generate data for')
     parser.add_argument('-st', '--state_type', dest='state_type', action='store', default='devel', help='Specify the type of state to generate data for')
 
-    parser.add_argument('-org', '--org_source', dest='org_source', action='store', default='in', help='Source of organizations.json file (default=in)')
-
     group = parser.add_argument_group('packages')
     group.add_argument('-pkg', '--pkg_source', dest='pkg_source', action='store', default='generate', help='Source of assessment packages, either \'generate\' or a path to tabulator CSV files')
     group.add_argument('-sum', '--sum_pkg', dest='sum_pkg', action='store_true', default=False, help='Load/generate summative assessment packages')

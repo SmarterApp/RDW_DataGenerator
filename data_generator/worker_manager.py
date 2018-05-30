@@ -63,8 +63,6 @@ class WorkerManager(Worker):
         self.gen_iab = args.gen_iab
         self.gen_item = args.gen_item
 
-        self.org_source = args.org_source
-
         self.id_gen = IDGen()
 
     def cleanup(self):

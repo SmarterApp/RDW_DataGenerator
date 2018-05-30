@@ -12,6 +12,9 @@ STUDENT_TRANSFER_RATE = .05     # 5% of students will move to a new school in th
 
 REPOPULATE_ADDITIONAL_STUDENTS = [0, 0, 1, 2, 3, 4]
 
+# NOTE: probabilities should correlate with cfg.DEMOGRAPHICS_BY_GRADE, specifically any 0 value there
+# should have a corresponding 0 (or lack of entry) here. For example, grade 1, race 'dmg_eth_pcf' is 0.0
+# so grade 1 ethnicity should not allow any pac_isl students.
 DEMOGRAPHICS = {
     'california': {
         '1': {'gender': {'male': {'name': 'Male', 'perc': .5134},

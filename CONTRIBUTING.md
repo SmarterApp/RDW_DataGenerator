@@ -90,6 +90,8 @@ number of things that may need cleaning up. And there are some enhancements/impr
  - [ ] Errors during outcome generation for ICA's read from tabulator CSV.
  - [x] ICA report is missing claim scores
  - [ ] Target scores for summative assessments.
+ - [ ] Combine cfg.DEMOGRAPHICS_BY_GRADE and population.DEMOGRAPHICS. They both represent demographic distribution of
+ students but they have different values.
  - [x] date-taken should be passed into outcome generation, not pulled from assessment.
  - [x] min/max scores are silly (1200/2400, grade independent); should use LOSS/HOSS tables from SB docs. 
  - [ ] How are Section/Staff used? Can they be removed? Consider the session-based generation task.
