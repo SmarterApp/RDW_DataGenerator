@@ -135,7 +135,6 @@ def generate_student(school: School, grade, id_gen: IDGen=IDGen, acad_year=datet
     s.prg_migrant = determine_demo_option_selected(demo_config['migrant'])
     s.prg_idea = determine_demo_option_selected(demo_config['idea'])
     s.prg_primary_disability = random.choice(cfg.PRG_DISABILITY_TYPES)
-    s.skip_iab = random.random() < cfg.IAB_STUDENT_RATE
 
     # None-out primary disability if it doesn't make sense
     if not s.prg_iep and not s.prg_idea and not s.prg_sec504:
@@ -144,7 +143,7 @@ def generate_student(school: School, grade, id_gen: IDGen=IDGen, acad_year=datet
     # Set language items
     _set_lang_items(s, acad_year)
 
-    # store the student's capability based on demographics and school adjustment
+    # generate and store the student's capability based on demographics and school adjustment
     adj = hier_config.SCHOOL_TYPES[school.type_str]['students'].get('adjust_pld', 0.0)
     for subject in cfg.SUBJECTS:
         generator, demo = _get_level_demographics(s, subject)
@@ -206,9 +205,6 @@ def advance_student(student: Student, schools_by_grade, hold_back_rate=pop_confi
     # SmarterBalanced wants to see students get better so apply a small adjustment each time they advance
     adjustments.append(0.1)
     _apply_capability_adjustments(student, adjustments)
-
-    # TODO: Change things like LEP status or IEP status
-    # TODO - adjust capability based on changes in status?
 
     return True
 

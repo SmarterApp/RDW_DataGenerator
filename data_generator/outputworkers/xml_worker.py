@@ -157,7 +157,7 @@ class XmlWorker(Worker):
         opportunity.set('completeStatus', outcome.completeness)
         opportunity.set('key', str(outcome.rec_id))
         opportunity.set('oppId', str(outcome.rec_id))
-        opportunity.set('opportunity', '5')         # TODO
+        opportunity.set('opportunity', '5')
         opportunity.set('startDate', outcome.start_date.isoformat())
         opportunity.set('statusDate', outcome.status_date.isoformat())
         opportunity.set('dateCompleted', outcome.submit_date.isoformat())
@@ -169,7 +169,7 @@ class XmlWorker(Worker):
         # opportunity.set('taId', None)
         # opportunity.set('taName', None)
         opportunity.set('sessionId', outcome.session)
-        opportunity.set('windowId', 'WINDOW_ID')    # TODO
+        opportunity.set('windowId', 'WINDOW_ID')
         # opportunity.set('windowOpportunity', None)
         opportunity.set('administrationCondition', outcome.admin_condition)
         opportunity.set('assessmentParticipantSessionPlatformUserAgent', '')

@@ -184,7 +184,7 @@ def score_given_capability(capability: float, cuts: [int]) -> int:
     :param cuts: the cut points for the levels, inc. min and max
     :return: score between min-max from cuts
     """
-    level = math.floor(capability)
+    level = int(math.floor(capability))
     assert 0 <= level <= len(cuts) - 2
 
     return int(cuts[level] + (cuts[level+1] - cuts[level]) * (capability - level))

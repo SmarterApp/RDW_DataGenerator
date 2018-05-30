@@ -9,10 +9,6 @@ from data_generator.util.assessment_stats import Properties, Stats, GradeLevels,
 HIERARCHY_FROM_DATE = datetime.date(2014, 9, 1)
 HIERARCHY_TO_DATE = datetime.date(9999, 12, 31)
 
-EXTERNAL_DISTRICTS = {}  # map of unused district id -> json for organization
-EXTERNAL_SCHOOLS = {}  # map of unused school id -> json for organization
-HIERARCHY_MAP = {}  # map of district/school id -> (id, name)
-
 LEP_LANGUAGE_CODES = ['esp', 'fre', 'ben', 'ger', 'chi', 'kor', 'jpn', 'rus']
 LEP_PROFICIENCY_LEVELS = ['very poor', 'poor', 'adequate', 'good', 'very good']
 LEP_PROFICIENCY_LEVELS_EXIT = ['good', 'very good']
@@ -878,7 +874,7 @@ LEVELS_BY_GRADE_BY_SUBJ = {
 # BEGIN interim assessment configuration ##
 
 # % of students that have might take at least 1 interim assessment block
-IAB_STUDENT_RATE = .5
+IAB_STUDENT_RATE = 0.90
 
 # In the following, the year is the year adjustment (offset of the year from the start of the schoolyear)
 # However, python (perhaps reasonably) doesn't do a year 0, so we'll need to subtract 1 from these later

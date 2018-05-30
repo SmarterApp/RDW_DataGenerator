@@ -39,10 +39,10 @@ class AssessmentOutcome:
         self.inst_hierarchy = None
         self.result_status = cfg.ASMT_STATUS_ACTIVE
         self.server = 'ip-10-113-148-45'
-        self.database = 'session'           # TODO - ?
+        self.database = 'session'
         self.client_name = 'SBAC'
-        self.status = 'scored'              # TODO - should we randomly not score a teeny fraction of them?
-        self.completeness = 'Complete'      # TODO - should we have forceComplete, invalid, etc.?
+        self.status = 'scored'
+        self.completeness = 'Complete'
         self.admin_condition = None
         self.session = None
         self.overall_score = None

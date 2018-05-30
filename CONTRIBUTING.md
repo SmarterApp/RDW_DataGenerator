@@ -89,13 +89,14 @@ number of things that may need cleaning up. And there are some enhancements/impr
  - [x] Valid categories for IAB are 1-3, it returns 2-4
  - [ ] Errors during outcome generation for ICA's read from tabulator CSV.
  - [x] ICA report is missing claim scores
+ - [ ] Target scores for summative assessments.
  - [x] date-taken should be passed into outcome generation, not pulled from assessment.
  - [x] min/max scores are silly (1200/2400, grade independent); should use LOSS/HOSS tables from SB docs. 
  - [ ] How are Section/Staff used? Can they be removed? Consider the session-based generation task.
  - [x] Combine remaining sbac_generators into generators.
  - [x] IDGen: clean up.
  - [ ] Stage work to avoid memory utilization problems for large generations.
- - [ ] Load District/School configurations to allow multiple generations against the same values.
+ - [ ] Add ability to save and load the hierarchy. Have to refactor some bits in worker_manager.
  - [ ] Make item.max_score more complex than 1; configure some to be unscored (-1). Then percolate to item outcomes,
 making score more complex than 0/1.
  - [ ] Make some items field tests (i.e. item.operational='0')
@@ -107,9 +108,17 @@ making score more complex than 0/1.
  `period` from the package; then generate the date-taken and pass it in when generating outcomes.
  - [ ] Clean up accommodations. These belong to the student profile combined with assessment-specific restrictions. When doing this update to make them realistic and consistent with current values.
  - [ ] Remove deprecated output workers. Consider that pg_worker could be repurposed as a sql_worker.
- - [ ] Student.skip_iab is not being used. Should it? Some way of skipping IAB's at the student level makes sense.
  - [x] Set admin condition of outcome based on assessment type (Summative: Valid, ICA: SD, IAB: NS)
- - [ ] Very rarely generate admin condition IN for outcomes of summative assessments
- - [ ] Randomly generate admin condition NS for outcomes of ICA assessments
- - [ ] Make scores for a student consistent with student capability
+ - [ ] Rare admin condition exceptions. Summative: IN, perhaps by session. ICA: NS, perhaps by school.
+ - [ ] Rare status exceptions. Instead of "scored": "appeal", "paused", "reset". Careful, they have meanings.
+ - [ ] Rare completeness/completeStatus exceptions. "partial" instead of "complete". Work in forceComplete.
+ - [x] Make scores for a student consistent with student capability
  - [x] Add filipino as an ethnicity for California demographics.
+ - [ ] Change student attributes when they advance. For example LEP/ELAS, IEP.
+ - [ ] Address date-taken requests (see \* below)
+
+\* Currently there is a single date-taken per assessment per school/grade. This isn't particularly realistic but does
+force all students in a group to have the same date-taken so they have the same session (session name is based on
+date-taken and group name). The ask is to have all students in a group have the same session with 0-3 students of the
+group in a second session, sometimes. Then the date-taken for a school/grade should be spread out, not all the same day.
+Perhaps use school attributes to control when assessments are given.

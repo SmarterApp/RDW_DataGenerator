@@ -110,7 +110,7 @@ def generate_segment_and_item_bank(asmt: Assessment, gen_item, size, id_gen: IDG
     for i in range(size):
         item = AssessmentItem()
         item.position = i + 1
-        item.bank_key = '200'   # TODO - handle properly
+        item.bank_key = '200'
         item.item_key = str(id_gen.get_rec_id('asmt_item_id'))
         item.segment_id = segment.id
         item.type = choice(ASMT_ITEM_BANK_FORMAT)

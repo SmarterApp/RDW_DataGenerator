@@ -75,7 +75,6 @@ class Student:
         self.group_9_text = None
         self.group_10_id = None
         self.group_10_text = None
-        self.skip_iab = None
         self.capability = {}        # map of subject -> capability, 0.0 <= value < 4.0
 
     @property

@@ -1,8 +1,6 @@
 import copy
 import datetime
 import itertools
-import json
-import os
 import random
 import sys
 
@@ -88,7 +86,6 @@ class WorkerManager(Worker):
             return
 
         # Process the state
-        self.__load_external_organizations()
         self.__generate_state_data(state, assessments)
 
     def __assessment_packages(self):
@@ -115,18 +112,6 @@ class WorkerManager(Worker):
         :return: sorted list of years, e.g. [2015, 2016, 2017]
         """
         return sorted(set(map(lambda asmt: asmt.year, assessments)))
-
-    def __load_external_organizations(self):
-        """
-        Look for an organizations.json file and load any contents
-        """
-        file = os.path.join(self.org_source, 'organizations.json')
-        if os.path.isfile(file):
-            with open(file, "r") as f:
-                org = json.load(f)
-                if 'districts' in org: cfg.EXTERNAL_DISTRICTS = {d['entityId']: d for d in org['districts']}
-                if 'institutions' in org: cfg.EXTERNAL_SCHOOLS = {s['entityId']: s for s in org['institutions']}
-            print('Loaded external organizations, %d districts, %d schools' % (len(cfg.EXTERNAL_DISTRICTS), len(cfg.EXTERNAL_SCHOOLS)))
 
     def __generate_state_data(self, state: State, assessments: [Assessment]):
         """
@@ -343,12 +328,10 @@ class WorkerManager(Worker):
             # collect any assessments for this year and grade
             asmts = list(filter(lambda asmt: asmt.year == year and asmt.grade == grade, assessments))
             for asmt in asmts:
-                # TODO - all students in a group should be in a single session with a single date
-                # TODO   until we figure out how to do that, pick a single date for each asmt (per school/grade)
                 date_taken = self.__date_taken_for_asmt(asmt)
                 for student in grade_students:
                     if asmt.is_iab():
-                        if school.takes_interim_asmts and not student.skip_iab:
+                        if school.takes_interim_asmts and random.random() < cfg.IAB_STUDENT_RATE:
                             iab_asmt_gen.create_iab_outcome_object(date_taken, student, asmt, inst_hier,
                                 self.id_gen, iab_results, gen_item=self.gen_item)
                     else:
@@ -408,12 +391,9 @@ class WorkerManager(Worker):
         ICAs will be late-January
         Summatives will be early May
 
-        TODO - use school or something else to make these more realistic
-
         :param asmt: assessment
         :return: date taken
         """
-
         if asmt.is_iab():
             date_taken = datetime.date(asmt.year-1, 9, 15) + datetime.timedelta(days=random.randint(0, 180))
         elif asmt.is_summative():

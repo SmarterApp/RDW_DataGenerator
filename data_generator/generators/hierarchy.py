@@ -71,15 +71,6 @@ def generate_district(district_type, state: State, id_gen=IDGen, district_types=
     d.demo_config = state.demo_config
     d.id = id_gen.get_district_id(state.id)
 
-    # override external id and name (if available)
-    # TODO - this isn't multithread safe
-    if d.id in cfg.HIERARCHY_MAP:
-        d.id, d.name = cfg.HIERARCHY_MAP[d.guid]
-    elif len(cfg.EXTERNAL_DISTRICTS) > 0:
-        # TODO - any way to pick district based on how many schools it will have?
-        ext_district = cfg.EXTERNAL_DISTRICTS.popitem()[1]
-        d.id, d.name = cfg.HIERARCHY_MAP[d.id] = (ext_district['entityId'], ext_district['entityName'])
-
     return d
 
 
@@ -107,17 +98,6 @@ def generate_school(school_type, district: District, id_gen=IDGen, school_types=
     s.config = school_types[school_type]
     s.demo_config = district.demo_config
     s.id = id_gen.get_school_id(district.id)
-
-    # override external id and name (if available)
-    if s.id in cfg.HIERARCHY_MAP:
-        s.id, s.name = cfg.HIERARCHY_MAP[s.guid]
-    elif len(cfg.EXTERNAL_SCHOOLS) > 0:
-        # find an external school that points to the correct district, if any
-        for key, ext_school in cfg.EXTERNAL_SCHOOLS.items():
-            if ext_school['parentEntityId'] == district.id:
-                cfg.EXTERNAL_SCHOOLS.pop(key)
-                s.id, s.name = cfg.HIERARCHY_MAP[s.guid] = (ext_school['entityId'], ext_school['entityName'])
-                break
 
     # Decide if the school takes interim assessments
     if random.random() < interim_asmt_rate:
