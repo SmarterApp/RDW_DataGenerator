@@ -6,17 +6,18 @@ import calendar
 import datetime
 import hashlib
 import random
-
 from math import ceil
 
 import data_generator.config.cfg as cfg
 import data_generator.config.population as pop_config
+import data_generator.config.hierarchy as hier_config
 import data_generator.generators.names as name_gen
 from data_generator.model.district import District
 from data_generator.model.school import School
 from data_generator.model.staff import DistrictStaff, TeachingStaff
 from data_generator.model.student import Student
-from data_generator.util.assessment_stats import Properties, RandomLevelByDemographics
+from data_generator.util.assessment_stats import Properties, RandomLevelByDemographics, random_capability, \
+    adjust_capability, inverse_adjustment
 from data_generator.util.id_gen import IDGen
 from data_generator.util.weighted_choice import weighted_choice
 
@@ -143,6 +144,12 @@ def generate_student(school: School, grade, id_gen: IDGen=IDGen, acad_year=datet
     # Set language items
     _set_lang_items(s, acad_year)
 
+    # store the student's capability based on demographics and school adjustment
+    adj = hier_config.SCHOOL_TYPES[school.type_str]['students'].get('adjust_pld', 0.0)
+    for subject in cfg.SUBJECTS:
+        generator, demo = _get_level_demographics(s, subject)
+        s.capability[subject] = random_capability(generator.distribution(demo), adj)
+
     return s
 
 
@@ -183,14 +190,25 @@ def advance_student(student: Student, schools_by_grade, hold_back_rate=pop_confi
     if student.grade not in schools_by_grade:
         return False
 
+    # changes in the student situation may change their capability
+    adjustments = []
+
     # If the new grade of the student is not available in the school, pick a new school
     if student.grade not in student.school.grades or random.random() < transfer_rate:
         student.transfer = True
+        # apply capability adjustments by undoing old school and applying new school
+        adjustments.append(inverse_adjustment(hier_config.SCHOOL_TYPES[student.school.type_str]['students'].get('adjust_pld', 0.0)))
         student.school = random.choice(schools_by_grade[student.grade])
+        adjustments.append(hier_config.SCHOOL_TYPES[student.school.type_str]['students'].get('adjust_pld', 0.0))
     else:
         student.transfer = False
 
-    # TODO: Change things like LEP status or IEP status, etc
+    # SmarterBalanced wants to see students get better so apply a small adjustment each time they advance
+    adjustments.append(0.1)
+    _apply_capability_adjustments(student, adjustments)
+
+    # TODO: Change things like LEP status or IEP status
+    # TODO - adjust capability based on changes in status?
 
     return True
 
@@ -262,16 +280,17 @@ def _pick_demo_option(sub_config):
     :param sub_config: A dictionary for a single multi-select characteristic
     :returns: Selected value for characteristic
     """
-    return weighted_choice({name: obj['perc']
-                            for name, obj in sub_config.items()})
+    return weighted_choice({name: obj['perc'] for name, obj in sub_config.items()})
 
 
-def generate_perf_lvl(student: Student, subject):
-    """For the student, randomly generate performance level based on demographics.
+def _get_level_demographics(student: Student, subject):
+    """
+    Creates the assessment stats generator and corresponding student demographics.
+    They can be used to make calls in RandomLevelByDemographics like random_level and distribution
 
     :param student: student
-    :param subject: assessment subject, Math or ELA
-    :return: 1 - 4
+    :param subject: assessment subject
+    :return: RandomLevelByDemographics and student properties
     """
     demographics = cfg.DEMOGRAPHICS_BY_GRADE[student.grade]
     level_breakdowns = cfg.LEVELS_BY_GRADE_BY_SUBJ[subject][student.grade]
@@ -294,7 +313,7 @@ def generate_perf_lvl(student: Student, subject):
                                       gender=student.gender,
                                       race=student_race)
 
-    return level_generator.random_level(student_demographics) + 1
+    return level_generator, student_demographics
 
 
 def repopulate_school_grade(school: School, grade, grade_students, id_gen, reg_sys,
@@ -476,3 +495,11 @@ def _generate_date_lep_exit(grade, acad_year=datetime.datetime.now().year):
     entry_month = random.randint(3, 6)
     entry_day = random.randint(1, 30)
     return datetime.date(entry_year, entry_month, entry_day)
+
+
+def _apply_capability_adjustments(student: Student, adjustments: [float]):
+    for subject, capability in student.capability.items():
+        value = capability
+        for adj in adjustments:
+            value = adjust_capability(value, adj)
+        student.capability[subject] = value

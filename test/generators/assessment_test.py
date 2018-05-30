@@ -823,6 +823,34 @@ def test_generate_response_for_other():
         assert 'good' in aid.response_value
 
 
+def test_generate_response_low_capability():
+    item = AssessmentItem()
+    item.type = 'EQ'
+    item.max_score = 1
+    item.difficulty = 2
+
+    total = 0
+    for _ in range(0, 100):
+        aid = item_lvl_data.AssessmentOutcomeItemData()
+        generate_response(aid, item, 0.0)
+        total += aid.score
+    assert total < 50
+
+
+def test_generate_response_high_capability():
+    item = AssessmentItem()
+    item.type = 'EQ'
+    item.max_score = 1
+    item.difficulty = 2
+
+    total = 0
+    for _ in range(0, 100):
+        aid = item_lvl_data.AssessmentOutcomeItemData()
+        generate_response(aid, item, 4.0)
+        total += aid.score
+    assert total > 50
+
+
 # Helper to replace removed method
 def __create_assessment_outcome_objects(student, asmt_summ, interim_asmts, inst_hier, id_gen, assessment_results,
                                         skip_rate, retake_rate, delete_rate, update_rate):

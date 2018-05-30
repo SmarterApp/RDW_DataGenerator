@@ -4,7 +4,7 @@ A student.
 
 
 class Student:
-    """A student class
+    """A student
     """
 
     def __init__(self):
@@ -76,6 +76,7 @@ class Student:
         self.group_10_id = None
         self.group_10_text = None
         self.skip_iab = None
+        self.capability = {}        # map of subject -> capability, 0.0 <= value < 4.0
 
     @property
     def name(self):
@@ -98,7 +99,6 @@ class Student:
         self.eth_amer_ind = False
         self.eth_multi = False
         self.eth_none = False
-
 
     def get_object_set(self):
         """Get the set of objects that this exposes to a CSV or JSON writer.

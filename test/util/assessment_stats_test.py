@@ -1,8 +1,10 @@
 """
 
 """
+from data_generator.config import cfg
 from data_generator.util.assessment_stats import DemographicLevels, Stats
 from data_generator.util.assessment_stats import RandomLevelByDemographics, Properties, GradeLevels
+from data_generator.util.assessment_stats import random_capability
 from data_generator.util.weighted_choice import weighted_choice
 
 
@@ -56,3 +58,33 @@ def test_random_level():
     for _ in range(10000):
         entity = gen_random_entity(demographics)
         level = level_generator.random_level(entity)
+
+
+def test_random_capability():
+    avg = 0
+    for _ in range(0, 100):
+        value = random_capability([0.04, 0.32, 0.57, 0.07])
+        assert 0 <= value < 4.0
+        avg += value
+    avg /= 100.0
+    assert 1.5 < avg < 3.0   # should be 2.17
+
+
+def test_random_capability_with_negative_adj():
+    avg = 0
+    for _ in range(0, 100):
+        value = random_capability([0.04, 0.32, 0.57, 0.07], -0.6)
+        assert 0 <= value < 4.0
+        avg += value
+    avg /= 100.0
+    assert 1.0 < avg < 2.0  # should be 1.5
+
+
+def test_random_capability_with_positive_adj():
+    avg = 0
+    for _ in range(0, 100):
+        value = random_capability([0.04, 0.32, 0.57, 0.07], 0.5)
+        assert 0 <= value < 4.0
+        avg += value
+    avg /= 100.0
+    assert 2.0 < avg < 3.5  # should be 2.9

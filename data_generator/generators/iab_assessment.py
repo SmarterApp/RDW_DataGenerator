@@ -7,12 +7,11 @@ import datetime
 import data_generator.config.cfg as cfg
 import data_generator.generators.assessment as gen_asmt_generator
 from data_generator.generators.hierarchy import InstitutionHierarchy
-from data_generator.generators.population import generate_perf_lvl
 from data_generator.model.assessment import Assessment
 from data_generator.model.interimassessment import InterimAssessment
 from data_generator.model.interimassessmentoutcome import InterimAssessmentOutcome
 from data_generator.model.student import Student
-from data_generator.util.assessment_stats import random_score_given_level, random_claim_error, claim_perf_lvl
+from data_generator.util.assessment_stats import random_claim_error, claim_perf_lvl, score_given_capability
 from data_generator.util.id_gen import IDGen
 
 
@@ -147,20 +146,14 @@ def generate_interim_assessment_outcome(date_taken: datetime.date,
     gen_asmt_generator.generate_session(sao)
 
     # Generate assessment outcome Item-level data
-    sao.item_data = [] if not gen_item else gen_asmt_generator.generate_item_data(assessment.item_bank, sao.date_taken)
+    if gen_item: gen_asmt_generator.generate_item_data(sao)
 
     # set timestamps for the opportunity
     gen_asmt_generator.set_opportunity_dates(sao)
 
-    if gen_item:
-        # if item data was generated, calculate the score from that
-        # (note: currently item data is randomly generated so this won't produce well distributed results)
-        percent_points = sum(map(lambda aid: aid.score, sao.item_data)) / assessment.item_total_score
-        sao.overall_score = (assessment.overall_score_max - assessment.overall_score_min) * percent_points + assessment.overall_score_min
-    else:
-        # otherwise, pick a random overall perf level (based on demographics) and use that to get a score
-        sao.overall_score = random_score_given_level(generate_perf_lvl(student, assessment.subject) - 1,
-            [assessment.overall_score_min, assessment.overall_cut_point_1, assessment.overall_cut_point_2, assessment.overall_cut_point_3, assessment.overall_score_max])
+    # use the student capability to generate an overall score
+    sao.overall_score = score_given_capability(student.capability[assessment.subject],
+        [assessment.overall_score_min, assessment.overall_cut_point_1, assessment.overall_cut_point_2, assessment.overall_cut_point_3, assessment.overall_score_max])
 
     # now that we have a score, generate a random SE and figure out IAB perf level (1-3) using SB formulae
     stderr = random_claim_error(sao.overall_score, assessment.overall_score_min, assessment.overall_score_max)

@@ -1,4 +1,5 @@
 # like sum, but with multiplication
+import itertools
 import math
 import random
 from functools import partial, reduce
@@ -135,46 +136,69 @@ class RandomLevelByDemographics:
         return weighted_choice(probs, rng=rng, seed=seed)
 
 
-def random_score_given_level(level: int, cuts: [int]) -> int:
+def random_capability(distribution: [float], adj: float = 0.0) -> float:
     """
-    Generate a random score given a level.
-    Note that we are generating scores uniformly within a level, as there is
-    no requirement to do anything more complex.
+    Given a distribution, e.g. [0.04,0.32,0.57,0.07] this will return the fractional level of a
+    random value. The return will be 0-N where N is the number of values in the distribution.
 
-    @param cuts: the cut points for the levels.
-        cuts[0] is the min, cuts[-1] is the max.
-        the range of scores is for a given level "i" is then
-
-            cuts[i] <= score < cuts[i + 1]
-
-        except for the highest level, where it is
-
-            cuts[i] <= score <= cuts[i + 1]
+    :param distribution: normalized distribution (i.e. adds up to 1)
+    :param adj: optional capability adjustment (-1, +1) (gamma correction so negative reduces capability)
+    :return: fractional value 0-N
     """
+    # in theory this can be any size distribution but we know it is for performance levels so should be 4
+    n = len(distribution)
+    assert n == 4
+
+    # accumulate values and stick a leading 0 in there
+    values = [0.0] + list(itertools.accumulate(distribution))
+    value = random.uniform(0, values[-1])
+    for i in range(0, n):
+        if value < values[i+1]:
+            return adjust_capability(i + ((value - values[i]) / (values[i+1] - values[i])), adj)
+
+
+def adjust_capability(capability: float, adj: float) -> float:
+    """
+    Adjust student capability a bit like gamma correction.
+    Assumes capability is [0.0, 4.0), an assumption made elsewhere.
+
+    :param capability: capability
+    :param adj: adjustment (-1, +1) (gamma correction so negative reduces capability)
+    :return: new capability
+    """
+    assert -10.0 < adj < +1.0
+
+    return 4.0 * pow(capability / 4.0, 1 - adj)
+
+
+def inverse_adjustment(adj: float) -> float:
+    return -adj / (1.0 - adj)
+
+
+def score_given_capability(capability: float, cuts: [int]) -> int:
+    """
+    Generate a score given a student capability. Because the capability is decimal it gives
+    us what we need to interpolate between cut point levels.
+
+    :param capability: float value [0.0, 4.0)
+    :param cuts: the cut points for the levels, inc. min and max
+    :return: score between min-max from cuts
+    """
+    level = math.floor(capability)
     assert 0 <= level <= len(cuts) - 2
 
-    if level == len(cuts) - 2:
-        # the top level includes the upper end point
-        return random.randint(cuts[level], cuts[level + 1])
-
-    else:
-        return random.randint(cuts[level], cuts[level + 1] - 1)
+    return int(cuts[level] + (cuts[level+1] - cuts[level]) * (capability - level))
 
 
-def adjust_score(score: int, scale_factor: float, min_score: int, max_score: int) -> int:
+def perf_level_given_capability(capability: float) -> int:
     """
-    "scale" a score by a factor. This is used to alter scores of students who attend schools which are generally
-    considered to perform better or worse than average.
+    Return performance level given a student capability.
+    Very simple method but abstracted in case capability implementation changes.
 
-    We use borrow here from the idea of "gamma correction" to shift the whole distribution without bunching scores up
-    at the extrema or creating gaps around the extrema, as fixed subtraction or multiplication would.
+    :param capability: float value [0.0, 4.0)
+    :return: 1 - 4
     """
-    if score != max_score:
-        score += random.random()  # to fill in gaps in the range
-
-    score_perc = (score - min_score) / (max_score - min_score)
-    scaled_perc = pow(score_perc, 1 - scale_factor)
-    return max(min_score, min(max_score, int(min_score + (max_score - min_score) * scaled_perc)))
+    return int(math.floor(capability)) + 1
 
 
 def random_claims(score: int, claim_weights: [float], claim_min: int, claim_max: int) -> [int]:

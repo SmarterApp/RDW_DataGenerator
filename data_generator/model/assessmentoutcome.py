@@ -38,7 +38,7 @@ class AssessmentOutcome:
         self.rec_id = None
         self.inst_hierarchy = None
         self.result_status = cfg.ASMT_STATUS_ACTIVE
-        self.server = 'ip-10-113-148-45'    # TODO - randomly generate?
+        self.server = 'ip-10-113-148-45'
         self.database = 'session'           # TODO - ?
         self.client_name = 'SBAC'
         self.status = 'scored'              # TODO - should we randomly not score a teeny fraction of them?

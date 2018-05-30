@@ -7,16 +7,14 @@ import datetime
 import random
 
 import data_generator.config.cfg as cfg
-import data_generator.config.hierarchy as hierarchy_config
 import data_generator.generators.assessment as gen_asmt_generator
-from data_generator.generators.population import generate_perf_lvl
 from data_generator.model.assessment import Assessment
 from data_generator.model.assessmentoutcome import AssessmentOutcome
 from data_generator.model.institutionhierarchy import InstitutionHierarchy
 from data_generator.model.student import Student
-from data_generator.util.assessment_stats import adjust_score, random_claim_error, claim_perf_lvl
+from data_generator.util.assessment_stats import random_claim_error, claim_perf_lvl, \
+    score_given_capability, perf_level_given_capability
 from data_generator.util.assessment_stats import random_claims
-from data_generator.util.assessment_stats import random_score_given_level
 from data_generator.util.id_gen import IDGen
 
 
@@ -182,24 +180,18 @@ def generate_assessment_outcome(date_taken: datetime.date,
     sao.inst_hierarchy = inst_hier
     sao.admin_condition = 'Valid' if assessment.type == 'SUMMATIVE' else 'SD'
     sao.date_taken = date_taken
-
     gen_asmt_generator.generate_session(sao)
 
     # Generate assessment outcome Item-level data
-    sao.item_data = [] if not gen_item else \
-        gen_asmt_generator.generate_item_data(assessment.item_bank, sao.date_taken)
+    if gen_item: gen_asmt_generator.generate_item_data(sao)
 
     # set timestamps for the opportunity
     gen_asmt_generator.set_opportunity_dates(sao)
 
-    # set overall performance level and score
-    sao.overall_perf_lvl = generate_perf_lvl(student, assessment.subject)
-    raw_overall_score = random_score_given_level(sao.overall_perf_lvl - 1,
+    # use the student capability to generate an overall score and performance level
+    sao.overall_score = score_given_capability(student.capability[assessment.subject],
         [assessment.overall_score_min, assessment.overall_cut_point_1, assessment.overall_cut_point_2, assessment.overall_cut_point_3, assessment.overall_score_max])
-
-    school_type = student.school.type_str
-    adjustment = hierarchy_config.SCHOOL_TYPES[school_type]['students'].get('adjust_pld', 0.0)
-    sao.overall_score = adjust_score(raw_overall_score, adjustment, assessment.overall_score_min, assessment.overall_score_max)
+    sao.overall_perf_lvl = perf_level_given_capability(student.capability[assessment.subject])
 
     overall_range_min = random.randint(50, 100)  # Total score range is between 100 and 200 points around score
     overall_range_max = random.randint(50, 100)  # Total score range is between 100 and 200 points around score

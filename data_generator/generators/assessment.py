@@ -1,15 +1,13 @@
 """Generate assessment elements.
 """
 import hashlib
-
 from datetime import timedelta, datetime, time
+from math import ceil
 from random import choice, randrange, random, sample, randint
 from string import ascii_uppercase
 
-from math import ceil
-
 from data_generator.config import cfg
-from data_generator.config.cfg import ASMT_ITEM_BANK_FORMAT, ITEM_ANSWER_RATE, ANSWER_CORRECT_RATE
+from data_generator.config.cfg import ASMT_ITEM_BANK_FORMAT
 from data_generator.generators import names, text
 from data_generator.generators.text import RandomText
 from data_generator.model.assessment import Assessment
@@ -134,17 +132,21 @@ def generate_segment_and_item_bank(asmt: Assessment, gen_item, size, id_gen: IDG
     asmt.item_total_score = sum(map(lambda i: i.max_score, item_bank))
 
 
-def generate_item_data(items: [AssessmentItem], date_taken):
-    # given items, generate item response data
+def generate_item_data(outcome: AssessmentOutcome):
+    # given items, generate item response data in the outcome
+    outcome.item_data = []
+
+    asmt = outcome.assessment
+    items = asmt.item_bank
     if not items or len(items) == 0:
-        return []
+        return
 
-    item_data = []
-
-    # TODO - emit only a subset of the items in the item bank?
-
-    admin_date = datetime.combine(date_taken, time(hour=randrange(7, 14)))
+    # answer rate depends on student capability
+    capability = outcome.student.capability[asmt.subject] if outcome.student.capability and asmt.subject in outcome.student.capability else None
+    answer_rate = (0.88 + 0.03 * capability) if capability is not None else 0.94
+    admin_date = datetime.combine(outcome.date_taken, time(hour=randrange(7, 14)))
     resp_date = admin_date
+
     for item in items:
         aid = AssessmentOutcomeItemData()
         aid.item = item
@@ -155,8 +157,8 @@ def generate_item_data(items: [AssessmentItem], date_taken):
         aid.admin_date = admin_date
         aid.score_status = 'SCORED'
 
-        if random() < ITEM_ANSWER_RATE:
-            generate_response(aid, item)
+        if random() < answer_rate:
+            generate_response(aid, item, capability)
         else:
             aid.page_time = randrange(1000, 5000)
             aid.is_selected = '0'
@@ -166,9 +168,7 @@ def generate_item_data(items: [AssessmentItem], date_taken):
         resp_date += timedelta(milliseconds=aid.page_time)
         aid.response_date = resp_date
 
-        item_data.append(aid)
-
-    return item_data
+        outcome.item_data.append(aid)
 
 
 def generate_session(outcome: [AssessmentOutcome]):
@@ -195,18 +195,24 @@ def set_opportunity_dates(outcome: [AssessmentOutcome]):
     outcome.status_date = outcome.submit_date
 
 
-def generate_response(aid: AssessmentOutcomeItemData, item: AssessmentItem):
+def generate_response(aid: AssessmentOutcomeItemData, item: AssessmentItem, capability: float = None):
     """ generate and set response-related fields in outcome
 
     :param aid outcome to set
     :param item outcome's item
+    :param capability student's capability (0.0 - 4.0)
     """
     # difficulty ranges from -3.0 to 10.0 (more or less)
     # difficulty cut points vary by asmt/subject/grade but approximately:
     #   easy:  < -2.5 + 0.2 * grade
     #   moderate: < -1.25 + 0.25 * grade
-    # chance to answer correctly should be adjusted by difficulty (-3.0 -> .95, 10.0 -> .30)
-    correct = random() < (ANSWER_CORRECT_RATE + (0 if not item.difficulty else -0.05 * item.difficulty))
+    # chance to answer correctly is adjusted by difficulty (-3.0 -> +0.15, 10.0 -> -0.50)
+    #
+    # student capability ranges from 0.0 to 4.0
+    # chance to answer correctly is based on capability if it's available
+    correct_rate = (0.40 + 0.15 * capability) if capability is not None else 0.70
+    correct_rate += (0 if not item.difficulty else -0.05 * item.difficulty)
+    correct = random() < correct_rate
 
     aid.is_selected = '1'
     if item.type == 'MC':       # multiple choice

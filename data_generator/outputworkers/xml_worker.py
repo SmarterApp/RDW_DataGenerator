@@ -137,6 +137,7 @@ class XmlWorker(Worker):
         self.add_examinee_attribute(examinee, 'StudentGroupName', student.group_9_text, contextDateStr)
         self.add_examinee_attribute(examinee, 'StudentGroupName', student.group_10_text, contextDateStr)
         self.add_examinee_attribute(examinee, 'Advancement', self.map_advancement(student), contextDateStr)
+        self.add_examinee_attribute(examinee, 'Capability', student.capability.get(asmt.subject, 0.0), contextDateStr)
 
         hierarchy = outcome.inst_hierarchy
         self.add_examinee_relationship(examinee, 'StateAbbreviation', hierarchy.state.code, contextDateStr)
