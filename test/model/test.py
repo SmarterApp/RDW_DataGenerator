@@ -34,14 +34,13 @@ def test_assessment_outcome_get_object_set():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    ih = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
     asmt = asmt_gen.generate_assessment('SUMMATIVE', 2015, 'ELA', 3, ID_GEN)
     student = pop_gen.generate_student(school, 3, ID_GEN)
-    asmt_out = asmt_gen.generate_assessment_outcome(datetime.date(2015, 5, 15), student, asmt, ih, ID_GEN)
+    asmt_out = asmt_gen.generate_assessment_outcome(datetime.date(2015, 5, 15), student, asmt, ID_GEN)
 
     # Tests
     objs = asmt_out.get_object_set()
-    assert len(objs) == 7
+    assert len(objs) == 6
     assert 'state' in objs
     assert objs['state'].guid == state.guid
     assert 'district' in objs
@@ -50,8 +49,6 @@ def test_assessment_outcome_get_object_set():
     assert objs['school'].guid == school.guid
     assert 'student' in objs
     assert objs['student'].guid == student.guid
-    assert 'institution_hierarchy' in objs
-    assert objs['institution_hierarchy'].guid == ih.guid
     assert 'assessment' in objs
     assert objs['assessment'].guid == asmt.guid
     assert 'assessment_outcome' in objs

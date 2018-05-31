@@ -98,7 +98,7 @@ number of things that may need cleaning up. And there are some enhancements/impr
  - [x] Combine remaining sbac_generators into generators.
  - [x] IDGen: clean up.
  - [ ] Stage work to avoid memory utilization problems for large generations.
- - [ ] Add ability to save and load the hierarchy. Have to refactor some bits in worker_manager.
+ - [x] Add ability to save and load the hierarchy. Have to refactor some bits in worker_manager.
  - [ ] Make item.max_score more complex than 1; configure some to be unscored (-1). Then percolate to item outcomes,
 making score more complex than 0/1.
  - [ ] Make some items field tests (i.e. item.operational='0')

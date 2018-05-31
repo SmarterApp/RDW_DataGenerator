@@ -8,6 +8,7 @@ from data_generator.model.assessment import Assessment
 from data_generator.model.assessmentoutcome import AssessmentOutcome
 from data_generator.model.institutionhierarchy import InstitutionHierarchy
 from data_generator.outputworkers.worker import Worker
+from data_generator.util.hierarchy import write_hierarchy
 from data_generator.writers import tabulator_writer
 
 CLAIM_MEASURES = {
@@ -27,6 +28,10 @@ class XmlWorker(Worker):
         pass
 
     def write_hierarchies(self, hierarchies: [InstitutionHierarchy]):
+        self._write_hierarchies_to_json(hierarchies)
+        write_hierarchy(os.path.join(self.out_path_root, 'hierarchy.csv'), [ih.school for ih in hierarchies])
+
+    def _write_hierarchies_to_json(self, hierarchies: [InstitutionHierarchy]):
         districts = {}
         schools = {}
 
@@ -139,13 +144,13 @@ class XmlWorker(Worker):
         self.add_examinee_attribute(examinee, 'Advancement', self.map_advancement(student), contextDateStr)
         self.add_examinee_attribute(examinee, 'Capability', student.capability.get(asmt.subject, 0.0), contextDateStr)
 
-        hierarchy = outcome.inst_hierarchy
-        self.add_examinee_relationship(examinee, 'StateAbbreviation', hierarchy.state.code, contextDateStr)
-        self.add_examinee_relationship(examinee, 'StateName', hierarchy.state.name, contextDateStr)
-        self.add_examinee_relationship(examinee, 'DistrictId', hierarchy.district.id, contextDateStr)
-        self.add_examinee_relationship(examinee, 'DistrictName', hierarchy.district.name, contextDateStr)
-        self.add_examinee_relationship(examinee, 'SchoolId', hierarchy.school.id, contextDateStr)
-        self.add_examinee_relationship(examinee, 'SchoolName', hierarchy.school.name, contextDateStr)
+        school = outcome.school
+        self.add_examinee_relationship(examinee, 'StateAbbreviation', school.district.state.code, contextDateStr)
+        self.add_examinee_relationship(examinee, 'StateName', school.district.state.name, contextDateStr)
+        self.add_examinee_relationship(examinee, 'DistrictId', school.district.id, contextDateStr)
+        self.add_examinee_relationship(examinee, 'DistrictName', school.district.name, contextDateStr)
+        self.add_examinee_relationship(examinee, 'SchoolId', school.id, contextDateStr)
+        self.add_examinee_relationship(examinee, 'SchoolName', school.name, contextDateStr)
 
         # write Opportunity
         opportunity = SubElement(root, 'Opportunity')
@@ -247,9 +252,9 @@ class XmlWorker(Worker):
         :return: 
         """
         path = os.path.join(self.out_path_root,
-                            outcome.inst_hierarchy.state.code,
-                            outcome.inst_hierarchy.district.id,
-                            outcome.inst_hierarchy.school.id)
+                            outcome.school.district.state.code,
+                            outcome.school.district.id,
+                            outcome.school.id)
         os.makedirs(path, exist_ok=True)
         return os.path.join(path, str(outcome.rec_id)) + '.xml'
 

@@ -14,7 +14,7 @@ class AssessmentOutcome:
 
     # using slots here only to avoid bugs due to typos etc.
     __slots__ = ('guid student assessment date_taken start_date status_date submit_date '
-                 'rec_id inst_hierarchy result_status '
+                 'rec_id school result_status '
                  'server database client_name status completeness admin_condition session '
                  'overall_score overall_score_range_min overall_score_range_max overall_perf_lvl '
                  'claim_1_score claim_1_score_range_min claim_1_score_range_max claim_1_perf_lvl '
@@ -28,7 +28,7 @@ class AssessmentOutcome:
                  'acc_streamline_mode from_date to_date accommodations item_data'.split())
 
     def __init__(self):
-        self.guid = None  # aka oppId? or key?
+        self.guid = None
         self.student = None
         self.assessment = None
         self.date_taken = None
@@ -36,7 +36,7 @@ class AssessmentOutcome:
         self.status_date = None
         self.submit_date = None
         self.rec_id = None
-        self.inst_hierarchy = None
+        self.school = None
         self.result_status = cfg.ASMT_STATUS_ACTIVE
         self.server = 'ip-10-113-148-45'
         self.database = 'session'
@@ -81,7 +81,7 @@ class AssessmentOutcome:
         self.acc_speech_to_text_nonembed = 0
         self.acc_streamline_mode = 0
         self.from_date = cfg.HIERARCHY_FROM_DATE
-        self.to_date = datetime.date(9999, 12, 31)
+        self.to_date = cfg.HIERARCHY_TO_DATE
         self.accommodations = []    # list of (type, code, value), e.g. ('Calculator', 'TDS_Calc0', 'None')
         self.item_data = []
 
@@ -91,10 +91,9 @@ class AssessmentOutcome:
 
         @returns: Dictionary of root objects
         """
-        return {'state': self.inst_hierarchy.state,
-                'district': self.student.school.district,
-                'school': self.student.school,
+        return {'state': self.school.district.state,
+                'district': self.school.district,
+                'school': self.school,
                 'student': self.student,
-                'institution_hierarchy': self.inst_hierarchy,
                 'assessment': self.assessment,
                 'assessment_outcome': self}

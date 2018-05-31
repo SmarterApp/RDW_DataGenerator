@@ -167,6 +167,10 @@ def advance_student(student: Student, schools_by_grade, hold_back_rate=pop_confi
     :returns: True if the student still exists in the system, False if they do not
     """
 
+    # clear flags
+    student.held_back = False
+    student.transfer = False
+
     # Now check if this student should be advanced
     if random.random() < hold_back_rate:
         # The student is not being advanced
@@ -182,7 +186,6 @@ def advance_student(student: Student, schools_by_grade, hold_back_rate=pop_confi
             return student.grade in schools_by_grade
 
     # Bump the grade
-    student.held_back = False
     student.grade += 1
 
     # If the new grade is not available in any school, drop the student
@@ -199,8 +202,6 @@ def advance_student(student: Student, schools_by_grade, hold_back_rate=pop_confi
         adjustments.append(inverse_adjustment(hier_config.SCHOOL_TYPES[student.school.type_str]['students'].get('adjust_pld', 0.0)))
         student.school = random.choice(schools_by_grade[student.grade])
         adjustments.append(hier_config.SCHOOL_TYPES[student.school.type_str]['students'].get('adjust_pld', 0.0))
-    else:
-        student.transfer = False
 
     # SmarterBalanced wants to see students get better so apply a small adjustment each time they advance
     adjustments.append(0.1)

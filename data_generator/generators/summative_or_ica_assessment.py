@@ -10,7 +10,6 @@ import data_generator.config.cfg as cfg
 import data_generator.generators.assessment as gen_asmt_generator
 from data_generator.model.assessment import Assessment
 from data_generator.model.assessmentoutcome import AssessmentOutcome
-from data_generator.model.institutionhierarchy import InstitutionHierarchy
 from data_generator.model.student import Student
 from data_generator.util.assessment_stats import random_claim_error, claim_perf_lvl, \
     score_given_capability, perf_level_given_capability
@@ -21,7 +20,6 @@ from data_generator.util.id_gen import IDGen
 def create_assessment_outcome_object(date_taken: datetime.date,
                                      student: Student,
                                      asmt: Assessment,
-                                     inst_hier: InstitutionHierarchy,
                                      id_gen: IDGen,
                                      assessment_results: {str: AssessmentOutcome},
                                      skip_rate=cfg.ASMT_SKIP_RATE,
@@ -57,7 +55,7 @@ def create_assessment_outcome_object(date_taken: datetime.date,
         assessment_results[asmt.guid] = []
 
     # Create the original outcome object
-    ao = generate_assessment_outcome(date_taken, student, asmt, inst_hier, id_gen, gen_item=gen_item)
+    ao = generate_assessment_outcome(date_taken, student, asmt, id_gen, gen_item=gen_item)
     assessment_results[asmt.guid].append(ao)
 
     # Decide if something special is happening
@@ -65,12 +63,12 @@ def create_assessment_outcome_object(date_taken: datetime.date,
     if special_random < retake_rate:
         # Set the original outcome object to inactive, create a new outcome (with an advanced date take), and return
         ao.result_status = cfg.ASMT_STATUS_INACTIVE
-        ao2 = generate_assessment_outcome(date_taken + datetime.timedelta(days=7), student, asmt, inst_hier, id_gen, gen_item=gen_item)
+        ao2 = generate_assessment_outcome(date_taken + datetime.timedelta(days=7), student, asmt, id_gen, gen_item=gen_item)
         assessment_results[asmt.guid].append(ao2)
     elif special_random < update_rate:
         # Set the original outcome object to deleted and create a new outcome
         ao.result_status = cfg.ASMT_STATUS_DELETED
-        ao2 = generate_assessment_outcome(date_taken, student, asmt, inst_hier, id_gen, gen_item=gen_item)
+        ao2 = generate_assessment_outcome(date_taken, student, asmt, id_gen, gen_item=gen_item)
         assessment_results[asmt.guid].append(ao2)
 
         # See if the updated record should be deleted
@@ -158,7 +156,6 @@ def generate_assessment(type, asmt_year, subject, grade, id_gen, from_date=None,
 def generate_assessment_outcome(date_taken: datetime.date,
                                 student: Student,
                                 assessment: Assessment,
-                                inst_hier: InstitutionHierarchy,
                                 id_gen,
                                 gen_item=True):
     """
@@ -167,7 +164,6 @@ def generate_assessment_outcome(date_taken: datetime.date,
     @param date_taken: date taken
     @param student: The student to create the outcome for
     @param assessment: The assessment to create the outcome for
-    @param inst_hier: The institution hierarchy this student belongs to
     @param id_gen: ID generator
     @param gen_item: If should create item-level responses
     @returns: The assessment outcome
@@ -177,7 +173,7 @@ def generate_assessment_outcome(date_taken: datetime.date,
     sao = gen_asmt_generator.generate_assessment_outcome(student, assessment, id_gen)
 
     # Set other specifics
-    sao.inst_hierarchy = inst_hier
+    sao.school = student.school
     sao.admin_condition = 'Valid' if assessment.type == 'SUMMATIVE' else 'SD'
     sao.date_taken = date_taken
     gen_asmt_generator.generate_session(sao)

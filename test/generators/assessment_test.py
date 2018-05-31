@@ -137,8 +137,7 @@ def test_generate_assessment_outcome_default_status():
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
     student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
-    institution_hierarchy = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
-    asmt_out = asmt_gen.generate_assessment_outcome(datetime.date(2015, 5, 15), student, asmt, institution_hierarchy, ID_GEN)
+    asmt_out = asmt_gen.generate_assessment_outcome(datetime.date(2015, 5, 15), student, asmt, ID_GEN)
 
     # Test
     assert asmt_out.result_status == 'C'
@@ -151,8 +150,7 @@ def test_generate_assessment_outcome_scores():
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
     student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
-    institution_hierarchy = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
-    asmt_out = asmt_gen.generate_assessment_outcome(datetime.date(2015, 5, 15), student, asmt, institution_hierarchy, ID_GEN)
+    asmt_out = asmt_gen.generate_assessment_outcome(datetime.date(2015, 5, 15), student, asmt, ID_GEN)
 
     # Tests
     assert 2114 <= asmt_out.overall_score <= 2623
@@ -176,8 +174,7 @@ def test_generate_assessment_outcome_summative_taken_date():
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
     student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
-    institution_hierarchy = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
-    asmt_out = asmt_gen.generate_assessment_outcome(datetime.date(2015, 5, 15), student, asmt, institution_hierarchy, ID_GEN)
+    asmt_out = asmt_gen.generate_assessment_outcome(datetime.date(2015, 5, 15), student, asmt, ID_GEN)
 
     # Test
     assert asmt_out.date_taken == datetime.date(2015, 5, 15)
@@ -190,8 +187,7 @@ def test_generate_assessment_outcome_interim_taken_date():
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
     student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
-    institution_hierarchy = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
-    asmt_out = asmt_gen.generate_assessment_outcome(datetime.date(2015, 5, 15), student, asmt, institution_hierarchy, ID_GEN)
+    asmt_out = asmt_gen.generate_assessment_outcome(datetime.date(2015, 5, 15), student, asmt, ID_GEN)
 
     # Test
     assert asmt_out.date_taken == datetime.date(2015, 5, 15)
@@ -204,8 +200,7 @@ def test_generate_assessment_outcome_accommodations_ela():
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
     student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
-    institution_hierarchy = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
-    asmt_out = asmt_gen.generate_assessment_outcome(datetime.date(2015, 5, 15), student, asmt, institution_hierarchy, ID_GEN)
+    asmt_out = asmt_gen.generate_assessment_outcome(datetime.date(2015, 5, 15), student, asmt, ID_GEN)
 
     # Tests
     assert 4 <= asmt_out.acc_asl_video_embed <= 26
@@ -232,8 +227,7 @@ def test_generate_assessment_outcome_accommodations_math():
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
     student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
-    institution_hierarchy = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
-    asmt_out = asmt_gen.generate_assessment_outcome(datetime.date(2015, 5, 15), student, asmt, institution_hierarchy, ID_GEN)
+    asmt_out = asmt_gen.generate_assessment_outcome(datetime.date(2015, 5, 15), student, asmt, ID_GEN)
 
     # Tests
     assert 4 <= asmt_out.acc_asl_video_embed <= 26
@@ -309,11 +303,10 @@ def test_create_assessment_outcome_object_item_data():
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
     student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
-    inst_hier = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
     outcomes = {}
 
     # Create outcomes
-    asmt_gen.create_assessment_outcome_object(datetime.date(2015, 5, 15), student, asmt, inst_hier, ID_GEN, outcomes,
+    asmt_gen.create_assessment_outcome_object(datetime.date(2015, 5, 15), student, asmt, ID_GEN, outcomes,
                                               skip_rate=0, retake_rate=0, delete_rate=0, update_rate=0, gen_item=True)
 
     # Tests
@@ -328,11 +321,10 @@ def test_create_assessment_outcome_object_skipped():
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
     student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
-    inst_hier = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
     outcomes = {}
 
     # Create outcomes
-    asmt_gen.create_assessment_outcome_object(datetime.date(2015, 5, 15), student, asmt, inst_hier, ID_GEN, outcomes,
+    asmt_gen.create_assessment_outcome_object(datetime.date(2015, 5, 15), student, asmt, ID_GEN, outcomes,
                                               skip_rate=1, retake_rate=0, delete_rate=0, update_rate=0, gen_item=False)
 
     # Tests
@@ -346,11 +338,10 @@ def test_create_assessment_outcome_object_one_active_result():
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
     student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
-    inst_hier = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
     outcomes = {}
 
     # Create outcomes
-    asmt_gen.create_assessment_outcome_object(datetime.date(2015, 5, 15), student, asmt, inst_hier, ID_GEN, outcomes,
+    asmt_gen.create_assessment_outcome_object(datetime.date(2015, 5, 15), student, asmt, ID_GEN, outcomes,
                                               skip_rate=0, retake_rate=0, delete_rate=0, update_rate=0)
 
     # Tests
@@ -366,11 +357,10 @@ def test_create_assessment_outcome_object_retake_results():
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
     student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
-    inst_hier = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
     outcomes = {}
 
     # Create outcomes
-    asmt_gen.create_assessment_outcome_object(datetime.date(2015, 5, 15), student, asmt, inst_hier, ID_GEN, outcomes,
+    asmt_gen.create_assessment_outcome_object(datetime.date(2015, 5, 15), student, asmt, ID_GEN, outcomes,
                                               skip_rate=0, retake_rate=1, delete_rate=0, update_rate=0)
 
     # Tests
@@ -388,11 +378,10 @@ def test_create_assessment_outcome_object_one_deleted_result():
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
     student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
-    inst_hier = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
     outcomes = {}
 
     # Create outcomes
-    asmt_gen.create_assessment_outcome_object(datetime.date(2015, 5, 15), student, asmt, inst_hier, ID_GEN, outcomes,
+    asmt_gen.create_assessment_outcome_object(datetime.date(2015, 5, 15), student, asmt, ID_GEN, outcomes,
                                               skip_rate=0, retake_rate=0, delete_rate=1, update_rate=0)
 
     # Tests
@@ -408,11 +397,10 @@ def test_create_assessment_outcome_object_update_no_second_delete_results():
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
     student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
-    inst_hier = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
     outcomes = {}
 
     # Create outcomes
-    asmt_gen.create_assessment_outcome_object(datetime.date(2015, 5, 15), student, asmt, inst_hier, ID_GEN, outcomes,
+    asmt_gen.create_assessment_outcome_object(datetime.date(2015, 5, 15), student, asmt, ID_GEN, outcomes,
                                               skip_rate=0, retake_rate=0, delete_rate=0, update_rate=1)
 
     # Tests
@@ -430,11 +418,10 @@ def test_create_assessment_outcome_object_update_second_delete_results():
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
     student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
-    inst_hier = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
     outcomes = {}
 
     # Create outcomes
-    asmt_gen.create_assessment_outcome_object(datetime.date(2015, 5, 15), student, asmt, inst_hier, ID_GEN, outcomes,
+    asmt_gen.create_assessment_outcome_object(datetime.date(2015, 5, 15), student, asmt, ID_GEN, outcomes,
                                               skip_rate=0, retake_rate=0, delete_rate=1, update_rate=1)
 
     # Tests
@@ -452,12 +439,11 @@ def test_create_assessment_outcome_objects_no_interims_skipped():
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
     student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
-    inst_hier = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
     outcomes = {}
 
     # Create outcomes
-    __create_assessment_outcome_objects(student, asmt_summ, [], inst_hier, ID_GEN, outcomes,
-                                               skip_rate=1, retake_rate=0, delete_rate=0, update_rate=0)
+    __create_assessment_outcome_objects(student, asmt_summ, [], ID_GEN, outcomes, skip_rate=1, retake_rate=0,
+                                        delete_rate=0, update_rate=0)
 
     # Tests
     assert len(outcomes) == 0
@@ -470,12 +456,11 @@ def test_create_assessment_outcome_objects_no_interims_one_active_result():
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
     student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
-    inst_hier = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
     outcomes = {}
 
     # Create outcomes
-    __create_assessment_outcome_objects(student, asmt_summ, [], inst_hier, ID_GEN, outcomes,
-                                        skip_rate=0, retake_rate=0, delete_rate=0, update_rate=0)
+    __create_assessment_outcome_objects(student, asmt_summ, [], ID_GEN, outcomes, skip_rate=0, retake_rate=0,
+                                        delete_rate=0, update_rate=0)
 
     # Tests
     assert len(outcomes) == 1
@@ -490,12 +475,11 @@ def test_create_assessment_outcome_objects_no_interims_retake_results():
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
     student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
-    inst_hier = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
     outcomes = {}
 
     # Create outcomes
-    __create_assessment_outcome_objects(student, asmt_summ, [], inst_hier, ID_GEN, outcomes,
-                                        skip_rate=0, retake_rate=1, delete_rate=0, update_rate=0)
+    __create_assessment_outcome_objects(student, asmt_summ, [], ID_GEN, outcomes, skip_rate=0, retake_rate=1,
+                                        delete_rate=0, update_rate=0)
 
     # Tests
     assert len(outcomes) == 1
@@ -512,12 +496,11 @@ def test_create_assessment_outcome_objects_no_interim_one_deleted_result():
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
     student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
-    inst_hier = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
     outcomes = {}
 
     # Create outcomes
-    __create_assessment_outcome_objects(student, asmt_summ, [], inst_hier, ID_GEN, outcomes,
-                                        skip_rate=0, retake_rate=0, delete_rate=1, update_rate=0)
+    __create_assessment_outcome_objects(student, asmt_summ, [], ID_GEN, outcomes, skip_rate=0, retake_rate=0,
+                                        delete_rate=1, update_rate=0)
 
     # Tests
     assert len(outcomes) == 1
@@ -532,12 +515,11 @@ def test_create_assessment_outcome_objects_no_interim_update_no_second_delete_re
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
     student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
-    inst_hier = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
     outcomes = {}
 
     # Create outcomes
-    __create_assessment_outcome_objects(student, asmt_summ, [], inst_hier, ID_GEN, outcomes,
-                                        skip_rate=0, retake_rate=0, delete_rate=0, update_rate=1)
+    __create_assessment_outcome_objects(student, asmt_summ, [], ID_GEN, outcomes, skip_rate=0, retake_rate=0,
+                                        delete_rate=0, update_rate=1)
 
     # Tests
     assert len(outcomes) == 1
@@ -554,12 +536,11 @@ def test_create_assessment_outcome_objects_no_interim_update_second_delete_resul
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
     student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
-    inst_hier = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
     outcomes = {}
 
     # Create outcomes
-    __create_assessment_outcome_objects(student, asmt_summ, [], inst_hier, ID_GEN, outcomes,
-                                        skip_rate=0, retake_rate=0, delete_rate=1, update_rate=1)
+    __create_assessment_outcome_objects(student, asmt_summ, [], ID_GEN, outcomes, skip_rate=0, retake_rate=0,
+                                        delete_rate=1, update_rate=1)
 
     # Tests
     assert len(outcomes) == 1
@@ -577,12 +558,11 @@ def test_create_assessment_outcome_objects_interims_skipped():
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
     student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
-    inst_hier = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
     outcomes = {}
 
     # Create outcomes
-    __create_assessment_outcome_objects(student, asmt_summ, interim_asmts, inst_hier, ID_GEN, outcomes,
-                                        skip_rate=1, retake_rate=0, delete_rate=0, update_rate=0)
+    __create_assessment_outcome_objects(student, asmt_summ, interim_asmts, ID_GEN, outcomes, skip_rate=1, retake_rate=0,
+                                        delete_rate=0, update_rate=0)
 
     # Tests
     assert len(outcomes) == 0
@@ -596,12 +576,11 @@ def test_create_assessment_outcome_objects_interims_one_active_result():
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
     student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
-    inst_hier = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
     outcomes = {}
 
     # Create outcomes
-    __create_assessment_outcome_objects(student, asmt_summ, interim_asmts, inst_hier, ID_GEN, outcomes,
-                                        skip_rate=0, retake_rate=0, delete_rate=0, update_rate=0)
+    __create_assessment_outcome_objects(student, asmt_summ, interim_asmts, ID_GEN, outcomes, skip_rate=0, retake_rate=0,
+                                        delete_rate=0, update_rate=0)
 
     # Tests
     assert len(outcomes) == 2
@@ -621,12 +600,11 @@ def test_create_assessment_outcome_objects_interims_retake_results():
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
     student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
-    inst_hier = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
     outcomes = {}
 
     # Create outcomes
-    __create_assessment_outcome_objects(student, asmt_summ, interim_asmts, inst_hier, ID_GEN, outcomes,
-                                        skip_rate=0, retake_rate=1, delete_rate=0, update_rate=0)
+    __create_assessment_outcome_objects(student, asmt_summ, interim_asmts, ID_GEN, outcomes, skip_rate=0, retake_rate=1,
+                                        delete_rate=0, update_rate=0)
 
     # Tests
     assert len(outcomes) == 2
@@ -652,12 +630,11 @@ def test_create_assessment_outcome_objects_interim_one_deleted_result():
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
     student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
-    inst_hier = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
     outcomes = {}
 
     # Create outcomes
-    __create_assessment_outcome_objects(student, asmt_summ, interim_asmts, inst_hier, ID_GEN, outcomes,
-                                        skip_rate=0, retake_rate=0, delete_rate=1, update_rate=0)
+    __create_assessment_outcome_objects(student, asmt_summ, interim_asmts, ID_GEN, outcomes, skip_rate=0, retake_rate=0,
+                                        delete_rate=1, update_rate=0)
 
     # Tests
     assert len(outcomes) == 2
@@ -677,12 +654,11 @@ def test_create_assessment_outcome_objects_interim_update_no_second_delete_resul
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
     student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
-    inst_hier = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
     outcomes = {}
 
     # Create outcomes
-    __create_assessment_outcome_objects(student, asmt_summ, interim_asmts, inst_hier, ID_GEN, outcomes,
-                                        skip_rate=0, retake_rate=0, delete_rate=0, update_rate=1)
+    __create_assessment_outcome_objects(student, asmt_summ, interim_asmts, ID_GEN, outcomes, skip_rate=0, retake_rate=0,
+                                        delete_rate=0, update_rate=1)
 
     # Tests
     assert len(outcomes) == 2
@@ -708,12 +684,11 @@ def test_create_assessment_outcome_objects_interim_update_second_delete_results(
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
     student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
-    inst_hier = hier_gen.generate_institution_hierarchy(state, district, school, ID_GEN)
     outcomes = {}
 
     # Create outcomes
-    __create_assessment_outcome_objects(student, asmt_summ, interim_asmts, inst_hier, ID_GEN, outcomes,
-                                        skip_rate=0, retake_rate=0, delete_rate=1, update_rate=1)
+    __create_assessment_outcome_objects(student, asmt_summ, interim_asmts, ID_GEN, outcomes, skip_rate=0, retake_rate=0,
+                                        delete_rate=1, update_rate=1)
 
     # Tests
     assert len(outcomes) == 2
@@ -852,15 +827,15 @@ def test_generate_response_high_capability():
 
 
 # Helper to replace removed method
-def __create_assessment_outcome_objects(student, asmt_summ, interim_asmts, inst_hier, id_gen, assessment_results,
-                                        skip_rate, retake_rate, delete_rate, update_rate):
+def __create_assessment_outcome_objects(student, asmt_summ, interim_asmts, id_gen, assessment_results, skip_rate,
+                                        retake_rate, delete_rate, update_rate):
     # Create the summative assessment outcome
-    asmt_gen.create_assessment_outcome_object(datetime.date(2015, 5, 15), student, asmt_summ, inst_hier, id_gen,
+    asmt_gen.create_assessment_outcome_object(datetime.date(2015, 5, 15), student, asmt_summ, id_gen,
                                               assessment_results, skip_rate, retake_rate, delete_rate, update_rate, False)
 
     # Generate interim assessment results (list will be empty if school does not perform
     # interim assessments)
     for asmt in interim_asmts:
         # Create the interim assessment outcome
-        asmt_gen.create_assessment_outcome_object(datetime.date(2015, 5, 15), student, asmt, inst_hier, id_gen,
+        asmt_gen.create_assessment_outcome_object(datetime.date(2015, 5, 15), student, asmt, id_gen,
                                                   assessment_results, skip_rate, retake_rate, delete_rate, update_rate, False)

@@ -6,7 +6,6 @@ import datetime
 
 import data_generator.config.cfg as cfg
 import data_generator.generators.assessment as gen_asmt_generator
-from data_generator.generators.hierarchy import InstitutionHierarchy
 from data_generator.model.assessment import Assessment
 from data_generator.model.interimassessment import InterimAssessment
 from data_generator.model.interimassessmentoutcome import InterimAssessmentOutcome
@@ -18,7 +17,6 @@ from data_generator.util.id_gen import IDGen
 def create_iab_outcome_object(date_taken: datetime.date,
                               student: Student,
                               iab_asmt: InterimAssessment,
-                              inst_hier: InstitutionHierarchy,
                               id_gen: IDGen,
                               iab_results: {str: InterimAssessmentOutcome},
                               gen_item=True):
@@ -38,7 +36,7 @@ def create_iab_outcome_object(date_taken: datetime.date,
         iab_results[iab_asmt.guid] = []
 
     # Create the original outcome object
-    ao = generate_interim_assessment_outcome(date_taken, student, iab_asmt, inst_hier, id_gen, gen_item=gen_item)
+    ao = generate_interim_assessment_outcome(date_taken, student, iab_asmt, id_gen, gen_item=gen_item)
     iab_results[iab_asmt.guid].append(ao)
 
 
@@ -121,7 +119,6 @@ def generate_interim_assessment(asmt_year: int,
 def generate_interim_assessment_outcome(date_taken: datetime.date,
                                         student: Student,
                                         assessment: Assessment,
-                                        inst_hier: InstitutionHierarchy,
                                         id_gen: IDGen,
                                         gen_item=True):
     """
@@ -130,7 +127,6 @@ def generate_interim_assessment_outcome(date_taken: datetime.date,
     @param date_taken: date test was taken
     @param student: The student to create the outcome for
     @param assessment: The assessment to create the outcome for
-    @param inst_hier: The institution hierarchy this student belongs to
     @param id_gen: ID generator
     @param gen_item: If should create item-level responses
     @returns: The assessment outcome
@@ -140,7 +136,7 @@ def generate_interim_assessment_outcome(date_taken: datetime.date,
     sao = gen_asmt_generator.generate_assessment_outcome(student, assessment, id_gen)
 
     # Set other specifics
-    sao.inst_hierarchy = inst_hier
+    sao.school = student.school
     sao.date_taken = date_taken
     sao.admin_condition = 'NS'
     gen_asmt_generator.generate_session(sao)

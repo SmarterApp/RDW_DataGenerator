@@ -6,10 +6,8 @@ It will produce assessment packages optionally with items.
 """
 
 import csv
-
 import datetime
-from os import listdir
-from os.path import isfile, join
+import glob
 
 from data_generator.config import cfg
 from data_generator.model.assessment import Assessment
@@ -18,11 +16,11 @@ from data_generator.model.segment import AssessmentSegment
 from data_generator.util.id_gen import IDGen
 
 
-def load_assessments(root_dir, load_sum, load_ica, load_iab, load_items):
+def load_assessments(glob_pattern, load_sum, load_ica, load_iab, load_items):
     """
     Load assessments from any csv file in the given directory
     
-    :param root_dir: 
+    :param glob_pattern:
     :param load_sum: True to load summative assessments
     :param load_ica: True to load interim comprehensive assessments
     :param load_iab: True to load interim assessment blocks
@@ -30,7 +28,7 @@ def load_assessments(root_dir, load_sum, load_ica, load_iab, load_items):
     :return: 
     """
     assessments = []
-    for file in (join(root_dir, f) for f in listdir(root_dir) if f.endswith('.csv') and isfile(join(root_dir, f))):
+    for file in (glob.glob(glob_pattern)):
         assessments.extend(load_assessments_file(file, load_sum, load_ica, load_iab, load_items))
     return assessments
 

@@ -5,7 +5,7 @@ Go through and calculate the average students sizes for the different state type
 
 import data_generator.config.hierarchy as hier_config
 import data_generator.config.state_types as state_config
-import data_generator.util.hiearchy as hier_util
+import data_generator.util.hierarchy as hier_util
 
 if __name__ == '__main__':
     for state_type, state_config in state_config.STATE_TYPES.items():

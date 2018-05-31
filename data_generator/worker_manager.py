@@ -11,10 +11,11 @@ import data_generator.generators.hierarchy as hier_gen
 import data_generator.generators.iab_assessment as iab_asmt_gen
 import data_generator.generators.population as pop_gen
 import data_generator.generators.summative_or_ica_assessment as asmt_gen
-import data_generator.util.hiearchy as hier_util
+import data_generator.util.hierarchy as hier_util
 from data_generator.model.assessment import Assessment
 from data_generator.model.district import District
 from data_generator.model.registrationsystem import RegistrationSystem
+from data_generator.model.school import School
 from data_generator.model.state import State
 from data_generator.outputworkers.csv_item_level_data_worker import CSVItemLevelDataWorker
 from data_generator.outputworkers.csv_star_worker import CSVStarWorker
@@ -39,6 +40,7 @@ class WorkerManager(Worker):
         # Save output directory
         self.out_path_root = args.out_dir
         self.state_cfg = {'name': args.state_name, 'code': args.state_code, 'type': args.state_type}
+        self.hier_source = args.hier_source
 
         # Set up output
         self.workers = []
@@ -74,17 +76,34 @@ class WorkerManager(Worker):
             worker.prepare()
 
     def run(self):
-        state = hier_gen.generate_state(self.state_cfg['type'], self.state_cfg['name'], self.state_cfg['code'], self.id_gen)
-        print('Creating State: %s' % state.name)
+        state, districts, schools = self.__hierarchy()
 
         assessments = self.__assessment_packages()
-
         if len(assessments) == 0:
             print('No assessment packages found')
             return
 
         # Process the state
-        self.__generate_state_data(state, assessments)
+        self.__generate_state_data(state, districts, schools, assessments)
+
+    def __hierarchy(self):
+        """
+        Generate or load the hierarchy of state, districts, schools
+
+        :return:
+        """
+        if self.hier_source == 'generate':
+            state, districts, schools = hier_util.generate_hierarchy(self.state_cfg['type'], self.state_cfg['name'], self.state_cfg['code'], self.id_gen)
+        else:
+            state, districts, schools = hier_util.read_hierarchy(self.hier_source)
+
+        # call hook for workers to write hierarchies
+        hierarchies = [hier_gen.generate_institution_hierarchy(school.district.state, school.district, school, self.id_gen) for school in schools]
+        for worker in self.workers:
+            worker.write_hierarchies(hierarchies)
+        del hierarchies
+
+        return state, districts, schools
 
     def __assessment_packages(self):
         """
@@ -111,12 +130,13 @@ class WorkerManager(Worker):
         """
         return sorted(set(map(lambda asmt: asmt.year, assessments)))
 
-    def __generate_state_data(self, state: State, assessments: [Assessment]):
+    def __generate_state_data(self, state: State, districts: [District], schools: [School], assessments: [Assessment]):
         """
         Generate an entire data set for a single state.
 
         @param state: State to generate data for
         """
+        print('Creating results for state: %s' % state.name)
 
         # build registration system by years
         rs_by_year = self.__build_registration_system(self.__years(assessments))
@@ -124,22 +144,22 @@ class WorkerManager(Worker):
         # Build the districts
         student_avg_count = 0
         student_unique_count = 0
-        for district_type, dist_type_count in state.config['district_types_and_counts']:
-            for _ in range(dist_type_count):
-                # Create the district
-                district = hier_gen.generate_district(district_type, state, self.id_gen)
-                print('\nCreating District: %s (%s District)' % (district.name, district.type_str))
+        for district in districts:
+            print('\nCreating results for district %s (%s District)' % (district.name, district.type_str))
 
-                # Generate the district data set
-                avg_year, unique = self.__generate_district_data(state, district, rs_by_year, assessments)
+            # collect schools for the district
+            district_schools = [s for s in schools if s.district == district]
 
-                # Print completion of district
-                print('District created with average of %i students/year and %i total unique' % (avg_year, unique))
-                student_avg_count += avg_year
-                student_unique_count += unique
+            # Generate the district data set
+            avg_year, unique = self.__generate_district_data(district_schools, rs_by_year, assessments)
+
+            # Print completion of district
+            print('District results created with average of %i students/year and %i total unique' % (avg_year, unique))
+            student_avg_count += avg_year
+            student_unique_count += unique
 
         # Print completion of state
-        print('State %s created with average of %i students/year and %i total unique' % (state.name, student_avg_count, student_unique_count))
+        print('State results created with average of %i students/year and %i total unique' % (student_avg_count, student_unique_count))
 
     def __generate_assessments(self):
         """
@@ -208,49 +228,13 @@ class WorkerManager(Worker):
         # Return the generated GUIDs
         return rs_by_year
 
-    def __generate_institution_hierarchy(self, state: State, district: District, inst_hiers, schools):
-        school_count = random.triangular(district.config['school_counts']['min'],
-                                         district.config['school_counts']['max'],
-                                         district.config['school_counts']['avg'])
-
-        # Convert school type counts into decimal ratios
-        hier_util.convert_config_school_count_to_ratios(district.config)
-
-        # Make the schools
-        hierarchies = []
-
-        for school_type, school_type_ratio in district.config['school_types_and_ratios'].items():
-            # Decide how many of this school type we need
-            school_type_count = max(int(school_count * school_type_ratio), 1)  # Make sure at least 1
-
-            for j in range(school_type_count):
-                # Create the school and institution hierarchy object
-                school = hier_gen.generate_school(school_type, district, self.id_gen)
-                ih = hier_gen.generate_institution_hierarchy(state, district, school, self.id_gen)
-                hierarchies.append(ih)
-                inst_hiers[school.guid] = ih
-                schools.append(school)
-
-        # Write out hierarchies for this district
-        for worker in self.workers:
-            worker.write_hierarchies(hierarchies)
-
-        # Some explicit garbage collection
-        del hierarchies
-
-    def __generate_district_data(self, state: State, district: District, reg_sys_by_year: {str: RegistrationSystem}, assessments: [Assessment]):
+    def __generate_district_data(self, schools: [School], reg_sys_by_year: {str: RegistrationSystem}, assessments: [Assessment]):
         """
-        Generate an entire data set for a single district.
+        Generate an entire data set for all schools in a single district.
 
-        @param state: State the district belongs to
-        @param district: District to generate data for
+        @param schools: schools for the district
         @param assessments: Dictionary of all assessment objects
         """
-        inst_hiers = {}
-        schools = []
-        # Make the schools
-        self.__generate_institution_hierarchy(state, district, inst_hiers, schools)
-
         # Sort the schools
         schools_by_grade = hier_gen.sort_schools_by_grade(schools)
 
@@ -287,15 +271,12 @@ class WorkerManager(Worker):
             # and create assessments with outcomes for the students
             for school, grades in schools_with_grades.items():
                 # Process the whole school
-                student_count += self.__process_school(grades, school, students, unique_students, state, district,
-                                                       reg_system, year, inst_hiers[school.guid], assessments)
+                student_count += self.__process_school(grades, school, students, unique_students, reg_system, year, assessments)
                 bar.update()
 
         unique_student_count = len(unique_students)
 
         # Some explicit garbage collection
-        del inst_hiers
-        del schools
         del schools_by_grade
         del students
         del unique_students
@@ -303,8 +284,10 @@ class WorkerManager(Worker):
         # Return the average student count
         return int(student_count // len(years)), unique_student_count
 
-    def __process_school(self, grades, school, students, unique_students, state, district, reg_system: RegistrationSystem,
-                         year, inst_hier, assessments):
+    def __process_school(self, grades, school, students, unique_students, reg_system: RegistrationSystem, year, assessments):
+
+        district = school.district
+        state = district.state
 
         # Grab the assessment rates by subjects
         asmt_skip_rates_by_subject = state.config['subject_skip_percentages']
@@ -330,10 +313,10 @@ class WorkerManager(Worker):
                 for student in grade_students:
                     if asmt.is_iab():
                         if school.takes_interim_asmts and random.random() < cfg.IAB_STUDENT_RATE:
-                            iab_asmt_gen.create_iab_outcome_object(date_taken, student, asmt, inst_hier,
-                                self.id_gen, iab_results, gen_item=self.gen_item)
+                            iab_asmt_gen.create_iab_outcome_object(date_taken, student, asmt, self.id_gen,
+                                iab_results, gen_item=self.gen_item)
                     else:
-                        asmt_gen.create_assessment_outcome_object(date_taken, student, asmt, inst_hier, self.id_gen,
+                        asmt_gen.create_assessment_outcome_object(date_taken, student, asmt, self.id_gen,
                             assessment_results, asmt_skip_rates_by_subject[asmt.subject], gen_item=self.gen_item)
 
                     # Make sure we have the student for the next run and for metrics

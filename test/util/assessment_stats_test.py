@@ -1,7 +1,6 @@
 """
 
 """
-from data_generator.config import cfg
 from data_generator.util.assessment_stats import DemographicLevels, Stats
 from data_generator.util.assessment_stats import RandomLevelByDemographics, Properties, GradeLevels
 from data_generator.util.assessment_stats import random_capability

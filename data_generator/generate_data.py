@@ -19,10 +19,12 @@ if __name__ == '__main__':
 
     parser.add_argument('-sn', '--state_name', dest='state_name', action='store', default='California', help='The name of the state (default=California)')
     parser.add_argument('-sc', '--state_code', dest='state_code', action='store', default='CA', help='The code of the state to generate data for')
-    parser.add_argument('-st', '--state_type', dest='state_type', action='store', default='devel', help='Specify the type of state to generate data for')
+    parser.add_argument('-st', '--state_type', dest='state_type', action='store', default='tiny', help='Specify the type of state to generate data for')
+
+    parser.add_argument('-hier', '--hier_source', dest='hier_source', action='store', default='generate', help='Source of hierarchy, either \'generate\' or a CSV pathname, e.g. ./in/hierarchy.csv')
 
     group = parser.add_argument_group('packages')
-    group.add_argument('-pkg', '--pkg_source', dest='pkg_source', action='store', default='generate', help='Source of assessment packages, either \'generate\' or a path to tabulator CSV files')
+    group.add_argument('-pkg', '--pkg_source', dest='pkg_source', action='store', default='generate', help='Source of assessment packages, either \'generate\' or a glob expression matching files, e.g. ./in/20*.csv')
     group.add_argument('-sum', '--sum_pkg', dest='sum_pkg', action='store_true', default=False, help='Load/generate summative assessment packages')
     group.add_argument('-ica', '--ica_pkg', dest='ica_pkg', action='store_true', default=False, help='Load/generate  interim comprehensive assessment packages')
     group.add_argument('-iab', '--iab_pkg', dest='iab_pkg', action='store_true', default=False, help='Load/generate  interim assessment block packages')
@@ -37,7 +39,7 @@ if __name__ == '__main__':
     group.add_argument('-po', '--pg_out', dest='pg_out', action='store_true', help='Output data to PostgreSQL database')
     group.add_argument('-ho', '--host', dest='pg_host', action='store', default='localhost', help='The host for the PostgreSQL server to write data to')
     group.add_argument('-pa', '--pass', dest='pg_pass', action='store', default='', help='The password for the PostgreSQL server to write data to')
-    group.add_argument('-s', '--schema', dest='pg_schema', action='store', default='dg_data', help='The schema for the PostgreSQL database to write data to')
+    group.add_argument('-sa', '--schema', dest='pg_schema', action='store', default='dg_data', help='The schema for the PostgreSQL database to write data to')
 
     parser.add_argument('-o', '--out_dir', dest='out_dir', action='store', default='out', help='Specify the root directory for writing output files to')
     parser.add_argument('-so', '--star_out', dest='star_out', action='store_true', help='Output data to star schema CSV')

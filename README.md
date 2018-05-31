@@ -16,13 +16,16 @@ First script is `generate_data.py`. This generates the data in the requested out
 > * `--state_name STATE_NAME`: Specify the name of the state that gets generated (defaults to `California`)
 > * `--state_code STATE_CODE`: Specify the code of the state that gets generated (defaults to `CA`)
 > * `--state_type STATE_TYPE`: Specify the hierarchy type for the state to generate. 
-This has to match configuration in in data_generator/config/state_type.py. Examples include `california`, `example` and `devel`. 
+This has to match configuration in in data_generator/config/state_type.py. Examples include `california`, `example` and `devel`.
+
+> An alternative to specifying state specs and generating the hierarchy is to load the hierarchy (see test data for format):
+> * `--hier_source FILE_NAME`: Specify the source file for the hierarchy
 
 > Select what should be generated and output:
 > * `--sum_pkg`: generate/load summative assessment (SUM) packages
 > * `--ica_pkg`: generate/load interim comprehensive assessment (ICA) packages
 > * `--iab_pkg`: generate/load interim assessment block (IAB) packages
-> * `--pkg_source`: either `generate` (default) or path where tabulator CSV files are located
+> * `--pkg_source`: either `generate` (default) or glob path where tabulator CSV files are located
 > * `--gen_sum`: generate SUM outcomes
 > * `--gen_ica`: generate ICA outcomes
 > * `--gen_iab`: generate IAB outcomes
