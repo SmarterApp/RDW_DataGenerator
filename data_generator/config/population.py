@@ -10,6 +10,8 @@ STUDENT_HOLD_BACK_RATE = .015   # 1.5% of students will be held back in their gr
 STUDENT_DROP_OUT_RATE = .5      # 50% of students drop out if not advanced to the next grade
 STUDENT_TRANSFER_RATE = .05     # 5% of students will move to a new school in the district without needing to
 
+IFEP_RATE = 0.05   # 5% of non-LEP students will have an alternate language but be english proficient
+
 REPOPULATE_ADDITIONAL_STUDENTS = [0, 0, 1, 2, 3, 4]
 
 # NOTE: probabilities should correlate with cfg.DEMOGRAPHICS_BY_GRADE, specifically any 0 value there
@@ -107,9 +109,9 @@ DEMOGRAPHICS = {
               'econ_dis': {'name': 'Economically Disadvantaged', 'perc': .53},
               'migrant': {'name': 'Migrant Status', 'perc': .0355}
               },
-        '6': {'gender': {'male': {'name': 'Male', 'perc': .5026},
-                         'non_binary': {'name': 'Non Binary', 'perc': .01},
-                         'female': {'name': 'Female', 'perc': .4874}},
+        '6': {'gender': {'male': {'name': 'Male', 'perc': .4826},
+                         'non_binary': {'name': 'Non Binary', 'perc': .05},
+                         'female': {'name': 'Female', 'perc': .4674}},
               'ethnicity': {'amer_ind': {'name': 'American Indian', 'perc': .0062},
                             'black': {'name': 'Black or African American', 'perc': .0649},
                             'hispanic': {'name': 'Hispanic or Latino', 'perc': .5282},
@@ -126,9 +128,9 @@ DEMOGRAPHICS = {
               'econ_dis': {'name': 'Economically Disadvantaged', 'perc': .53},
               'migrant': {'name': 'Migrant Status', 'perc': .0355}
               },
-        '7': {'gender': {'male': {'name': 'Male', 'perc': .5032},
-                         'non_binary': {'name': 'Non Binary', 'perc': .01},
-                         'female': {'name': 'Female', 'perc': .4868}},
+        '7': {'gender': {'male': {'name': 'Male', 'perc': .4832},
+                         'non_binary': {'name': 'Non Binary', 'perc': .05},
+                         'female': {'name': 'Female', 'perc': .4668}},
               'ethnicity': {'amer_ind': {'name': 'American Indian', 'perc': .0066},
                             'black': {'name': 'Black or African American', 'perc': .0652},
                             'hispanic': {'name': 'Hispanic or Latino', 'perc': .5228},
@@ -145,9 +147,9 @@ DEMOGRAPHICS = {
               'econ_dis': {'name': 'Economically Disadvantaged', 'perc': .53},
               'migrant': {'name': 'Migrant Status', 'perc': .0355}
               },
-        '8': {'gender': {'male': {'name': 'Male', 'perc': .5037},
-                         'non_binary': {'name': 'Non Binary', 'perc': .01},
-                         'female': {'name': 'Female', 'perc': .4863}},
+        '8': {'gender': {'male': {'name': 'Male', 'perc': .4837},
+                         'non_binary': {'name': 'Non Binary', 'perc': .05},
+                         'female': {'name': 'Female', 'perc': .4663}},
               'ethnicity': {'amer_ind': {'name': 'American Indian', 'perc': .0067},
                             'black': {'name': 'Black or African American', 'perc': .0676},
                             'hispanic': {'name': 'Hispanic or Latino', 'perc': .5182},
@@ -164,9 +166,9 @@ DEMOGRAPHICS = {
               'econ_dis': {'name': 'Economically Disadvantaged', 'perc': .53},
               'migrant': {'name': 'Migrant Status', 'perc': .0355}
               },
-        '9': {'gender': {'male': {'name': 'Male', 'perc': .5012},
-                         'non_binary': {'name': 'Non Binary', 'perc': .015},
-                         'female': {'name': 'Female', 'perc': .4838}},
+        '9': {'gender': {'male': {'name': 'Male', 'perc': .4762},
+                         'non_binary': {'name': 'Non Binary', 'perc': .06},
+                         'female': {'name': 'Female', 'perc': .4638}},
               'ethnicity': {'amer_ind': {'name': 'American Indian', 'perc': .0074},
                             'black': {'name': 'Black or African American', 'perc': .067},
                             'hispanic': {'name': 'Hispanic or Latino', 'perc': .4979},
@@ -183,9 +185,9 @@ DEMOGRAPHICS = {
               'econ_dis': {'name': 'Economically Disadvantaged', 'perc': .53},
               'migrant': {'name': 'Migrant Status', 'perc': .0355}
               },
-        '10': {'gender': {'male': {'name': 'Male', 'perc': .5012},
-                          'non_binary': {'name': 'Non Binary', 'perc': .015},
-                          'female': {'name': 'Female', 'perc': .4838}},
+        '10': {'gender': {'male': {'name': 'Male', 'perc': .4762},
+                          'non_binary': {'name': 'Non Binary', 'perc': .06},
+                          'female': {'name': 'Female', 'perc': .4638}},
                'ethnicity': {'amer_ind': {'name': 'American Indian', 'perc': .0074},
                              'black': {'name': 'Black or African American', 'perc': .067},
                              'hispanic': {'name': 'Hispanic or Latino', 'perc': .4979},
@@ -202,9 +204,9 @@ DEMOGRAPHICS = {
                'econ_dis': {'name': 'Economically Disadvantaged', 'perc': .53},
                'migrant': {'name': 'Migrant Status', 'perc': .0355}
                },
-        '11': {'gender': {'male': {'name': 'Male', 'perc': .5012},
-                          'non_binary': {'name': 'Non Binary', 'perc': .015},
-                          'female': {'name': 'Female', 'perc': .4838}},
+        '11': {'gender': {'male': {'name': 'Male', 'perc': .4762},
+                          'non_binary': {'name': 'Non Binary', 'perc': .06},
+                          'female': {'name': 'Female', 'perc': .4638}},
                'ethnicity': {'amer_ind': {'name': 'American Indian', 'perc': .0074},
                              'black': {'name': 'Black or African American', 'perc': .067},
                              'hispanic': {'name': 'Hispanic or Latino', 'perc': .4979},
@@ -221,9 +223,9 @@ DEMOGRAPHICS = {
                'econ_dis': {'name': 'Economically Disadvantaged', 'perc': .53},
                'migrant': {'name': 'Migrant Status', 'perc': .0355}
                },
-        '12': {'gender': {'male': {'name': 'Male', 'perc': .5012},
-                          'non_binary': {'name': 'Non Binary', 'perc': .01},
-                          'female': {'name': 'Female', 'perc': .4838}},
+        '12': {'gender': {'male': {'name': 'Male', 'perc': .4812},
+                          'non_binary': {'name': 'Non Binary', 'perc': .05},
+                          'female': {'name': 'Female', 'perc': .4638}},
                'ethnicity': {'amer_ind': {'name': 'American Indian', 'perc': .0074},
                              'black': {'name': 'Black or African American', 'perc': .067},
                              'hispanic': {'name': 'Hispanic or Latino', 'perc': .4979},

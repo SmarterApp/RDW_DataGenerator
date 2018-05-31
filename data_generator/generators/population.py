@@ -430,7 +430,8 @@ def _set_lang_items(student, acad_year=datetime.datetime.now().year,
                     lep_language_codes=cfg.LEP_LANGUAGE_CODES,
                     lep_proficiency_levels=cfg.LEP_PROFICIENCY_LEVELS,
                     lep_proficiency_levels_exit=cfg.LEP_PROFICIENCY_LEVELS_EXIT,
-                    lep_title_3_programs=cfg.LEP_TITLE_3_PROGRAMS):
+                    lep_title_3_programs=cfg.LEP_TITLE_3_PROGRAMS,
+                    ifep_rate=pop_config.IFEP_RATE):
     """
     Set the language values for a student.
 
@@ -442,6 +443,7 @@ def _set_lang_items(student, acad_year=datetime.datetime.now().year,
     @param lep_proficiency_levels: Proficiency levels that can be assigned to an LEP student
     @param lep_proficiency_levels_exit: Proficiency levels that are good enough for the student to have exited LEP
     @param lep_title_3_programs: Title 3 programs that can be assigned to an LEP student
+    @param ifep_rate: IFEP rate
     """
     if student.prg_lep:
         # Pick a random non-English language
@@ -463,7 +465,14 @@ def _set_lang_items(student, acad_year=datetime.datetime.now().year,
             student.elas = 'EL'
             student.elas_start_date = student.prg_lep_entry_date
     else:
-        student.elas = 'EO'
+        # rarely set lang_code to not english, proficiency "very good", and ELAS to "IFEP"
+        # IFEP = student tested out of, and never entered LEP/ELAS
+        if random.random() < ifep_rate:
+            student.lang_code = random.choice(lep_language_codes)
+            student.lang_prof_level = random.choice(lep_proficiency_levels_exit)
+            student.elas = 'IFEP'
+        else:
+            student.elas = 'EO'
 
 
 def _generate_date_lep_entry(grade, acad_year=datetime.datetime.now().year):

@@ -9,7 +9,7 @@ from data_generator.util.assessment_stats import Properties, Stats, GradeLevels,
 HIERARCHY_FROM_DATE = datetime.date(2014, 9, 1)
 HIERARCHY_TO_DATE = datetime.date(9999, 12, 31)
 
-LEP_LANGUAGE_CODES = ['esp', 'fre', 'ben', 'ger', 'chi', 'kor', 'jpn', 'rus']
+LEP_LANGUAGE_CODES = ['spa', 'fre', 'ben', 'ger', 'chi', 'kor', 'jpn', 'rus']
 LEP_PROFICIENCY_LEVELS = ['very poor', 'poor', 'adequate', 'good', 'very good']
 LEP_PROFICIENCY_LEVELS_EXIT = ['good', 'very good']
 LEP_TITLE_3_PROGRAMS = [None, None,  # Allow blanks and give them higher weight
@@ -157,7 +157,7 @@ DEMOGRAPHICS_BY_GRADE = {
         dmg_prg_tt1={False: 46.0, True: 54.0},
         dmg_prg_iep={False: 84.0, True: 16.0},
         dmg_prg_lep={False: 94.0, True: 6.0},
-        gender={'female': 49.0, 'male': 49.0, 'non_binary': 1.0, 'not_stated': 1.0},
+        gender={'female': 47.0, 'male': 47.0, 'non_binary': 5.0, 'not_stated': 1.0},
         race={'dmg_eth_2mr': 1.0, 'dmg_eth_hsp': 22.0, 'dmg_eth_asn': 8.0, 'dmg_eth_nst': 2.0, 'dmg_eth_blk': 18.0,
               'dmg_eth_ami': 1.0, 'dmg_eth_wht': 46.0, 'dmg_eth_pcf': 2.0},
     ),
@@ -166,7 +166,7 @@ DEMOGRAPHICS_BY_GRADE = {
         dmg_prg_tt1={False: 47.0, True: 53.0},
         dmg_prg_iep={False: 84.0, True: 16.0},
         dmg_prg_lep={False: 95.0, True: 5.0},
-        gender={'female': 48.0, 'male': 50.0, 'non_binary': 1.0, 'not_stated': 1.0},
+        gender={'female': 46.0, 'male': 48.0, 'non_binary': 5.0, 'not_stated': 1.0},
         race={'dmg_eth_2mr': 1.0, 'dmg_eth_hsp': 22.0, 'dmg_eth_asn': 8.0, 'dmg_eth_nst': 2.0, 'dmg_eth_blk': 16.0,
               'dmg_eth_ami': 1.0, 'dmg_eth_wht': 48.0, 'dmg_eth_pcf': 2.0},
     ),
@@ -175,7 +175,7 @@ DEMOGRAPHICS_BY_GRADE = {
         dmg_prg_tt1={False: 48.0, True: 52.0},
         dmg_prg_iep={False: 84.0, True: 16.0},
         dmg_prg_lep={False: 95.0, True: 5.0},
-        gender={'female': 49.0, 'male': 50.0, 'non_binary': 1.0, 'not_stated': 0.0},
+        gender={'female': 47.0, 'male': 48.0, 'non_binary': 5.0, 'not_stated': 0.0},
         race={'dmg_eth_2mr': 1.0, 'dmg_eth_hsp': 21.0, 'dmg_eth_asn': 8.0, 'dmg_eth_nst': 2.0, 'dmg_eth_blk': 19.0,
               'dmg_eth_ami': 1.0, 'dmg_eth_wht': 46.0, 'dmg_eth_pcf': 2.0},
     ),
@@ -184,7 +184,7 @@ DEMOGRAPHICS_BY_GRADE = {
         dmg_prg_tt1={False: 44.0, True: 56.0},
         dmg_prg_iep={False: 85.0, True: 15.0},
         dmg_prg_lep={False: 91.0, True: 9.0},
-        gender={'female': 48.0, 'male': 49.0, 'non_binary': 1.0, 'not_stated': 2.0},
+        gender={'female': 46.0, 'male': 47.0, 'non_binary': 5.0, 'not_stated': 2.0},
         race={'dmg_eth_2mr': 1.0, 'dmg_eth_hsp': 24.0, 'dmg_eth_asn': 8.0, 'dmg_eth_nst': 2.0, 'dmg_eth_blk': 16.0,
               'dmg_eth_ami': 1.0, 'dmg_eth_wht': 46.0, 'dmg_eth_pcf': 2.0},
     ),
@@ -193,7 +193,7 @@ DEMOGRAPHICS_BY_GRADE = {
         dmg_prg_tt1={False: 44.0, True: 56.0},
         dmg_prg_iep={False: 85.0, True: 15.0},
         dmg_prg_lep={False: 91.0, True: 9.0},
-        gender={'female': 48.0, 'male': 49.0, 'non_binary': 1.0, 'not_stated': 2.0},
+        gender={'female': 46.0, 'male': 47.0, 'non_binary': 5.0, 'not_stated': 2.0},
         race={'dmg_eth_2mr': 1.0, 'dmg_eth_hsp': 24.0, 'dmg_eth_asn': 8.0, 'dmg_eth_nst': 2.0, 'dmg_eth_blk': 16.0,
               'dmg_eth_ami': 1.0, 'dmg_eth_wht': 46.0, 'dmg_eth_pcf': 2.0},
     ),
@@ -202,7 +202,7 @@ DEMOGRAPHICS_BY_GRADE = {
         dmg_prg_tt1={False: 48.0, True: 52.0},
         dmg_prg_iep={False: 84.0, True: 16.0},
         dmg_prg_lep={False: 95.0, True: 5.0},
-        gender={'female': 49.0, 'male': 49.0, 'non_binary': 1.0, 'not_stated': 1.0},
+        gender={'female': 47.0, 'male': 47.0, 'non_binary': 5.0, 'not_stated': 1.0},
         race={'dmg_eth_2mr': 1.0, 'dmg_eth_hsp': 21.0, 'dmg_eth_asn': 8.0, 'dmg_eth_nst': 2.0, 'dmg_eth_blk': 18.0,
               'dmg_eth_ami': 1.0, 'dmg_eth_wht': 47.0, 'dmg_eth_pcf': 2.0},
     ),
@@ -211,7 +211,7 @@ DEMOGRAPHICS_BY_GRADE = {
         dmg_prg_tt1={False: 44.0, True: 56.0},
         dmg_prg_iep={False: 85.0, True: 15.0},
         dmg_prg_lep={False: 91.0, True: 9.0},
-        gender={'female': 48.0, 'male': 49.0, 'non_binary': 1.0, 'not_stated': 2.0},
+        gender={'female': 46.0, 'male': 47.0, 'non_binary': 5.0, 'not_stated': 2.0},
         race={'dmg_eth_2mr': 1.0, 'dmg_eth_hsp': 24.0, 'dmg_eth_asn': 8.0, 'dmg_eth_nst': 2.0, 'dmg_eth_blk': 16.0,
               'dmg_eth_ami': 1.0, 'dmg_eth_wht': 46.0, 'dmg_eth_pcf': 2.0},
     ),

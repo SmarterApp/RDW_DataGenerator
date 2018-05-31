@@ -73,9 +73,10 @@ def generate_person_name(gender):
         fm_names = random.choice([PEOPLE_NAMES.male_names, PEOPLE_NAMES.female_names])
     else:
         raise Exception("Unknown gender value '" + str(gender) + "' provided [expected 'male', 'female', 'non_binary' or 'none']")
-    return fm_names[random.randint(0, len(fm_names) - 1)], \
-           fm_names[random.randint(0, len(fm_names) - 1)] if random.randint(1, 10) < 7 else None, \
-           l_names[random.randint(0, len(l_names) - 1)]
+
+    return random.choice(fm_names), \
+           random.choice(fm_names) if random.random() < 0.70 else None, \
+           random.choice(l_names) + ('' if random.random() < 0.92 else '-'+random.choice(l_names))
 
 
 def generate_street_address_line_1():

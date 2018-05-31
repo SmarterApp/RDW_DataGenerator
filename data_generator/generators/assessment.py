@@ -82,7 +82,7 @@ def generate_assessment_outcome(student: Student, assessment: Assessment, id_gen
     if 'Calculator' in assessment.accommodations:
         ao.accommodations.append(('Calculator', 'TDS_CalcBasic', 'Calculator on'))
         ao.accommodations.append(('Non-Embedded Accommodations', 'NEA_Calc', 'Calculator'))
-    if 'Spanish' in assessment.accommodations and student.lang_code == 'esp':
+    if 'Spanish' in assessment.accommodations and student.lang_code == 'spa' and student.prg_lep:
         ao.accommodations.append(('Language', 'ESN', 'Spanish'))
         ao.accommodations.append(('Translation', 'TDS_WL_ESNGlossary', 'Spanish'))
 
