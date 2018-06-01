@@ -87,9 +87,9 @@ number of things that may need cleaning up. And there are some enhancements/impr
  - [ ] Use only a subset of items from item bank in a particular session outcome (?)
  - [x] Session-based generation. Assign sessionId, test adminstrator, etc.
  - [x] Valid categories for IAB are 1-3, it returns 2-4
- - [ ] Errors during outcome generation for ICA's read from tabulator CSV.
+ - [x] Errors during outcome generation for ICA's read from tabulator CSV.
  - [x] ICA report is missing claim scores
- - [ ] Target scores for summative assessments.
+ - [x] Target scores for summative assessments.
  - [ ] Combine cfg.DEMOGRAPHICS_BY_GRADE and population.DEMOGRAPHICS. They both represent demographic distribution of
  students but they have different values.
  - [x] date-taken should be passed into outcome generation, not pulled from assessment.
@@ -108,7 +108,7 @@ making score more complex than 0/1.
  different `period`. It makes more sense to separate the IAB packages from the date taken. So a single IAB package
  might be used more than once during the academic year. Or even in a subsequent academic year. To do this, remove
  `period` from the package; then generate the date-taken and pass it in when generating outcomes.
- - [ ] Clean up accommodations. These belong to the student profile combined with assessment-specific restrictions. When doing this update to make them realistic and consistent with current values.
+ - [x] Clean up accommodations. These belong to the student profile combined with assessment-specific restrictions. When doing this update to make them realistic and consistent with current values.
  - [ ] Remove deprecated output workers. Consider that pg_worker could be repurposed as a sql_worker.
  - [x] Set admin condition of outcome based on assessment type (Summative: Valid, ICA: SD, IAB: NS)
  - [ ] Rare admin condition exceptions. Summative: IN, perhaps by session. ICA: NS, perhaps by school.
