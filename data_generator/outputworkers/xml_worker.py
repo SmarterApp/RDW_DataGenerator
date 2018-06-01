@@ -87,7 +87,7 @@ class XmlWorker(Worker):
         test.set('bankKey', asmt.bank_key)
         test.set('subject', asmt.subject)
         test.set('grade', '{:02}'.format(asmt.grade))
-        test.set('assessmentType', self.map_asmt_type(asmt.type))
+        test.set('assessmentType', self._map_asmt_type(asmt.type))
         test.set('academicYear', str(asmt.year))
         test.set('assessmentVersion', asmt.version)
         test.set('contract', asmt.contract)
@@ -99,53 +99,53 @@ class XmlWorker(Worker):
         examinee.set('key', str(student.rec_id))
 
         contextDateStr = outcome.status_date.isoformat()
-        self.add_examinee_attribute(examinee, 'StudentIdentifier', student.id, contextDateStr)
-        self.add_examinee_attribute(examinee, 'AlternateSSID', student.external_ssid, contextDateStr)
-        self.add_examinee_attribute(examinee, 'Birthdate', student.dob, contextDateStr)
-        self.add_examinee_attribute(examinee, 'FirstName', student.first_name, contextDateStr)
-        self.add_examinee_attribute(examinee, 'MiddleName', student.middle_name, contextDateStr)
-        self.add_examinee_attribute(examinee, 'LastOrSurname', student.last_name, contextDateStr)
-        self.add_examinee_attribute(examinee, 'Sex', self.map_gender(student.gender), contextDateStr)
-        self.add_examinee_attribute(examinee, 'GradeLevelWhenAssessed', '{:02}'.format(student.grade), contextDateStr)
-        self.add_examinee_attribute(examinee, 'HispanicOrLatinoEthnicity', self.map_yes_no(student.eth_hispanic), contextDateStr)
-        self.add_examinee_attribute(examinee, 'AmericanIndianOrAlaskaNative', self.map_yes_no(student.eth_amer_ind), contextDateStr)
-        self.add_examinee_attribute(examinee, 'Asian', self.map_yes_no(student.eth_asian), contextDateStr)
-        self.add_examinee_attribute(examinee, 'Filipino', self.map_yes_no(student.eth_filipino), contextDateStr)
-        self.add_examinee_attribute(examinee, 'BlackOrAfricanAmerican', self.map_yes_no(student.eth_black), contextDateStr)
-        self.add_examinee_attribute(examinee, 'White', self.map_yes_no(student.eth_white), contextDateStr)
-        self.add_examinee_attribute(examinee, 'NativeHawaiianOrOtherPacificIslander', self.map_yes_no(student.eth_pacific), contextDateStr)
-        self.add_examinee_attribute(examinee, 'DemographicRaceTwoOrMoreRaces', self.map_yes_no(student.eth_multi), contextDateStr)
-        self.add_examinee_attribute(examinee, 'IDEAIndicator', self.map_yes_no(student.prg_iep), contextDateStr)
-        self.add_examinee_attribute(examinee, 'LEPStatus', self.map_yes_no(student.prg_lep), contextDateStr)
-        self.add_examinee_attribute(examinee, 'LimitedEnglishProficiencyEntryDate', student.prg_lep_entry_date, contextDateStr)
-        self.add_examinee_attribute(examinee, 'LEPExitDate', student.prg_lep_exit_date, contextDateStr)
-        self.add_examinee_attribute(examinee, 'Section504Status', self.map_yes_no(student.prg_sec504), contextDateStr)
-        self.add_examinee_attribute(examinee, 'EconomicDisadvantageStatus', self.map_yes_no(student.prg_econ_disad), contextDateStr)
-        self.add_examinee_attribute(examinee, 'LanguageCode', student.lang_code, contextDateStr)
-        self.add_examinee_attribute(examinee, 'EnglishLanguageProficiencyLevel', student.lang_prof_level, contextDateStr)
-        self.add_examinee_attribute(examinee, 'EnglishLanguageAcquisitionStatus', student.elas, contextDateStr)
-        self.add_examinee_attribute(examinee, 'EnglishLanguageAcquisitionStatusStartDate', student.elas_start_date, contextDateStr)
-        self.add_examinee_attribute(examinee, 'MigrantStatus', self.map_yes_no(student.prg_migrant), contextDateStr)
-        self.add_examinee_attribute(examinee, 'StudentGroupName', student.group_1_text, contextDateStr)
-        self.add_examinee_attribute(examinee, 'StudentGroupName', student.group_2_text, contextDateStr)
-        self.add_examinee_attribute(examinee, 'StudentGroupName', student.group_3_text, contextDateStr)
-        self.add_examinee_attribute(examinee, 'StudentGroupName', student.group_4_text, contextDateStr)
-        self.add_examinee_attribute(examinee, 'StudentGroupName', student.group_5_text, contextDateStr)
-        self.add_examinee_attribute(examinee, 'StudentGroupName', student.group_6_text, contextDateStr)
-        self.add_examinee_attribute(examinee, 'StudentGroupName', student.group_7_text, contextDateStr)
-        self.add_examinee_attribute(examinee, 'StudentGroupName', student.group_8_text, contextDateStr)
-        self.add_examinee_attribute(examinee, 'StudentGroupName', student.group_9_text, contextDateStr)
-        self.add_examinee_attribute(examinee, 'StudentGroupName', student.group_10_text, contextDateStr)
-        self.add_examinee_attribute(examinee, 'Advancement', self.map_advancement(student), contextDateStr)
-        self.add_examinee_attribute(examinee, 'Capability', student.capability.get(asmt.subject, 0.0), contextDateStr)
+        self._add_examinee_attribute(examinee, 'StudentIdentifier', student.id, contextDateStr)
+        self._add_examinee_attribute(examinee, 'AlternateSSID', student.external_ssid, contextDateStr)
+        self._add_examinee_attribute(examinee, 'Birthdate', student.dob, contextDateStr)
+        self._add_examinee_attribute(examinee, 'FirstName', student.first_name, contextDateStr)
+        self._add_examinee_attribute(examinee, 'MiddleName', student.middle_name, contextDateStr)
+        self._add_examinee_attribute(examinee, 'LastOrSurname', student.last_name, contextDateStr)
+        self._add_examinee_attribute(examinee, 'Sex', self._map_gender(student.gender), contextDateStr)
+        self._add_examinee_attribute(examinee, 'GradeLevelWhenAssessed', '{:02}'.format(student.grade), contextDateStr)
+        self._add_examinee_attribute(examinee, 'HispanicOrLatinoEthnicity', self._map_yes_no(student.eth_hispanic), contextDateStr)
+        self._add_examinee_attribute(examinee, 'AmericanIndianOrAlaskaNative', self._map_yes_no(student.eth_amer_ind), contextDateStr)
+        self._add_examinee_attribute(examinee, 'Asian', self._map_yes_no(student.eth_asian), contextDateStr)
+        self._add_examinee_attribute(examinee, 'Filipino', self._map_yes_no(student.eth_filipino), contextDateStr)
+        self._add_examinee_attribute(examinee, 'BlackOrAfricanAmerican', self._map_yes_no(student.eth_black), contextDateStr)
+        self._add_examinee_attribute(examinee, 'White', self._map_yes_no(student.eth_white), contextDateStr)
+        self._add_examinee_attribute(examinee, 'NativeHawaiianOrOtherPacificIslander', self._map_yes_no(student.eth_pacific), contextDateStr)
+        self._add_examinee_attribute(examinee, 'DemographicRaceTwoOrMoreRaces', self._map_yes_no(student.eth_multi), contextDateStr)
+        self._add_examinee_attribute(examinee, 'IDEAIndicator', self._map_yes_no(student.prg_iep), contextDateStr)
+        self._add_examinee_attribute(examinee, 'LEPStatus', self._map_yes_no(student.prg_lep), contextDateStr)
+        self._add_examinee_attribute(examinee, 'LimitedEnglishProficiencyEntryDate', student.prg_lep_entry_date, contextDateStr)
+        self._add_examinee_attribute(examinee, 'LEPExitDate', student.prg_lep_exit_date, contextDateStr)
+        self._add_examinee_attribute(examinee, 'Section504Status', self._map_yes_no(student.prg_sec504), contextDateStr)
+        self._add_examinee_attribute(examinee, 'EconomicDisadvantageStatus', self._map_yes_no(student.prg_econ_disad), contextDateStr)
+        self._add_examinee_attribute(examinee, 'LanguageCode', student.lang_code, contextDateStr)
+        self._add_examinee_attribute(examinee, 'EnglishLanguageProficiencyLevel', student.lang_prof_level, contextDateStr)
+        self._add_examinee_attribute(examinee, 'EnglishLanguageAcquisitionStatus', student.elas, contextDateStr)
+        self._add_examinee_attribute(examinee, 'EnglishLanguageAcquisitionStatusStartDate', student.elas_start_date, contextDateStr)
+        self._add_examinee_attribute(examinee, 'MigrantStatus', self._map_yes_no(student.prg_migrant), contextDateStr)
+        self._add_examinee_attribute(examinee, 'StudentGroupName', student.group_1_text, contextDateStr)
+        self._add_examinee_attribute(examinee, 'StudentGroupName', student.group_2_text, contextDateStr)
+        self._add_examinee_attribute(examinee, 'StudentGroupName', student.group_3_text, contextDateStr)
+        self._add_examinee_attribute(examinee, 'StudentGroupName', student.group_4_text, contextDateStr)
+        self._add_examinee_attribute(examinee, 'StudentGroupName', student.group_5_text, contextDateStr)
+        self._add_examinee_attribute(examinee, 'StudentGroupName', student.group_6_text, contextDateStr)
+        self._add_examinee_attribute(examinee, 'StudentGroupName', student.group_7_text, contextDateStr)
+        self._add_examinee_attribute(examinee, 'StudentGroupName', student.group_8_text, contextDateStr)
+        self._add_examinee_attribute(examinee, 'StudentGroupName', student.group_9_text, contextDateStr)
+        self._add_examinee_attribute(examinee, 'StudentGroupName', student.group_10_text, contextDateStr)
+        self._add_examinee_attribute(examinee, 'Advancement', self._map_advancement(student), contextDateStr)
+        self._add_examinee_attribute(examinee, 'Capability', student.capability.get(asmt.subject, 0.0), contextDateStr)
 
         school = outcome.school
-        self.add_examinee_relationship(examinee, 'StateAbbreviation', school.district.state.code, contextDateStr)
-        self.add_examinee_relationship(examinee, 'StateName', school.district.state.name, contextDateStr)
-        self.add_examinee_relationship(examinee, 'DistrictId', school.district.id, contextDateStr)
-        self.add_examinee_relationship(examinee, 'DistrictName', school.district.name, contextDateStr)
-        self.add_examinee_relationship(examinee, 'SchoolId', school.id, contextDateStr)
-        self.add_examinee_relationship(examinee, 'SchoolName', school.name, contextDateStr)
+        self._add_examinee_relationship(examinee, 'StateAbbreviation', school.district.state.code, contextDateStr)
+        self._add_examinee_relationship(examinee, 'StateName', school.district.state.name, contextDateStr)
+        self._add_examinee_relationship(examinee, 'DistrictId', school.district.id, contextDateStr)
+        self._add_examinee_relationship(examinee, 'DistrictName', school.district.name, contextDateStr)
+        self._add_examinee_relationship(examinee, 'SchoolId', school.id, contextDateStr)
+        self._add_examinee_relationship(examinee, 'SchoolName', school.name, contextDateStr)
 
         # write Opportunity
         opportunity = SubElement(root, 'Opportunity')
@@ -188,11 +188,15 @@ class XmlWorker(Worker):
             accommodation.set('code', code)
             accommodation.set('value', value)
 
-        self.add_scale_score(opportunity, 'Overall',
-            outcome.overall_score, outcome.overall_score_range_min, outcome.overall_perf_lvl)
-        if not asmt.is_iab():
+        # add scores
+        self._add_scale_score(opportunity, 'Overall',
+                              outcome.overall_score, outcome.overall_score_range_min, outcome.overall_perf_lvl)
+        if not asmt.is_iab() and outcome.claim_scores:
             for claim_score in outcome.claim_scores:
-                self.add_scale_score(opportunity, claim_score.claim.code, claim_score.score, claim_score.range_min, claim_score.perf_lvl)
+                self._add_scale_score(opportunity, claim_score.claim.code, claim_score.score, claim_score.range_min, claim_score.perf_lvl)
+        if asmt.is_summative() and outcome.target_scores:
+            for target_score in outcome.target_scores:
+                self._add_residual_score(opportunity, target_score.id, target_score.student_residual, target_score.standard_met_residual)
 
         for item_data in outcome.item_data:
             item = SubElement(opportunity, 'Item')
@@ -222,11 +226,11 @@ class XmlWorker(Worker):
                 response.text = item_data.response_value
 
             if item_data.sub_scores:
-                scoreInfo = self.add_score_info(item, 'Overall', item_data.score)
+                scoreInfo = self._add_score_info(item, 'Overall', item_data.score)
                 subScoreList = SubElement(scoreInfo, 'SubScoreList')
-                self.add_score_info(subScoreList, 'Organization/Purpose', item_data.sub_scores[0])
-                self.add_score_info(subScoreList, 'Evidence/Elaboration', item_data.sub_scores[1])
-                self.add_score_info(subScoreList, 'Conventions', item_data.sub_scores[2])
+                self._add_score_info(subScoreList, 'Organization/Purpose', item_data.sub_scores[0])
+                self._add_score_info(subScoreList, 'Evidence/Elaboration', item_data.sub_scores[1])
+                self._add_score_info(subScoreList, 'Conventions', item_data.sub_scores[2])
 
         xml = tostring(root, 'unicode')
         with open(self.file_path_for_outcome(outcome), "w") as f:
@@ -247,7 +251,7 @@ class XmlWorker(Worker):
         os.makedirs(path, exist_ok=True)
         return os.path.join(path, str(outcome.rec_id)) + '.xml'
 
-    def add_examinee_attribute(self, parent, name, value, contextDateStr):
+    def _add_examinee_attribute(self, parent, name, value, contextDateStr):
         if value:
             attr = SubElement(parent, 'ExamineeAttribute')
             attr.set('context', 'FINAL')
@@ -255,7 +259,7 @@ class XmlWorker(Worker):
             attr.set('value', str(value))
             attr.set('contextDate', contextDateStr)
 
-    def add_examinee_relationship(self, parent, name, value, contextDateStr):
+    def _add_examinee_relationship(self, parent, name, value, contextDateStr):
         if value:
             attr = SubElement(parent, 'ExamineeRelationship')
             attr.set('context', 'FINAL')
@@ -263,20 +267,23 @@ class XmlWorker(Worker):
             attr.set('value', str(value))
             attr.set('contextDate', contextDateStr)
 
-    def add_scale_score(self, parent, measure, scale_score, scale_score_range_min, perf_lvl):
+    def _add_scale_score(self, parent, measure, scale_score, scale_score_range_min, perf_lvl):
         if scale_score:
-            score = SubElement(parent, 'Score')
-            score.set('measureOf', measure)
-            score.set('measureLabel', 'ScaleScore')
-            score.set('value', str(scale_score))
-            score.set('standardError', str(scale_score - scale_score_range_min))
-            score = SubElement(parent, 'Score')
-            score.set('measureOf', measure)
-            score.set('measureLabel', 'PerformanceLevel')
-            score.set('value', str(perf_lvl))
-            score.set('standardError', '')
+            self._add_score(parent, measure, 'ScaleScore', scale_score, scale_score - scale_score_range_min)
+            self._add_score(parent, measure, 'PerformanceLevel', perf_lvl, '')
 
-    def add_score_info(self, parent, dimension, points):
+    def _add_residual_score(self, parent, measure, student_residual, standard_met_residual):
+        self._add_score(parent, measure, 'StudentRelativeResidualScore', student_residual, 0.0)
+        self._add_score(parent, measure, 'StandardMetRelativeResidualScore', standard_met_residual, 0.0)
+
+    def _add_score(self, parent, measure, label, value, stderr):
+        score = SubElement(parent, 'Score')
+        score.set('measureOf', measure)
+        score.set('measureLabel', label)
+        score.set('value', str(value))
+        score.set('standardError', str(stderr))
+
+    def _add_score_info(self, parent, dimension, points):
         scoreInfo = SubElement(parent, 'ScoreInfo')
         scoreInfo.set('maxScore', '0')
         scoreInfo.set('scoreDimension', dimension)
@@ -284,19 +291,19 @@ class XmlWorker(Worker):
         scoreInfo.set('scoreStatus', 'Scored')
         return scoreInfo
 
-    def map_asmt_type(self, value):
+    def _map_asmt_type(self, value):
         return 'Summative' if 'summative' in value.lower() else 'Interim'
 
-    def map_gender(self, value):
+    def _map_gender(self, value):
         if 'female' == value.lower(): return 'Female'
         if 'male' == value.lower(): return 'Male'
         if 'non_binary' == value.lower(): return 'NonBinary'
         return None
 
-    def map_yes_no(self, value):
+    def _map_yes_no(self, value):
         return 'Yes' if value else 'No'
 
-    def map_advancement(self, student):
+    def _map_advancement(self, student):
         if student.held_back: return 'HeldBack'
         if student.transfer: return 'Transfer'
         return 'Normal'

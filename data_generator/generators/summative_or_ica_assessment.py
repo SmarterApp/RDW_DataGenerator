@@ -5,6 +5,7 @@ An assessment generator for the SBAC assessment.
 
 import datetime
 import random
+from collections import Counter
 
 import data_generator.config.cfg as cfg
 import data_generator.generators.assessment as gen_asmt_generator
@@ -13,6 +14,7 @@ from data_generator.model.assessmentoutcome import AssessmentOutcome
 from data_generator.model.claim import Claim
 from data_generator.model.claimscore import ClaimScore
 from data_generator.model.student import Student
+from data_generator.model.targetscore import TargetScore
 from data_generator.util.assessment_stats import random_claim_error, claim_perf_lvl, \
     score_given_capability, perf_level_given_capability
 from data_generator.util.assessment_stats import random_claims
@@ -191,5 +193,15 @@ def generate_assessment_outcome(date_taken: datetime.date,
                                            claim_perf_lvl(claim_score, stderr, assessment.overall_cut_point_2),
                                            max(claim.score_min, claim_score - stderr),
                                            min(claim.score_max, claim_score + stderr)))
+
+    # for summative assessments, if the items have target information, generate target residuals
+    # NOTE: these are really fake values, with no real correlation to overall/item scores:
+    #   student_residual - since everything is generated uniformly, this should be really close to 0
+    #   standard_met_residual - this is based on student capability so offset uniform distribution
+    if assessment.is_summative() and assessment.item_bank and any(item.target for item in assessment.item_bank):
+        # collect the unique targets from all items
+        targets = Counter(item.target for item in assessment.item_bank if item.target)
+        offset = (student.capability[assessment.subject] - 2.0) / 2.0
+        sao.target_scores = [TargetScore(t, random.uniform(-0.1, +0.1), random.triangular(-1.0, +1.0, offset)) for t in targets.keys()]
 
     return sao

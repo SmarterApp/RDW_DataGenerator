@@ -14,7 +14,8 @@ class AssessmentOutcome:
     __slots__ = ('guid student assessment date_taken start_date status_date submit_date '
                  'rec_id school result_status '
                  'server database client_name status completeness admin_condition session '
-                 'overall_score overall_score_range_min overall_score_range_max overall_perf_lvl claim_scores '
+                 'overall_score overall_score_range_min overall_score_range_max overall_perf_lvl '
+                 'claim_scores target_scores '
                  'acc_asl_video_embed acc_print_on_demand_items_nonembed acc_noise_buffer_nonembed acc_braile_embed '
                  'acc_closed_captioning_embed acc_text_to_speech_embed acc_abacus_nonembed '
                  'acc_alternate_response_options_nonembed acc_calculator_nonembed acc_multiplication_table_nonembed '
@@ -43,7 +44,8 @@ class AssessmentOutcome:
         self.overall_score_range_min = None
         self.overall_score_range_max = None
         self.overall_perf_lvl = None
-        self.claim_scores = None      # list of ClaimScore's
+        self.claim_scores = None        # list of ClaimScore's
+        self.target_scores = None       # list of TargetScore's
         self.acc_asl_video_embed = 0
         self.acc_print_on_demand_items_nonembed = 0
         self.acc_noise_buffer_nonembed = 0
