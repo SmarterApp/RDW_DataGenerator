@@ -3,8 +3,6 @@ Model the core of an assessment outcome (an instance of a student taking an asse
 
 """
 
-import datetime
-
 import data_generator.config.cfg as cfg
 
 
@@ -16,11 +14,7 @@ class AssessmentOutcome:
     __slots__ = ('guid student assessment date_taken start_date status_date submit_date '
                  'rec_id school result_status '
                  'server database client_name status completeness admin_condition session '
-                 'overall_score overall_score_range_min overall_score_range_max overall_perf_lvl '
-                 'claim_1_score claim_1_score_range_min claim_1_score_range_max claim_1_perf_lvl '
-                 'claim_2_score claim_2_score_range_min claim_2_score_range_max claim_2_perf_lvl '
-                 'claim_3_score claim_3_score_range_min claim_3_score_range_max claim_3_perf_lvl '
-                 'claim_4_score claim_4_score_range_min claim_4_score_range_max claim_4_perf_lvl '
+                 'overall_score overall_score_range_min overall_score_range_max overall_perf_lvl claim_scores '
                  'acc_asl_video_embed acc_print_on_demand_items_nonembed acc_noise_buffer_nonembed acc_braile_embed '
                  'acc_closed_captioning_embed acc_text_to_speech_embed acc_abacus_nonembed '
                  'acc_alternate_response_options_nonembed acc_calculator_nonembed acc_multiplication_table_nonembed '
@@ -49,22 +43,7 @@ class AssessmentOutcome:
         self.overall_score_range_min = None
         self.overall_score_range_max = None
         self.overall_perf_lvl = None
-        self.claim_1_score = None
-        self.claim_1_score_range_min = None
-        self.claim_1_score_range_max = None
-        self.claim_1_perf_lvl = None
-        self.claim_2_score = None
-        self.claim_2_score_range_min = None
-        self.claim_2_score_range_max = None
-        self.claim_2_perf_lvl = None
-        self.claim_3_score = None
-        self.claim_3_score_range_min = None
-        self.claim_3_score_range_max = None
-        self.claim_3_perf_lvl = None
-        self.claim_4_score = None
-        self.claim_4_score_range_min = None
-        self.claim_4_score_range_max = None
-        self.claim_4_perf_lvl = None
+        self.claim_scores = None      # list of ClaimScore's
         self.acc_asl_video_embed = 0
         self.acc_print_on_demand_items_nonembed = 0
         self.acc_noise_buffer_nonembed = 0
@@ -97,3 +76,82 @@ class AssessmentOutcome:
                 'student': self.student,
                 'assessment': self.assessment,
                 'assessment_outcome': self}
+
+    # These properties provide backward-compatible getters to claim info which was pushed into a list of objects
+
+    @property
+    def claim_1_score(self):
+        return self._safe_claim_score(0)
+
+    @property
+    def claim_2_score(self):
+        return self._safe_claim_score(1)
+
+    @property
+    def claim_3_score(self):
+        return self._safe_claim_score(2)
+
+    @property
+    def claim_4_score(self):
+        return self._safe_claim_score(3)
+
+    @property
+    def claim_1_perf_lvl(self):
+        return self._safe_claim_perf_lvl(0)
+
+    @property
+    def claim_2_perf_lvl(self):
+        return self._safe_claim_perf_lvl(1)
+
+    @property
+    def claim_3_perf_lvl(self):
+        return self._safe_claim_perf_lvl(2)
+
+    @property
+    def claim_4_perf_lvl(self):
+        return self._safe_claim_perf_lvl(3)
+
+    @property
+    def claim_1_score_range_min(self):
+        return self._safe_claim_score_range_min(0)
+
+    @property
+    def claim_2_score_range_min(self):
+        return self._safe_claim_score_range_min(1)
+
+    @property
+    def claim_3_score_range_min(self):
+        return self._safe_claim_score_range_min(2)
+
+    @property
+    def claim_4_score_range_min(self):
+        return self._safe_claim_score_range_min(3)
+
+    @property
+    def claim_1_score_range_max(self):
+        return self._safe_claim_score_range_max(0)
+
+    @property
+    def claim_2_score_range_max(self):
+        return self._safe_claim_score_range_max(1)
+
+    @property
+    def claim_3_score_range_max(self):
+        return self._safe_claim_score_range_max(2)
+
+    @property
+    def claim_4_score_range_max(self):
+        return self._safe_claim_score_range_max(3)
+
+    def _safe_claim_score(self, i):
+            return self.claim_scores[i].score if self.claim_scores and len(self.claim_scores) > i else None
+
+    def _safe_claim_perf_lvl(self, i):
+            return self.claim_scores[i].perf_level if self.claim_scores and len(self.claim_scores) > i else None
+
+    def _safe_claim_score_range_min(self, i):
+        return self.claim_scores[i].range_min if self.claim_scores and len(self.claim_scores) > i else None
+
+    def _safe_claim_score_range_max(self, i):
+        return self.claim_scores[i].range_max if self.claim_scores and len(self.claim_scores) > i else None
+

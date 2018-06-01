@@ -78,13 +78,15 @@ ASMT_SCALE_SCORE = {
     }
 }
 
-CLAIM_DEFINITIONS = {'Math': [{'name': 'Concepts & Procedures', 'weight': .4},
-                              {'name': 'Problem Solving and Modeling & Data Analysis', 'weight': .45},
-                              {'name': 'Communicating Reasoning', 'weight': .15}],
-                     'ELA': [{'name': 'Reading', 'weight': .20},
-                             {'name': 'Writing', 'weight': .25},
-                             {'name': 'Listening', 'weight': .25},
-                             {'name': 'Research & Inquiry', 'weight': .30}]
+# Scorable claims by subject
+# (weight is used to generate claim scores from overall)
+CLAIM_DEFINITIONS = {'Math': [{'code': '1', 'name': 'Concepts & Procedures', 'weight': .4},
+                              {'code': 'SOCK_2', 'name': 'Problem Solving and Modeling & Data Analysis', 'weight': .45},
+                              {'code': '3', 'name': 'Communicating Reasoning', 'weight': .15}],
+                     'ELA': [{'code': 'SOCK_R', 'name': 'Reading', 'weight': .20},
+                             {'code': '2-W', 'name': 'Writing', 'weight': .25},
+                             {'code': 'SOCK_LS', 'name': 'Listening', 'weight': .25},
+                             {'code': '4-CR', 'name': 'Research & Inquiry', 'weight': .30}]
                      }
 
 # Legacy accommodations handling in the data generator involves randomly assigning settings to the outcomes

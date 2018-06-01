@@ -1,8 +1,7 @@
 import json
+import os
 from collections import OrderedDict
 from xml.etree.ElementTree import Element, SubElement, tostring
-
-import os
 
 from data_generator.model.assessment import Assessment
 from data_generator.model.assessmentoutcome import AssessmentOutcome
@@ -10,11 +9,6 @@ from data_generator.model.institutionhierarchy import InstitutionHierarchy
 from data_generator.outputworkers.worker import Worker
 from data_generator.util.hierarchy import write_hierarchy
 from data_generator.writers import tabulator_writer
-
-CLAIM_MEASURES = {
-    'Math': ['1', 'SOCK_2', '3', ''],
-    'ELA': ['SOCK_R', '2-W', 'SOCK_LS', '4-CR']
-}
 
 
 class XmlWorker(Worker):
@@ -197,14 +191,8 @@ class XmlWorker(Worker):
         self.add_scale_score(opportunity, 'Overall',
             outcome.overall_score, outcome.overall_score_range_min, outcome.overall_perf_lvl)
         if not asmt.is_iab():
-            self.add_scale_score(opportunity, CLAIM_MEASURES[asmt.subject][0],
-                outcome.claim_1_score, outcome.claim_1_score_range_min, outcome.claim_1_perf_lvl)
-            self.add_scale_score(opportunity, CLAIM_MEASURES[asmt.subject][1],
-                outcome.claim_2_score, outcome.claim_2_score_range_min, outcome.claim_2_perf_lvl)
-            self.add_scale_score(opportunity, CLAIM_MEASURES[asmt.subject][2],
-                outcome.claim_3_score, outcome.claim_3_score_range_min, outcome.claim_3_perf_lvl)
-            self.add_scale_score(opportunity, CLAIM_MEASURES[asmt.subject][3],
-                outcome.claim_4_score, outcome.claim_4_score_range_min, outcome.claim_4_perf_lvl)
+            for claim_score in outcome.claim_scores:
+                self.add_scale_score(opportunity, claim_score.claim.code, claim_score.score, claim_score.range_min, claim_score.perf_lvl)
 
         for item_data in outcome.item_data:
             item = SubElement(opportunity, 'Item')

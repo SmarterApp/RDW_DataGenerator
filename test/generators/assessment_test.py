@@ -49,42 +49,36 @@ def test_generate_assessment_invalid_subject():
 
 def test_generate_assessment_claims_ela():
     asmt = asmt_gen.generate_assessment('SUMMATIVE', 2015, 'ELA', 8, ID_GEN)
+    assert len(asmt.claims) == 4
     assert asmt.claim_1_name == 'Reading'
     assert asmt.claim_1_score_min == 2288
     assert asmt.claim_1_score_max == 2769
-    assert asmt.claim_1_score_weight == .2
     assert asmt.claim_2_name == 'Writing'
     assert asmt.claim_2_score_min == 2288
     assert asmt.claim_2_score_max == 2769
-    assert asmt.claim_2_score_weight == .25
     assert asmt.claim_3_name == 'Listening'
     assert asmt.claim_3_score_min == 2288
     assert asmt.claim_3_score_max == 2769
-    assert asmt.claim_3_score_weight == .25
     assert asmt.claim_4_name == 'Research & Inquiry'
     assert asmt.claim_4_score_min == 2288
     assert asmt.claim_4_score_max == 2769
-    assert asmt.claim_4_score_weight == .3
 
 
 def test_generate_assessment_claims_math():
     asmt = asmt_gen.generate_assessment('SUMMATIVE', 2015, 'Math', 8, ID_GEN)
+    assert len(asmt.claims) == 3
     assert asmt.claim_1_name == 'Concepts & Procedures'
     assert asmt.claim_1_score_min == 2265
     assert asmt.claim_1_score_max == 2802
-    assert asmt.claim_1_score_weight == .4
     assert asmt.claim_2_name == 'Problem Solving and Modeling & Data Analysis'
     assert asmt.claim_2_score_min == 2265
     assert asmt.claim_2_score_max == 2802
-    assert asmt.claim_2_score_weight == .45
     assert asmt.claim_3_name == 'Communicating Reasoning'
     assert asmt.claim_3_score_min == 2265
     assert asmt.claim_3_score_max == 2802
-    assert asmt.claim_3_score_weight == .15
     assert asmt.claim_4_name is None
     assert asmt.claim_4_score_min is None
     assert asmt.claim_4_score_max is None
-    assert asmt.claim_4_score_weight is None
 
 
 def test_generate_assessment_perf_lvl_names():

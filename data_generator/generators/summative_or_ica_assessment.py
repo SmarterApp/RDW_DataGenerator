@@ -10,6 +10,8 @@ import data_generator.config.cfg as cfg
 import data_generator.generators.assessment as gen_asmt_generator
 from data_generator.model.assessment import Assessment
 from data_generator.model.assessmentoutcome import AssessmentOutcome
+from data_generator.model.claim import Claim
+from data_generator.model.claimscore import ClaimScore
 from data_generator.model.student import Student
 from data_generator.util.assessment_stats import random_claim_error, claim_perf_lvl, \
     score_given_capability, perf_level_given_capability
@@ -116,10 +118,6 @@ def generate_assessment(type, asmt_year, subject, grade, id_gen, from_date=None,
     sa.version = cfg.ASMT_VERSION
     sa.subject = subject
     sa.bank_key = '200'
-    sa.claim_1_name = claims[0]['name']
-    sa.claim_2_name = claims[1]['name']
-    sa.claim_3_name = claims[2]['name']
-    sa.claim_4_name = claims[3]['name'] if len(claims) == 4 else None
     sa.perf_lvl_name_1 = cfg.ASMT_PERF_LEVEL_NAME_1
     sa.perf_lvl_name_2 = cfg.ASMT_PERF_LEVEL_NAME_2
     sa.perf_lvl_name_3 = cfg.ASMT_PERF_LEVEL_NAME_3
@@ -127,24 +125,13 @@ def generate_assessment(type, asmt_year, subject, grade, id_gen, from_date=None,
     sa.perf_lvl_name_5 = cfg.ASMT_PERF_LEVEL_NAME_5
     sa.overall_score_min = asmt_scale_scores[0]
     sa.overall_score_max = asmt_scale_scores[-1]
-    sa.claim_1_score_min = asmt_scale_scores[0]
-    sa.claim_1_score_max = asmt_scale_scores[-1]
-    sa.claim_1_score_weight = claims[0]['weight']
-    sa.claim_2_score_min = asmt_scale_scores[0]
-    sa.claim_2_score_max = asmt_scale_scores[-1]
-    sa.claim_2_score_weight = claims[1]['weight']
-    sa.claim_3_score_min = asmt_scale_scores[0]
-    sa.claim_3_score_max = asmt_scale_scores[-1]
-    sa.claim_3_score_weight = claims[2]['weight']
-    sa.claim_4_score_min = asmt_scale_scores[0] if len(claims) == 4 else None
-    sa.claim_4_score_max = asmt_scale_scores[-1] if len(claims) == 4 else None
-    sa.claim_4_score_weight = claims[3]['weight'] if len(claims) == 4 else None
     sa.claim_perf_lvl_name_1 = cfg.CLAIM_PERF_LEVEL_NAME_1
     sa.claim_perf_lvl_name_2 = cfg.CLAIM_PERF_LEVEL_NAME_2
     sa.claim_perf_lvl_name_3 = cfg.CLAIM_PERF_LEVEL_NAME_3
     sa.overall_cut_point_1 = asmt_scale_scores[1]
     sa.overall_cut_point_2 = asmt_scale_scores[2]
     sa.overall_cut_point_3 = asmt_scale_scores[3]
+    sa.claims = [Claim(claim['code'], claim['name'], asmt_scale_scores[0], asmt_scale_scores[-1]) for claim in claims]
     sa.effective_date = datetime.date(asmt_year - 1, 8, 15)
     sa.from_date = from_date if from_date is not None else sa.effective_date
     sa.to_date = to_date if to_date is not None else cfg.ASMT_TO_DATE
@@ -194,41 +181,15 @@ def generate_assessment_outcome(date_taken: datetime.date,
     sao.overall_score_range_min = max(assessment.overall_score_min, sao.overall_score - overall_range_min)
     sao.overall_score_range_max = min(assessment.overall_score_max, sao.overall_score + overall_range_max)
 
-    claims = cfg.CLAIM_DEFINITIONS[assessment.subject]
-    claim_weights = [claim['weight'] for claim in claims]
+    # use (arbitrary) claim weights to generate claim scores
+    claim_weights = [claim['weight'] for claim in cfg.CLAIM_DEFINITIONS[assessment.subject]]
     claim_scores = random_claims(sao.overall_score, claim_weights, assessment.overall_score_min, assessment.overall_score_max)
-
-    sao.claim_1_score = claim_scores[0]
-    stderr = random_claim_error(sao.claim_1_score, assessment.overall_score_min, assessment.overall_score_max)
-    sao.claim_1_score_range_min = max(assessment.claim_1_score_min, sao.claim_1_score - stderr)
-    sao.claim_1_score_range_max = min(assessment.claim_1_score_max, sao.claim_1_score + stderr)
-    sao.claim_1_perf_lvl = claim_perf_lvl(sao.claim_1_score, stderr, assessment.overall_cut_point_2)
-
-    sao.claim_2_score = claim_scores[1]
-    stderr = random_claim_error(sao.claim_2_score, assessment.overall_score_min, assessment.overall_score_max)
-    sao.claim_2_score_range_min = max(assessment.claim_2_score_min, sao.claim_2_score - stderr)
-    sao.claim_2_score_range_max = min(assessment.claim_2_score_max, sao.claim_2_score + stderr)
-    sao.claim_2_perf_lvl = claim_perf_lvl(sao.claim_2_score, stderr, assessment.overall_cut_point_2)
-
-    sao.claim_3_score = claim_scores[2]
-    stderr = random_claim_error(sao.claim_3_score, assessment.overall_score_min, assessment.overall_score_max)
-    sao.claim_3_score_range_min = max(assessment.claim_3_score_min, sao.claim_3_score - stderr)
-    sao.claim_3_score_range_max = min(assessment.claim_3_score_max, sao.claim_3_score + stderr)
-    sao.claim_3_perf_lvl = claim_perf_lvl(sao.claim_3_score, stderr, assessment.overall_cut_point_2)
-
-    if assessment.claim_4_name is not None:
-        if len(claim_scores) != 4:
-            raise Exception(
-                "unexpected number of claim scores: %s %s %s" % (assessment.subject, claim_scores, claim_weights))
-
-        sao.claim_4_score = claim_scores[3]
-        stderr = random_claim_error(sao.claim_4_score, assessment.overall_score_min, assessment.overall_score_max)
-        sao.claim_4_score_range_min = max(assessment.claim_4_score_min, sao.claim_4_score - stderr)
-        sao.claim_4_score_range_max = min(assessment.claim_4_score_max, sao.claim_4_score + stderr)
-        sao.claim_4_perf_lvl = claim_perf_lvl(sao.claim_4_score, stderr, assessment.overall_cut_point_2)
-
-    elif len(claim_scores) != 3:
-        raise Exception(
-            "unexpected number of claim scores: %s %s %s" % (assessment.subject, claim_scores, claim_weights))
+    sao.claim_scores = []
+    for claim, claim_score in zip(assessment.claims, claim_scores):
+        stderr = random_claim_error(claim_score, assessment.overall_score_min, assessment.overall_score_max)
+        sao.claim_scores.append(ClaimScore(claim, claim_score,
+                                           claim_perf_lvl(claim_score, stderr, assessment.overall_cut_point_2),
+                                           max(claim.score_min, claim_score - stderr),
+                                           min(claim.score_max, claim_score + stderr)))
 
     return sao

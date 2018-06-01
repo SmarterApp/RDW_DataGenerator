@@ -11,6 +11,7 @@ import glob
 
 from data_generator.config import cfg
 from data_generator.model.assessment import Assessment
+from data_generator.model.claim import Claim
 from data_generator.model.item import AssessmentItem
 from data_generator.model.segment import AssessmentSegment
 from data_generator.util.id_gen import IDGen
@@ -100,27 +101,12 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
         asmt.to_date = cfg.ASMT_TO_DATE
 
         # claims (this is just using the hard-coded values from generator code)
-        asmt.claim_1_score_min = asmt.overall_score_min
-        asmt.claim_1_score_max = asmt.overall_score_max
         asmt.claim_perf_lvl_name_1 = cfg.CLAIM_PERF_LEVEL_NAME_1
         asmt.claim_perf_lvl_name_2 = cfg.CLAIM_PERF_LEVEL_NAME_2
         asmt.claim_perf_lvl_name_3 = cfg.CLAIM_PERF_LEVEL_NAME_3
-        if asmt.type != 'IAB':
-            claims = cfg.CLAIM_DEFINITIONS[asmt.subject]
-            asmt.claim_1_name = claims[0]['name']
-            asmt.claim_1_score_weight = claims[0]['weight']
-            asmt.claim_2_name = claims[1]['name']
-            asmt.claim_2_score_min = asmt.overall_score_min
-            asmt.claim_2_score_max = asmt.overall_score_max
-            asmt.claim_2_score_weight = claims[1]['weight']
-            asmt.claim_3_name = claims[2]['name']
-            asmt.claim_3_score_min = asmt.overall_score_min
-            asmt.claim_3_score_max = asmt.overall_score_max
-            asmt.claim_3_score_weight = claims[2]['weight']
-            asmt.claim_4_name = claims[3]['name'] if len(claims) == 4 else None
-            asmt.claim_4_score_min = asmt.overall_score_min if len(claims) == 4 else None
-            asmt.claim_4_score_max = asmt.overall_score_max if len(claims) == 4 else None
-            asmt.claim_4_score_weight = claims[3]['weight'] if len(claims) == 4 else None
+        if not asmt.is_iab():
+            asmt.claims = [Claim(claim['code'], claim['name'], asmt.overall_score_min, asmt.overall_score_max)
+                           for claim in cfg.CLAIM_DEFINITIONS[asmt.subject]]
 
         # if items are being parsed, create segment and list
         if parse_item:

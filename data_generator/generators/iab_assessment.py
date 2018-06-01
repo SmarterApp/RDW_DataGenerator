@@ -7,6 +7,8 @@ import datetime
 import data_generator.config.cfg as cfg
 import data_generator.generators.assessment as gen_asmt_generator
 from data_generator.model.assessment import Assessment
+from data_generator.model.claim import Claim
+from data_generator.model.claimscore import ClaimScore
 from data_generator.model.interimassessment import InterimAssessment
 from data_generator.model.interimassessmentoutcome import InterimAssessmentOutcome
 from data_generator.model.student import Student
@@ -25,7 +27,6 @@ def create_iab_outcome_object(date_taken: datetime.date,
     :param date_taken:
     :param student:
     :param iab_asmt:
-    :param inst_hier:
     :param id_gen:
     :param iab_results:
     :param gen_item:
@@ -45,7 +46,6 @@ def generate_interim_assessment(asmt_year: int,
                                 block: str,
                                 grade: int,
                                 id_gen: IDGen,
-                                claim_definitions=cfg.CLAIM_DEFINITIONS,
                                 gen_item=True):
     """
     Generate an assessment object.
@@ -55,15 +55,9 @@ def generate_interim_assessment(asmt_year: int,
     @param block: block
     @param grade: grade
     @param id_gen: id generator
-    @param claim_definitions: Definitions for claims to generate
     @param gen_item: If should create item-level item bank
     @returns: The assessment object
     """
-    # Get the claim definitions for this subject
-    if subject not in claim_definitions:
-        raise KeyError("Subject '%s' not found in claim definitions" % subject)
-
-    claims = claim_definitions[subject]
     asmt_scale_scores = cfg.ASMT_SCALE_SCORE[subject][grade]
 
     # Run the General generator
@@ -79,10 +73,6 @@ def generate_interim_assessment(asmt_year: int,
     sa.subject = subject
     sa.grade = grade
     sa.bank_key = '200'
-    sa.claim_1_name = block
-    sa.claim_2_name = "Grade %s" % grade
-    sa.claim_3_name = None
-    sa.claim_4_name = None
     sa.perf_lvl_name_1 = cfg.CLAIM_PERF_LEVEL_NAME_1
     sa.perf_lvl_name_2 = cfg.CLAIM_PERF_LEVEL_NAME_2
     sa.perf_lvl_name_3 = cfg.CLAIM_PERF_LEVEL_NAME_3
@@ -90,24 +80,14 @@ def generate_interim_assessment(asmt_year: int,
     sa.perf_lvl_name_5 = None
     sa.overall_score_min = asmt_scale_scores[0]
     sa.overall_score_max = asmt_scale_scores[-1]
-    sa.claim_1_score_min = asmt_scale_scores[0]
-    sa.claim_1_score_max = asmt_scale_scores[-1]
-    sa.claim_1_score_weight = 1.0
-    sa.claim_2_score_min = 0
-    sa.claim_2_score_max = 0
-    sa.claim_2_score_weight = 0.0
-    sa.claim_3_score_min = 0
-    sa.claim_3_score_max = 0
-    sa.claim_3_score_weight = 0.0
-    sa.claim_4_score_min = None
-    sa.claim_4_score_max = None
-    sa.claim_4_score_weight = None
     sa.claim_perf_lvl_name_1 = cfg.CLAIM_PERF_LEVEL_NAME_1
     sa.claim_perf_lvl_name_2 = cfg.CLAIM_PERF_LEVEL_NAME_2
     sa.claim_perf_lvl_name_3 = cfg.CLAIM_PERF_LEVEL_NAME_3
     sa.overall_cut_point_1 = asmt_scale_scores[1]
     sa.overall_cut_point_2 = asmt_scale_scores[2]
     sa.overall_cut_point_3 = asmt_scale_scores[3]
+    # IABs don't really have claims (because they are like a claim) but there is code that expects claim_1 to exist
+    sa.claims = [Claim(block, block, asmt_scale_scores[0], asmt_scale_scores[-1])]
     sa.effective_date = datetime.date(asmt_year-1, 8, 15)
     sa.from_date = sa.effective_date
     sa.to_date = cfg.ASMT_TO_DATE
@@ -158,9 +138,6 @@ def generate_interim_assessment_outcome(date_taken: datetime.date,
     sao.overall_perf_lvl = claim_perf_lvl(sao.overall_score, stderr, assessment.overall_cut_point_2)
 
     # The legacy output expects there to be a claim_1_score; not really correct for IABs but for now ...
-    sao.claim_1_score = sao.overall_score
-    sao.claim_1_score_range_min = sao.overall_score_range_min
-    sao.claim_1_score_range_max = sao.overall_score_range_max
-    sao.claim_1_perf_lvl = sao.overall_perf_lvl
+    sao.claims = [ClaimScore(assessment.claims[0], sao.overall_score, sao.overall_perf_lvl, sao.overall_score_range_min, sao.overall_score_range_max)]
 
     return sao
