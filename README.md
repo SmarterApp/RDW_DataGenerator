@@ -91,7 +91,7 @@ e.g. `-v ~/in:/src/data_generator/in --pkg_source /src/data_generator/in`.
 To get at the resulting data you need to map a local folder, e.g. `-v ~/out:/src/data_generator/out`.
 Combining all these looks something like:
 
-    docker run -v ~/out:/src/data_generator/out -v ~/in:/src/data_generator/in fwsbac/rdw-datagen --state_type tiny --gen_ica --gen_iab --gen_item --xml_out --pkg_source /src/data_generator/in
+    docker run -v ~/out:/src/data_generator/out -v ~/in:/src/data_generator/in fwsbac/rdw-datagen --state_type tiny --gen_ica --gen_iab --gen_item --xml_out --pkg_source /src/data_generator/in/*.csv
 
 #### Setting up an EC2 instance with docker
 Followed the directions from: http://docs.aws.amazon.com/AmazonECS/latest/developerguide/docker-basics.html.

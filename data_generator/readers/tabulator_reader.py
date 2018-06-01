@@ -101,10 +101,13 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
         asmt.to_date = cfg.ASMT_TO_DATE
 
         # claims (this is just using the hard-coded values from generator code)
+        # IABs don't really have claims (because they are like a claim) but there is code that expects claim_1 to exist
         asmt.claim_perf_lvl_name_1 = cfg.CLAIM_PERF_LEVEL_NAME_1
         asmt.claim_perf_lvl_name_2 = cfg.CLAIM_PERF_LEVEL_NAME_2
         asmt.claim_perf_lvl_name_3 = cfg.CLAIM_PERF_LEVEL_NAME_3
-        if not asmt.is_iab():
+        if asmt.is_iab():
+            asmt.claims = [Claim(row['Claim'].strip(), row['AssessmentLabel'], asmt.overall_score_min, asmt.overall_score_max)]
+        else:
             asmt.claims = [Claim(claim['code'], claim['name'], asmt.overall_score_min, asmt.overall_score_max)
                            for claim in cfg.CLAIM_DEFINITIONS[asmt.subject]]
 
