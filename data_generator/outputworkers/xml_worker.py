@@ -187,6 +187,7 @@ class XmlWorker(Worker):
             accommodation.set('type', type)
             accommodation.set('code', code)
             accommodation.set('value', value)
+            accommodation.set('segment', '0')  # available for entire test
 
         # add scores
         self._add_scale_score(opportunity, 'Overall',
