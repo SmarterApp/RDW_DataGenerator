@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
-# This script is invoked by submit_driver.sh to process a sub-folder
+# This script is invoked to process a sub-folder of TRT files.
 # $1 - sub-folder, usually the school folder
+#
+# To process a bunch of folders use this in conjunction with find and xargs. This
+# example launches up to 8 processes to submit all the school folder contents:
+# find ./out/*/*/* -type d | xargs -I FOLDER -P 8 ./scripts/submit_helper.sh FOLDER
 
 s=$1
 
