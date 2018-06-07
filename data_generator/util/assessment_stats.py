@@ -242,7 +242,7 @@ def random_claims(score: int, claim_weights: [float], claim_min: int, claim_max:
     return tuple(claims[order.index(i)] for i in range(len(claim_weights)))
 
 
-def random_claim_error(claim_score: int, claim_min: int, claim_max: int):
+def random_stderr(claim_score: int, claim_min: int, claim_max: int):
     """Generate a std error for a claim score.
     Not sure if it is valid but this will give a larger error, the lower the score.
 
@@ -251,7 +251,7 @@ def random_claim_error(claim_score: int, claim_min: int, claim_max: int):
     :param claim_max: max possible score
     :return: std error
     """
-    return 40 + random.randint(0, round(80 * (claim_max - claim_score) / (claim_max - claim_min)))
+    return 25 + random.randint(0, 60 + round(120 * (claim_max - claim_score) / (claim_max - claim_min)))
 
 
 def claim_perf_lvl(claim_score: int, claim_error: int, perf_cut_point: int):

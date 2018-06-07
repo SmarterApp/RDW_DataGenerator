@@ -54,7 +54,7 @@ STATE_TYPES = {
          },
     'uat':
         {'district_types_and_counts': [('Small Good', 1),
-                                       ('Tiny', 9)],
+                                       ('Tiny', 3)],
          'subject_skip_percentages': {'Math': .04, 'ELA': .03},
          'demographics': 'california',
          'id': '06'

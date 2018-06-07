@@ -15,7 +15,7 @@ from data_generator.model.claim import Claim
 from data_generator.model.claimscore import ClaimScore
 from data_generator.model.student import Student
 from data_generator.model.targetscore import TargetScore
-from data_generator.util.assessment_stats import random_claim_error, claim_perf_lvl, \
+from data_generator.util.assessment_stats import random_stderr, claim_perf_lvl, \
     score_given_capability, perf_level_given_capability
 from data_generator.util.assessment_stats import random_claims
 from data_generator.util.id_gen import IDGen
@@ -178,18 +178,18 @@ def generate_assessment_outcome(date_taken: datetime.date,
         [assessment.overall_score_min, assessment.overall_cut_point_1, assessment.overall_cut_point_2, assessment.overall_cut_point_3, assessment.overall_score_max])
     sao.overall_perf_lvl = perf_level_given_capability(student.capability[assessment.subject])
 
-    overall_range_min = random.randint(50, 100)  # Total score range is between 100 and 200 points around score
-    overall_range_max = random.randint(50, 100)  # Total score range is between 100 and 200 points around score
-    sao.overall_score_range_min = max(assessment.overall_score_min, sao.overall_score - overall_range_min)
-    sao.overall_score_range_max = min(assessment.overall_score_max, sao.overall_score + overall_range_max)
+    stderr = random_stderr(sao.overall_score, assessment.overall_score_min, assessment.overall_score_max)
+    sao.overall_score_stderr = stderr
+    sao.overall_score_range_min = max(assessment.overall_score_min, sao.overall_score - stderr)
+    sao.overall_score_range_max = min(assessment.overall_score_max, sao.overall_score + stderr)
 
     # use (arbitrary) claim weights to generate claim scores
     claim_weights = [claim['weight'] for claim in cfg.CLAIM_DEFINITIONS[assessment.subject]]
     claim_scores = random_claims(sao.overall_score, claim_weights, assessment.overall_score_min, assessment.overall_score_max)
     sao.claim_scores = []
     for claim, claim_score in zip(assessment.claims, claim_scores):
-        stderr = random_claim_error(claim_score, assessment.overall_score_min, assessment.overall_score_max)
-        sao.claim_scores.append(ClaimScore(claim, claim_score,
+        stderr = random_stderr(claim_score, assessment.overall_score_min, assessment.overall_score_max)
+        sao.claim_scores.append(ClaimScore(claim, claim_score, stderr,
                                            claim_perf_lvl(claim_score, stderr, assessment.overall_cut_point_2),
                                            max(claim.score_min, claim_score - stderr),
                                            min(claim.score_max, claim_score + stderr)))

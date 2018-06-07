@@ -218,9 +218,14 @@ DEMOGRAPHICS_BY_GRADE = {
               'dmg_eth_ami': 1.0, 'dmg_eth_wht': 46.0, 'dmg_eth_pcf': 2.0},
     ),
 }
+
+# Note that the totals for each GradeLevels has been changed to be (32.0, 24.0, 24.0, 20.0). This
+# is based on observations of overall production score distributions. I'm assuming the original
+# values were based on an authoritative source with better granularity but the values just don't
+# match up with what is seen in real data.
 LEVELS_BY_GRADE_BY_SUBJ = {
     "Math": {
-        1: GradeLevels((14.0, 30.0, 49.0, 7.0),
+        1: GradeLevels((32.0, 24.0, 24.0, 20.0),  # (14.0, 30.0, 49.0, 7.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(45.0, 37.0, 17.0, 1.0),
                             False: Stats(11.30, 29.39, 51.78, 7.53)}),
@@ -247,7 +252,7 @@ LEVELS_BY_GRADE_BY_SUBJ = {
                            dmg_eth_nst=Stats(4.0, 47.0, 31.0, 18.0),
                            dmg_eth_pcf=Stats(9.0, 31.0, 47.0, 13.0),
                            dmg_eth_wht=Stats(9.0, 25.0, 57.0, 9.0), ), ),
-        2: GradeLevels((14.0, 30.0, 49.0, 7.0),
+        2: GradeLevels((32.0, 24.0, 24.0, 20.0),  # (14.0, 30.0, 49.0, 7.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(45.0, 37.0, 17.0, 1.0),
                             False: Stats(11.30, 29.39, 51.78, 7.53)}),
@@ -274,7 +279,7 @@ LEVELS_BY_GRADE_BY_SUBJ = {
                            dmg_eth_nst=Stats(4.0, 47.0, 31.0, 18.0),
                            dmg_eth_pcf=Stats(9.0, 31.0, 47.0, 13.0),
                            dmg_eth_wht=Stats(9.0, 25.0, 57.0, 9.0), ), ),
-        3: GradeLevels((14.0, 30.0, 49.0, 7.0),
+        3: GradeLevels((32.0, 24.0, 24.0, 20.0),  # (14.0, 30.0, 49.0, 7.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(45.0, 37.0, 17.0, 1.0),
                             False: Stats(11.30, 29.39, 51.78, 7.53)}),
@@ -301,7 +306,7 @@ LEVELS_BY_GRADE_BY_SUBJ = {
                            dmg_eth_nst=Stats(4.0, 47.0, 31.0, 18.0),
                            dmg_eth_pcf=Stats(9.0, 31.0, 47.0, 13.0),
                            dmg_eth_wht=Stats(9.0, 25.0, 57.0, 9.0), ), ),
-        4: GradeLevels((9.0, 32.0, 54.0, 5.0),
+        4: GradeLevels((32.0, 24.0, 24.0, 20.0),  # (9.0, 32.0, 54.0, 5.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(35.0, 45.0, 20.0, 0.0),
                             False: Stats(6.74, 30.87, 56.96, 5.43)}),
@@ -328,7 +333,7 @@ LEVELS_BY_GRADE_BY_SUBJ = {
                            dmg_eth_nst=Stats(4.0, 47.0, 31.0, 18.0),
                            dmg_eth_pcf=Stats(2.0, 15.0, 53.0, 30.0),
                            dmg_eth_wht=Stats(6.0, 24.0, 64.0, 6.0), ), ),
-        5: GradeLevels((11.0, 31.0, 53.0, 5.0),
+        5: GradeLevels((32.0, 24.0, 24.0, 20.0),  # (11.0, 31.0, 53.0, 5.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(39.0, 44.0, 17.0, 0.0),
                             False: Stats(8.57, 29.87, 56.13, 5.43)}),
@@ -355,7 +360,7 @@ LEVELS_BY_GRADE_BY_SUBJ = {
                            dmg_eth_nst=Stats(4.0, 47.0, 31.0, 18.0),
                            dmg_eth_pcf=Stats(2.0, 15.0, 53.0, 30.0),
                            dmg_eth_wht=Stats(7.0, 25.0, 62.0, 6.0), ), ),
-        6: GradeLevels((11.0, 33.0, 54.0, 2.0),
+        6: GradeLevels((32.0, 24.0, 24.0, 20.0),  # (11.0, 33.0, 54.0, 2.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(38.0, 47.0, 15.0, 0.0),
                             False: Stats(8.65, 31.78, 57.39, 2.18)}),
@@ -382,7 +387,7 @@ LEVELS_BY_GRADE_BY_SUBJ = {
                            dmg_eth_nst=Stats(4.0, 47.0, 31.0, 18.0),
                            dmg_eth_pcf=Stats(2.0, 15.0, 53.0, 30.0),
                            dmg_eth_wht=Stats(6.0, 26.0, 64.0, 4.0), ), ),
-        7: GradeLevels((8.0, 40.0, 48.0, 4.0),
+        7: GradeLevels((32.0, 24.0, 24.0, 20.0),  # (8.0, 40.0, 48.0, 4.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(33.0, 55.0, 12.0, 0.0),
                             False: Stats(5.83, 38.70, 51.13, 4.34)}),
@@ -409,7 +414,7 @@ LEVELS_BY_GRADE_BY_SUBJ = {
                            dmg_eth_nst=Stats(4.0, 47.0, 31.0, 18.0),
                            dmg_eth_pcf=Stats(2.0, 15.0, 53.0, 30.0),
                            dmg_eth_wht=Stats(5.0, 31.0, 59.0, 5.0), ), ),
-        8: GradeLevels((7.0, 43.0, 48.0, 2.0),
+        8: GradeLevels((32.0, 24.0, 24.0, 20.0),  # (7.0, 43.0, 48.0, 2.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(29.0, 60.0, 11.0, 0.0),
                             False: Stats(5.09, 41.52, 51.22, 2.17)}),
@@ -436,7 +441,7 @@ LEVELS_BY_GRADE_BY_SUBJ = {
                            dmg_eth_nst=Stats(4.0, 47.0, 31.0, 18.0),
                            dmg_eth_pcf=Stats(2.0, 15.0, 53.0, 30.0),
                            dmg_eth_wht=Stats(4.0, 33.0, 60.0, 3.0), ), ),
-        9: GradeLevels((14.0, 30.0, 49.0, 7.0),
+        9: GradeLevels((32.0, 24.0, 24.0, 20.0),  # (14.0, 30.0, 49.0, 7.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(45.0, 37.0, 17.0, 1.0),
                             False: Stats(11.30, 29.39, 51.78, 7.53)}),
@@ -463,7 +468,7 @@ LEVELS_BY_GRADE_BY_SUBJ = {
                            dmg_eth_nst=Stats(4.0, 47.0, 31.0, 18.0),
                            dmg_eth_pcf=Stats(9.0, 31.0, 47.0, 13.0),
                            dmg_eth_wht=Stats(9.0, 25.0, 57.0, 9.0), ), ),
-        10: GradeLevels((14.0, 30.0, 49.0, 7.0),
+        10: GradeLevels((32.0, 24.0, 24.0, 20.0),  # (14.0, 30.0, 49.0, 7.0),
                         dmg_prg_504=DemographicLevels(
                             {True: Stats(45.0, 37.0, 17.0, 1.0),
                              False: Stats(11.30, 29.39, 51.78, 7.53)}),
@@ -490,7 +495,7 @@ LEVELS_BY_GRADE_BY_SUBJ = {
                             dmg_eth_nst=Stats(4.0, 47.0, 31.0, 18.0),
                             dmg_eth_pcf=Stats(9.0, 31.0, 47.0, 13.0),
                             dmg_eth_wht=Stats(9.0, 25.0, 57.0, 9.0), ), ),
-        11: GradeLevels((7.0, 43.0, 48.0, 2.0),
+        11: GradeLevels((32.0, 24.0, 24.0, 20.0),  # (7.0, 43.0, 48.0, 2.0),
                         dmg_prg_504=DemographicLevels(
                             {True: Stats(29.0, 60.0, 11.0, 0.0),
                              False: Stats(5.09, 41.52, 51.22, 2.17)}),
@@ -517,7 +522,7 @@ LEVELS_BY_GRADE_BY_SUBJ = {
                             dmg_eth_nst=Stats(4.0, 47.0, 31.0, 18.0),
                             dmg_eth_pcf=Stats(2.0, 15.0, 53.0, 30.0),
                             dmg_eth_wht=Stats(4.0, 33.0, 60.0, 3.0), ), ),
-        12: GradeLevels((14.0, 30.0, 49.0, 7.0),
+        12: GradeLevels((32.0, 24.0, 24.0, 20.0),  # (14.0, 30.0, 49.0, 7.0),
                         dmg_prg_504=DemographicLevels(
                             {True: Stats(45.0, 37.0, 17.0, 1.0),
                              False: Stats(11.30, 29.39, 51.78, 7.51)}),
@@ -546,7 +551,7 @@ LEVELS_BY_GRADE_BY_SUBJ = {
                             dmg_eth_wht=Stats(9.0, 25.0, 57.0, 9.0), ), ),
     },
     "ELA": {
-        1: GradeLevels((9.0, 30.0, 48.0, 13.0),
+        1: GradeLevels((32.0, 24.0, 24.0, 20.0),  # (9.0, 30.0, 48.0, 13.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(29.0, 42.0, 26.0, 3.0),
                             False: Stats(7.49, 29.10, 49.66, 13.75)}),
@@ -573,7 +578,7 @@ LEVELS_BY_GRADE_BY_SUBJ = {
                            dmg_eth_nst=Stats(4.0, 47.0, 31.0, 18.0),
                            dmg_eth_pcf=Stats(2.0, 15.0, 53.0, 30.0),
                            dmg_eth_wht=Stats(5.3, 24.7, 54.6, 15.4), ), ),
-        2: GradeLevels((9.0, 30.0, 48.0, 13.0),
+        2: GradeLevels((32.0, 24.0, 24.0, 20.0),  # (9.0, 30.0, 48.0, 13.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(29.0, 42.0, 26.0, 3.0),
                             False: Stats(7.49, 29.10, 49.66, 13.75)}),
@@ -600,7 +605,7 @@ LEVELS_BY_GRADE_BY_SUBJ = {
                            dmg_eth_nst=Stats(4.0, 47.0, 31.0, 18.0),
                            dmg_eth_pcf=Stats(2.0, 15.0, 53.0, 30.0),
                            dmg_eth_wht=Stats(5.3, 24.7, 54.6, 15.4), ), ),
-        3: GradeLevels((9.0, 30.0, 48.0, 13.0),
+        3: GradeLevels((32.0, 24.0, 24.0, 20.0),  # (9.0, 30.0, 48.0, 13.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(29.0, 42.0, 26.0, 3.0),
                             False: Stats(7.49, 29.10, 49.66, 13.75)}),
@@ -627,7 +632,7 @@ LEVELS_BY_GRADE_BY_SUBJ = {
                            dmg_eth_nst=Stats(4.0, 47.0, 31.0, 18.0),
                            dmg_eth_pcf=Stats(2.0, 15.0, 53.0, 30.0),
                            dmg_eth_wht=Stats(5.3, 24.7, 54.6, 15.4), ), ),
-        4: GradeLevels((5.0, 26.0, 39.0, 30.0),
+        4: GradeLevels((32.0, 24.0, 24.0, 20.0),  # (5.0, 26.0, 39.0, 30.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(21.0, 44.0, 26.0, 9.0),
                             False: Stats(3.61, 24.43, 40.13, 31.83)}),
@@ -654,7 +659,7 @@ LEVELS_BY_GRADE_BY_SUBJ = {
                            dmg_eth_nst=Stats(4.0, 47.0, 31.0, 18.0),
                            dmg_eth_pcf=Stats(2.0, 15.0, 53.0, 30.0),
                            dmg_eth_wht=Stats(3.0, 19.0, 40.4468, 37.5532), ), ),
-        5: GradeLevels((7.0, 26.0, 39.0, 28.0),
+        5: GradeLevels((32.0, 24.0, 24.0, 20.0),  # (7.0, 26.0, 39.0, 28.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(27.0, 42.0, 25.0, 6.0),
                             False: Stats(5.26, 24.61, 40.22, 29.91)}),
@@ -681,7 +686,7 @@ LEVELS_BY_GRADE_BY_SUBJ = {
                            dmg_eth_nst=Stats(4.0, 47.0, 31.0, 18.0),
                            dmg_eth_pcf=Stats(2.0, 15.0, 53.0, 30.0),
                            dmg_eth_wht=Stats(4.85, 21.15, 41.42, 32.58), ), ),
-        6: GradeLevels((8.0, 27.0, 34.0, 31.0),
+        6: GradeLevels((32.0, 24.0, 24.0, 20.0),  # (8.0, 27.0, 34.0, 31.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(29.0, 44.0, 21.0, 6.0),
                             False: Stats(6.17, 25.53, 35.13, 33.17)}),
@@ -708,7 +713,7 @@ LEVELS_BY_GRADE_BY_SUBJ = {
                            dmg_eth_nst=Stats(4.0, 47.0, 31.0, 18.0),
                            dmg_eth_pcf=Stats(2.0, 15.0, 53.0, 30.0),
                            dmg_eth_wht=Stats(5.0, 21.26, 35.70, 38.04), ), ),
-        7: GradeLevels((9.0, 26.0, 34.0, 31.0),
+        7: GradeLevels((32.0, 24.0, 24.0, 20.0),  # (9.0, 26.0, 34.0, 31.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(31.0, 43.0, 21.0, 5.0),
                             False: Stats(7.09, 24.52, 35.13, 33.26)}),
@@ -735,7 +740,7 @@ LEVELS_BY_GRADE_BY_SUBJ = {
                            dmg_eth_nst=Stats(4.0, 47.0, 31.0, 18.0),
                            dmg_eth_pcf=Stats(2.0, 15.0, 53.0, 30.0),
                            dmg_eth_wht=Stats(5.0, 19.0, 36.4167, 39.5833), ), ),
-        8: GradeLevels((7.0, 32.0, 41.0, 20.0),
+        8: GradeLevels((32.0, 24.0, 24.0, 20.0),  # (7.0, 32.0, 41.0, 20.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(27.0, 50.0, 21.0, 2.0),
                             False: Stats(5.26, 30.43, 42.74, 21.57)}),
@@ -762,7 +767,7 @@ LEVELS_BY_GRADE_BY_SUBJ = {
                            dmg_eth_nst=Stats(4.0, 47.0, 31.0, 18.0),
                            dmg_eth_pcf=Stats(2.0, 15.0, 53.0, 30.0),
                            dmg_eth_wht=Stats(4.0, 26.56, 45.06, 24.38), ), ),
-        9: GradeLevels((9.0, 30.0, 48.0, 13.0),
+        9: GradeLevels((32.0, 24.0, 24.0, 20.0),  # (9.0, 30.0, 48.0, 13.0),
                        dmg_prg_504=DemographicLevels(
                            {True: Stats(29.0, 42.0, 26.0, 3.0),
                             False: Stats(7.49, 29.10, 49.66, 13.75)}),
@@ -789,7 +794,7 @@ LEVELS_BY_GRADE_BY_SUBJ = {
                            dmg_eth_nst=Stats(4.0, 47.0, 31.0, 18.0),
                            dmg_eth_pcf=Stats(2.0, 15.0, 53.0, 30.0),
                            dmg_eth_wht=Stats(5.3, 24.7, 54.6, 15.4), ), ),
-        10: GradeLevels((9.0, 30.0, 48.0, 13.0),
+        10: GradeLevels((32.0, 24.0, 24.0, 20.0),  # (9.0, 30.0, 48.0, 13.0),
                         dmg_prg_504=DemographicLevels(
                             {True: Stats(29.0, 42.0, 26.0, 3.0),
                              False: Stats(7.49, 29.10, 49.66, 13.75)}),
@@ -816,7 +821,7 @@ LEVELS_BY_GRADE_BY_SUBJ = {
                             dmg_eth_nst=Stats(4.0, 47.0, 31.0, 18.0),
                             dmg_eth_pcf=Stats(2.0, 15.0, 53.0, 30.0),
                             dmg_eth_wht=Stats(5.3, 24.7, 54.6, 15.4), ), ),
-        11: GradeLevels((7.0, 32.0, 41.0, 20.0),
+        11: GradeLevels((32.0, 24.0, 24.0, 20.0),  # (7.0, 32.0, 41.0, 20.0),
                         dmg_prg_504=DemographicLevels(
                             {True: Stats(27.0, 50.0, 21.0, 2.0),
                              False: Stats(5.26, 30.43, 42.74, 21.57)}),
@@ -843,7 +848,7 @@ LEVELS_BY_GRADE_BY_SUBJ = {
                             dmg_eth_nst=Stats(4.0, 47.0, 31.0, 18.0),
                             dmg_eth_pcf=Stats(2.0, 15.0, 53.0, 30.0),
                             dmg_eth_wht=Stats(4.0, 25.92, 45.19, 24.89), ), ),
-        12: GradeLevels((9.0, 30.0, 48.0, 13.0),
+        12: GradeLevels((32.0, 24.0, 24.0, 20.0),  # (9.0, 30.0, 48.0, 13.0),
                         dmg_prg_504=DemographicLevels(
                             {True: Stats(29.0, 42.0, 26.0, 3.0),
                              False: Stats(7.49, 29.10, 49.66, 13.75)}),

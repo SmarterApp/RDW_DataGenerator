@@ -99,9 +99,6 @@ number of things that may need cleaning up. And there are some enhancements/impr
  - [x] IDGen: clean up.
  - [ ] Stage work to avoid memory utilization problems for large generations.
  - [x] Add ability to save and load the hierarchy. Have to refactor some bits in worker_manager.
- - [ ] Make item.max_score more complex than 1; configure some to be unscored (-1). Then percolate to item outcomes,
-making score more complex than 0/1.
- - [ ] Make some items field tests (i.e. item.operational='0')
  - [x] Improve fake answers for items; based on item type of course.
  - [x] Make item score distribution correspond to item difficulty.
  - [x] Reuse IAB packages. Currently the system generates multiple ICA packages for a single year, each with a
@@ -118,6 +115,7 @@ making score more complex than 0/1.
  - [x] Add filipino as an ethnicity for California demographics.
  - [ ] Change student attributes when they advance. For example LEP/ELAS, IEP.
  - [ ] Address date-taken requests (see \* below)
+ - [x] Store (and emit) std-err instead of (or beside) that min/max cruft.
 
 \* Currently there is a single date-taken per assessment per school/grade. This isn't particularly realistic but does
 force all students in a group to have the same date-taken so they have the same session (session name is based on
