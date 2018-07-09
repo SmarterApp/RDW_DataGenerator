@@ -1,0 +1,10 @@
+state_id,state_code,state_name,state_type,district_id,district_name,district_type,school_id,school_name,school_type,school_interims
+06,CA,California,tiny,88800120000000,Igen District,Tiny,88800120012001,Big Bay,Tiny Middle School,1
+06,CA,California,tiny,88800120000000,Igen District,Tiny,88800120012002,Igen Hold,Tiny High School,1
+06,CA,California,tiny,88800120000000,Igen District,Tiny,88800120012003,Katz Field,Tiny Elementary School,1
+06,CA,California,tiny,88800120000000,Igen District,Tiny,88800120012004,Tannercraft Hall,Tiny Elementary School,1
+06,CA,California,tiny,88800130000000,Crom District,Tiny,88800130013001,Camp Natalon,Tiny Middle School,True
+06,CA,California,tiny,88800130000000,Crom District,Tiny,88800130013002,Crom Hold,Tiny High School,True
+06,CA,California,tiny,88800130000000,Crom District,Tiny,88800130013003,Greenfields,Tiny Middle School,True
+06,CA,California,tiny,88800130000000,Crom District,Tiny,88800130013004,Keogh,Tiny Elementary School,True
+06,CA,California,tiny,88800130000000,Crom District,Tiny,88800130013005,Three Rivers,Tiny Elementary School,False

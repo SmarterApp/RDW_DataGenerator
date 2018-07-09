@@ -1,0 +1,27 @@
+# OS generated files #
+######################
+*.egg-info
+*.egg
+
+# IDE generated files #
+#######################
+__pycache__
+.coverage
+*/build/
+*/docs/_build
+.idea/
+*.iml
+.settings/
+.idea
+
+#########################
+# csv's will be ignored #
+# added gitignore file  # 
+# to the csv directory  #
+#########################
+cover
+coverage.xml
+nosetests.xml
+
+out/
+out.*/

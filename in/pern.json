@@ -1,0 +1,99 @@
+{
+  "groupofdistricts": [
+    {
+      "entityId": "8880001",
+      "entityType": "GROUPOFDISTRICTS",
+      "parentEntityType": "STATE",
+      "entityName": "Pern North",
+      "parentEntityId": "CA"
+    }
+  ],
+  "districts": [
+    {
+      "entityId": "88800120000000",
+      "entityType": "DISTRICT",
+      "parentEntityType": "GROUPOFDISTRICTS",
+      "entityName": "Igen District",
+      "parentEntityId": "8880001"
+    },
+    {
+      "entityId": "88800130000000",
+      "entityType": "DISTRICT",
+      "parentEntityType": "STATE",
+      "entityName": "Crom District",
+      "parentEntityId": "CA"
+    },
+    {
+      "entityId": "88800140000000",
+      "entityType": "DISTRICT",
+      "parentEntityType": "GROUPOFDISTRICTS",
+      "entityName": "Bitra District",
+      "parentEntityId": "8880001"
+    }
+  ], 
+  "institutions": [
+    {
+      "entityId": "88800120012001",
+      "entityType": "INSTITUTION", 
+      "parentEntityType": "DISTRICT", 
+      "entityName": "Big Bay",
+      "parentEntityId": "88800120000000"
+    }, 
+    {
+      "entityId": "88800130013001",
+      "entityType": "INSTITUTION", 
+      "parentEntityType": "DISTRICT", 
+      "entityName": "Camp Natalon",
+      "parentEntityId": "88800130000000"
+    }, 
+    {
+      "entityId": "88800120012002",
+      "entityType": "INSTITUTION", 
+      "parentEntityType": "DISTRICT", 
+      "entityName": "Igen Hold",
+      "parentEntityId": "88800120000000"
+    }, 
+    {
+      "entityId": "88800130013002",
+      "entityType": "INSTITUTION", 
+      "parentEntityType": "DISTRICT", 
+      "entityName": "Crom Hold",
+      "parentEntityId": "88800130000000"
+    }, 
+    {
+      "entityId": "88800120012003",
+      "entityType": "INSTITUTION", 
+      "parentEntityType": "DISTRICT", 
+      "entityName": "Katz Field",
+      "parentEntityId": "88800120000000"
+    }, 
+    {
+      "entityId": "88800130013003",
+      "entityType": "INSTITUTION", 
+      "parentEntityType": "DISTRICT", 
+      "entityName": "Greenfields",
+      "parentEntityId": "88800130000000"
+    }, 
+    {
+      "entityId": "88800130013004",
+      "entityType": "INSTITUTION", 
+      "parentEntityType": "DISTRICT", 
+      "entityName": "Keogh",
+      "parentEntityId": "88800130000000"
+    }, 
+    {
+      "entityId": "88800120012004",
+      "entityType": "INSTITUTION", 
+      "parentEntityType": "DISTRICT", 
+      "entityName": "Tannercraft Hall",
+      "parentEntityId": "88800120000000"
+    }, 
+    {
+      "entityId": "88800130013005",
+      "entityType": "INSTITUTION", 
+      "parentEntityType": "DISTRICT", 
+      "entityName": "Three Rivers",
+      "parentEntityId": "88800130000000"
+    }
+  ]
+}

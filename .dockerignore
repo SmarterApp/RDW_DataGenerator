@@ -1,0 +1,6 @@
+.coverage
+.git
+.idea
+cover
+out
+out.*
