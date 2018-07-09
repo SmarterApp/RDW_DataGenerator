@@ -127,9 +127,8 @@ def generate_interim_assessment_outcome(date_taken: datetime.date,
     # set timestamps for the opportunity
     gen_asmt_generator.set_opportunity_dates(sao)
 
-    # use the student capability to generate an overall score
-    sao.overall_score = score_given_capability(student.capability[assessment.subject],
-        [assessment.overall_score_min, assessment.overall_cut_point_1, assessment.overall_cut_point_2, assessment.overall_cut_point_3, assessment.overall_score_max])
+    # use the student capability to generate an overall score (level for IABs is calculated differently, see below)
+    sao.overall_score, level = score_given_capability(student.capability[assessment.subject], assessment.get_cuts())
 
     # now that we have a score, generate a random SE and figure out IAB perf level (1-3) using SB formulae
     stderr = random_stderr(sao.overall_score, assessment.overall_score_min, assessment.overall_score_max)

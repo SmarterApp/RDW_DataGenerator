@@ -60,11 +60,7 @@ def load_assessments_file(file, load_sum, load_ica, load_iab, load_items):
         for row in reader:
             parse_asmt = False
             id = row['AssessmentId']
-            if asmt and asmt.id == id:
-                if not load_items:
-                    continue
-                # else fall thru and load row's item into current assessment
-            else:
+            if not asmt or asmt.id != id:
                 if not should_process(row['AssessmentSubtype']):
                     continue
                 asmt = Assessment()
@@ -86,15 +82,13 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
         asmt.year = int(row['AcademicYear'])
         asmt.bank_key = row['BankKey']
 
-        asmt_scale_scores = cfg.ASMT_SCALE_SCORE[asmt.subject][asmt.grade]
-        asmt.overall_score_min = __getScore(row['ScaledLow1'], asmt_scale_scores[0])
-        asmt.overall_cut_point_1 = __getScore(row['ScaledHigh1'], asmt_scale_scores[1])
-        asmt.overall_cut_point_2 = __getScore(row['ScaledHigh2'], asmt_scale_scores[2])
-        asmt.overall_cut_point_3 = __getScore(row['ScaledHigh3'], asmt_scale_scores[3])
-        asmt.overall_score_max = __getScore(row['ScaledHigh4'], asmt_scale_scores[-1])
-
-        # TODO - standard? what's in there?
-        # TODO - claim/target? they'll need to be trimmed (trailing tab)
+        asmt.overall_score_min = __getScore(row['ScaledLow1'])
+        asmt.overall_cut_point_1 = __getRowScore(row, 'ScaledHigh1')
+        asmt.overall_cut_point_2 = __getRowScore(row, 'ScaledHigh2')
+        asmt.overall_cut_point_3 = __getRowScore(row, 'ScaledHigh3')
+        asmt.overall_cut_point_4 = __getRowScore(row, 'ScaledHigh4')
+        asmt.overall_cut_point_5 = __getRowScore(row, 'ScaledHigh5')
+        asmt.overall_score_max = max([s for s in [asmt.overall_cut_point_1, asmt.overall_cut_point_2, asmt.overall_cut_point_3, asmt.overall_cut_point_4, asmt.overall_cut_point_5] if s is not None])
 
         asmt.effective_date = datetime.date(asmt.year - 1, 8, 15)
         asmt.from_date = asmt.effective_date
@@ -107,9 +101,11 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
         asmt.claim_perf_lvl_name_3 = cfg.CLAIM_PERF_LEVEL_NAME_3
         if asmt.is_iab():
             asmt.claims = [Claim(row['Claim'].strip(), row['AssessmentLabel'], asmt.overall_score_min, asmt.overall_score_max)]
-        else:
+        elif asmt.subject in cfg.CLAIM_DEFINITIONS:
             asmt.claims = [Claim(claim['code'], claim['name'], asmt.overall_score_min, asmt.overall_score_max)
                            for claim in cfg.CLAIM_DEFINITIONS[asmt.subject]]
+        else:
+            asmt.claims = []
 
         # if items are being parsed, create segment and list
         if parse_item:
@@ -117,6 +113,12 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
             asmt.segment.id = IDGen.get_uuid()
             asmt.item_bank = []
             asmt.item_total_score = 0
+
+    # infer claims for custom subjects even if not parsing items
+    if not asmt.is_iab() and asmt.subject not in cfg.CLAIM_DEFINITIONS:
+        claim_code = row['Claim'].strip()
+        if claim_code not in [claim.code for claim in asmt.claims]:
+            asmt.claims.append(Claim(claim_code, claim_code, asmt.overall_score_min, asmt.overall_score_max))
 
     # infer allowed accommodations even if not parsing items
     if len(row['ASL']) > 0:
@@ -156,14 +158,19 @@ def __mapAssessmentType(type, subtype):
 def __mapSubject(subject):
     if subject.lower() == 'math': return 'Math'
     if subject.lower() == 'ela': return 'ELA'
-    raise Exception('Unexpected assessment subject {}'.format(subject))
+    print('Custom subject found, '+ subject)
+    return subject
 
 
-def __getScore(value, default_value):
+def __getScore(value, default_value=None):
     try:
         return int(float(value))
     except ValueError:
         return default_value
+
+
+def __getRowScore(row, label):
+    return __getScore(row[label]) if label in row else None
 
 
 def __getInt(value, default_value):

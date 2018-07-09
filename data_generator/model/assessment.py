@@ -12,8 +12,9 @@ class Assessment:
 
     # using slots here only to avoid bugs due to typos etc.
     __slots__ = ('guid', 'id', 'name', 'subject', 'grade', 'contract', 'mode', 'rec_id', 'type', 'year', 'version', 'bank_key',
-                 'perf_lvl_name_1', 'perf_lvl_name_2', 'perf_lvl_name_3', 'perf_lvl_name_4', 'perf_lvl_name_5',
-                 'overall_score_min', 'overall_score_max', 'overall_cut_point_1', 'overall_cut_point_2', 'overall_cut_point_3',
+                 'perf_lvl_name_1', 'perf_lvl_name_2', 'perf_lvl_name_3', 'perf_lvl_name_4', 'perf_lvl_name_5', 'perf_lvl_name_6',
+                 'overall_score_min', 'overall_score_max',
+                 'overall_cut_point_1', 'overall_cut_point_2', 'overall_cut_point_3', 'overall_cut_point_4', 'overall_cut_point_5',
                  'claim_perf_lvl_name_1', 'claim_perf_lvl_name_2', 'claim_perf_lvl_name_3',
                  'claims', 'from_date', 'to_date', 'effective_date', 'segment', 'accommodations',
                  'item_bank', 'item_total_score')
@@ -36,14 +37,17 @@ class Assessment:
         self.perf_lvl_name_3 = None
         self.perf_lvl_name_4 = None
         self.perf_lvl_name_5 = None
+        self.perf_lvl_name_6 = None
         self.overall_score_min = None
         self.overall_score_max = None
-        self.claim_perf_lvl_name_1 = None
-        self.claim_perf_lvl_name_2 = None
-        self.claim_perf_lvl_name_3 = None
         self.overall_cut_point_1 = None
         self.overall_cut_point_2 = None
         self.overall_cut_point_3 = None
+        self.overall_cut_point_4 = None
+        self.overall_cut_point_5 = None
+        self.claim_perf_lvl_name_1 = None
+        self.claim_perf_lvl_name_2 = None
+        self.claim_perf_lvl_name_3 = None
         self.claims = None      # list of Claim's
         self.from_date = cfg.HIERARCHY_FROM_DATE
         self.to_date = None
@@ -61,6 +65,21 @@ class Assessment:
 
     def is_iab(self):
         return 'BLOCK' in self.type
+
+    def get_cuts(self):
+        cuts = [self.overall_score_min]
+        if self.overall_cut_point_1 is not None:
+            cuts.append(self.overall_cut_point_1)
+            if self.overall_cut_point_2 is not None:
+                cuts.append(self.overall_cut_point_2)
+                if self.overall_cut_point_3 is not None:
+                    cuts.append(self.overall_cut_point_3)
+                    if self.overall_cut_point_4 is not None:
+                        cuts.append(self.overall_cut_point_4)
+                        if self.overall_cut_point_5 is not None:
+                            cuts.append(self.overall_cut_point_5)
+        cuts.append(self.overall_score_max)
+        return cuts
 
     def get_object_set(self):
         """Get the set of objects that this exposes to a CSV or JSON writer.

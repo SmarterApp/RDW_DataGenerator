@@ -51,21 +51,23 @@ def generate_assessment_outcome(student: Student, assessment: Assessment, id_gen
     ao.rec_id = id_gen.get_rec_id('assessment_outcome')
 
     # Create legacy accommodations details
-    ao.acc_asl_video_embed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_asl_video_embed'][assessment.subject])
-    ao.acc_print_on_demand_items_nonembed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_print_on_demand_items_nonembed'][assessment.subject])
-    ao.acc_noise_buffer_nonembed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_noise_buffer_nonembed'][assessment.subject])
-    ao.acc_braile_embed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_braile_embed'][assessment.subject])
-    ao.acc_closed_captioning_embed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_closed_captioning_embed'][assessment.subject])
-    ao.acc_text_to_speech_embed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_text_to_speech_embed'][assessment.subject])
-    ao.acc_abacus_nonembed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_abacus_nonembed'][assessment.subject])
-    ao.acc_alternate_response_options_nonembed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_alternate_response_options_nonembed'][assessment.subject])
-    ao.acc_calculator_nonembed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_calculator_nonembed'][assessment.subject])
-    ao.acc_multiplication_table_nonembed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_multiplication_table_nonembed'][assessment.subject])
-    ao.acc_print_on_demand_nonembed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_asl_video_embed'][assessment.subject])
-    ao.acc_read_aloud_nonembed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_read_aloud_nonembed'][assessment.subject])
-    ao.acc_scribe_nonembed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_scribe_nonembed'][assessment.subject])
-    ao.acc_speech_to_text_nonembed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_speech_to_text_nonembed'][assessment.subject])
-    ao.acc_streamline_mode = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_streamline_mode'][assessment.subject])
+    # hack for custom subjects
+    accommodation_subject = assessment.subject if assessment.subject in cfg.SUBJECTS else 'ELA'
+    ao.acc_asl_video_embed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_asl_video_embed'][accommodation_subject])
+    ao.acc_print_on_demand_items_nonembed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_print_on_demand_items_nonembed'][accommodation_subject])
+    ao.acc_noise_buffer_nonembed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_noise_buffer_nonembed'][accommodation_subject])
+    ao.acc_braile_embed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_braile_embed'][accommodation_subject])
+    ao.acc_closed_captioning_embed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_closed_captioning_embed'][accommodation_subject])
+    ao.acc_text_to_speech_embed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_text_to_speech_embed'][accommodation_subject])
+    ao.acc_abacus_nonembed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_abacus_nonembed'][accommodation_subject])
+    ao.acc_alternate_response_options_nonembed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_alternate_response_options_nonembed'][accommodation_subject])
+    ao.acc_calculator_nonembed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_calculator_nonembed'][accommodation_subject])
+    ao.acc_multiplication_table_nonembed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_multiplication_table_nonembed'][accommodation_subject])
+    ao.acc_print_on_demand_nonembed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_asl_video_embed'][accommodation_subject])
+    ao.acc_read_aloud_nonembed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_read_aloud_nonembed'][accommodation_subject])
+    ao.acc_scribe_nonembed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_scribe_nonembed'][accommodation_subject])
+    ao.acc_speech_to_text_nonembed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_speech_to_text_nonembed'][accommodation_subject])
+    ao.acc_streamline_mode = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_streamline_mode'][accommodation_subject])
 
     # Create real accommodations based on assessment and other data.
     # Yeah, this should be driven by configuration at some point but for now, let's get a couple emitted ...
@@ -174,12 +176,13 @@ def generate_item_data(outcome: AssessmentOutcome):
 def generate_session(outcome: [AssessmentOutcome]):
     """ generate and set session based on date, student group for this subject
     """
-    group = getattr(outcome.student, "group_%i_text" % (1 + cfg.SUBJECTS.index(outcome.assessment.subject),))
-    if not outcome.date_taken and not group: return
+    group = outcome.student.get_group(outcome.assessment.subject)
+    if not outcome.date_taken and not group:
+        return
 
     hasher = hashlib.sha1()
     if outcome.date_taken: hasher.update(str(outcome.date_taken).encode())
-    if group: hasher.update(group.encode())
+    if group: hasher.update(group.name.encode())
     hexdigest = hasher.hexdigest()
     # pick last name based on last 4 digits of digest and combine with first 4 digits
     outcome.session = names.PEOPLE_NAMES.last_names[int(hexdigest[-4:], 16)][:3].upper() + '-' + hexdigest[:4]

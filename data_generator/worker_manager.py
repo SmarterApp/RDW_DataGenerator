@@ -130,6 +130,14 @@ class WorkerManager(Worker):
         """
         return sorted(set(map(lambda asmt: asmt.year, assessments)))
 
+    def __subjects(self, assessments: [Assessment]):
+        """
+        Return the sorted list of subjects represented by assessment packages.
+        :param assessments: assessments
+        :return: sorted list of subjects, e.g. ['ELA', 'Math']
+        """
+        return sorted(set(map(lambda asmt: asmt.subject, assessments)))
+
     def __generate_state_data(self, state: State, districts: [District], schools: [School], assessments: [Assessment]):
         """
         Generate an entire data set for a single state.
@@ -289,8 +297,15 @@ class WorkerManager(Worker):
         district = school.district
         state = district.state
 
+        # get all subjects represented by assessment packages
+        subjects = self.__subjects(assessments)
+
         # Grab the assessment rates by subjects
         asmt_skip_rates_by_subject = state.config['subject_skip_percentages']
+        # hack for custom subjects
+        for subject in subjects:
+            if subject not in asmt_skip_rates_by_subject:
+                asmt_skip_rates_by_subject[subject] = asmt_skip_rates_by_subject['Math']
 
         # Process the whole school
         assessment_results = {}
@@ -301,10 +316,10 @@ class WorkerManager(Worker):
 
         for grade, grade_students in grades.items():
             # Potentially re-populate the student population
-            pop_gen.repopulate_school_grade(school, grade, grade_students, self.id_gen, reg_system, year)
+            pop_gen.repopulate_school_grade(school, grade, grade_students, self.id_gen, reg_system, year, subjects)
             student_count += len(grade_students)
 
-            pop_gen.assign_student_groups(school, grade, grade_students, self.id_gen)
+            pop_gen.assign_student_groups(school, grade, grade_students, self.id_gen, subjects)
 
             # collect any assessments for this year and grade
             asmts = list(filter(lambda asmt: asmt.year == year and asmt.grade == grade, assessments))

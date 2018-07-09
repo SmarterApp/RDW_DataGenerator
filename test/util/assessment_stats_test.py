@@ -1,7 +1,7 @@
 """
 
 """
-from data_generator.util.assessment_stats import DemographicLevels, Stats
+from data_generator.util.assessment_stats import DemographicLevels, Stats, score_given_capability
 from data_generator.util.assessment_stats import RandomLevelByDemographics, Properties, GradeLevels
 from data_generator.util.assessment_stats import random_capability
 from data_generator.util.weighted_choice import weighted_choice
@@ -87,3 +87,48 @@ def test_random_capability_with_positive_adj():
         avg += value
     avg /= 100.0
     assert 2.0 < avg < 3.5  # should be 2.9
+
+
+def test_score_given_capability_with_two_levels():
+    score, level = score_given_capability(0, [2300, 2500, 2700])
+    assert score == 2300
+    assert level == 1
+
+    score, level = score_given_capability(1.0, [2300, 2500, 2700])
+    assert score == 2400
+    assert level == 1
+
+    score, level = score_given_capability(2.0, [2300, 2500, 2700])
+    assert score == 2500
+    assert level == 2
+
+    score, level = score_given_capability(3.0, [2300, 2500, 2700])
+    assert score == 2600
+    assert level == 2
+
+    score, level = score_given_capability(3.999, [2300, 2500, 2700])
+    assert score == 2699
+    assert level == 2
+
+
+def test_score_given_capability_with_six_levels():
+    score, level = score_given_capability(0, [2300, 2400, 2500, 2600, 2700, 2800, 2900])
+    assert score == 2300
+    assert level == 1
+
+    score, level = score_given_capability(1.0, [2300, 2400, 2500, 2600, 2700, 2800, 2900])
+    assert score == 2450
+    assert level == 2
+
+    score, level = score_given_capability(2.0, [2300, 2400, 2500, 2600, 2700, 2800, 2900])
+    assert score == 2600
+    assert level == 4
+
+    score, level = score_given_capability(3.0, [2300, 2400, 2500, 2600, 2700, 2800, 2900])
+    assert score == 2750
+    assert level == 5
+
+    score, level = score_given_capability(3.999, [2300, 2400, 2500, 2600, 2700, 2800, 2900])
+    assert score == 2899
+    assert level == 6
+

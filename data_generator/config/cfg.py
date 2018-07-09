@@ -50,7 +50,6 @@ ASMT_PERF_LEVEL_NAME_1 = 'Minimal Understanding'
 ASMT_PERF_LEVEL_NAME_2 = 'Partial Understanding'
 ASMT_PERF_LEVEL_NAME_3 = 'Adequate Understanding'
 ASMT_PERF_LEVEL_NAME_4 = 'Thorough Understanding'
-ASMT_PERF_LEVEL_NAME_5 = None
 
 CLAIM_PERF_LEVEL_NAME_1 = 'Below Standard'
 CLAIM_PERF_LEVEL_NAME_2 = 'At/Near Standard'

@@ -8,6 +8,7 @@ import data_generator.generators.hierarchy as hier_gen
 import data_generator.generators.population as pop_gen
 import data_generator.generators.summative_or_ica_assessment as asmt_gen
 import data_generator.model.itemdata as item_lvl_data
+from data_generator.model.studentgroup import StudentGroup
 from data_generator.util.id_gen import IDGen
 
 ID_GEN = IDGen()
@@ -123,3 +124,27 @@ def test_student_get_object_set():
     assert objs['registration_system'].guid == reg_sys.guid
     assert 'student' in objs
     assert objs['student'].guid == student.guid
+
+
+def test_student_set_get_groups():
+    state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
+    district = hier_gen.generate_district('Small Average', state, ID_GEN)
+    school = hier_gen.generate_school('Elementary School', district, ID_GEN)
+    student = pop_gen.generate_student(school, 3, ID_GEN)
+
+    student.set_group(StudentGroup('ELA', '100', 'G3-100'))
+    assert student.get_group('ELA').name == 'G3-100';
+    assert student.group_1_text == 'G3-100';
+    assert student.group_2_text is None;
+
+    student.set_group(StudentGroup('ELA', '200', 'G3-200'))
+    student.set_group(StudentGroup('Math', '300', 'G3-300'))
+    student.set_group(StudentGroup('ELPAC', '400', 'G3-400'))
+
+    assert student.get_group('ELA').name == 'G3-200';
+    assert student.get_group('Math').name == 'G3-300';
+    assert student.get_group('ELPAC').name == 'G3-400';
+
+    assert student.group_1_text == 'G3-200';
+    assert student.group_2_text == 'G3-300';
+    assert student.group_3_text == 'G3-400';

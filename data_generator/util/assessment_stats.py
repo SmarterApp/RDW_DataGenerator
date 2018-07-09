@@ -175,30 +175,18 @@ def inverse_adjustment(adj: float) -> float:
     return -adj / (1.0 - adj)
 
 
-def score_given_capability(capability: float, cuts: [int]) -> int:
+def score_given_capability(capability: float, cuts: [int]) -> (int, int):
     """
     Generate a score given a student capability. Because the capability is decimal it gives
     us what we need to interpolate between cut point levels.
 
     :param capability: float value [0.0, 4.0)
     :param cuts: the cut points for the levels, inc. min and max
-    :return: score between min-max from cuts
+    :return: score between min-max from cuts and level based on cuts
     """
-    level = int(math.floor(capability))
-    assert 0 <= level <= len(cuts) - 2
-
-    return int(cuts[level] + (cuts[level+1] - cuts[level]) * (capability - level))
-
-
-def perf_level_given_capability(capability: float) -> int:
-    """
-    Return performance level given a student capability.
-    Very simple method but abstracted in case capability implementation changes.
-
-    :param capability: float value [0.0, 4.0)
-    :return: 1 - 4
-    """
-    return int(math.floor(capability)) + 1
+    score = int(cuts[0] + capability * (cuts[-1] - cuts[0]) / 4.0)
+    level = [i for (i, cut) in enumerate(cuts) if score < cut][0]
+    return score, level
 
 
 def random_claims(score: int, claim_weights: [float], claim_min: int, claim_max: int) -> [int]:

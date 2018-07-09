@@ -16,6 +16,7 @@ from data_generator.model.district import District
 from data_generator.model.school import School
 from data_generator.model.staff import DistrictStaff, TeachingStaff
 from data_generator.model.student import Student
+from data_generator.model.studentgroup import StudentGroup
 from data_generator.util.assessment_stats import Properties, RandomLevelByDemographics, random_capability, \
     adjust_capability, inverse_adjustment
 from data_generator.util.id_gen import IDGen
@@ -54,7 +55,8 @@ def generate_teaching_staff_member(school: School, id_gen: IDGen=IDGen, sub_clas
     return s
 
 
-def generate_student(school: School, grade, id_gen: IDGen=IDGen, acad_year=datetime.datetime.now().year, sub_class=None,
+def generate_student(school: School, grade, id_gen: IDGen=IDGen, acad_year=datetime.datetime.now().year,
+                     subjects: [str]=cfg.SUBJECTS,
                      has_email_address_rate=pop_config.HAS_EMAIL_ADDRESS_RATE,
                      has_physical_address_rate=pop_config.HAS_PHYSICAL_ADDRESS_RATE,
                      has_address_line_2_rate=pop_config.HAS_ADDRESS_LINE_2_RATE):
@@ -66,14 +68,14 @@ def generate_student(school: School, grade, id_gen: IDGen=IDGen, acad_year=datet
     :param id_gen: id generator
     :param acad_year: The current academic year this student is being created for (optional, defaults to your machine
                       clock's current year)
-    :param sub_class: The sub-class of student to create (if requested, must be subclass of Student)
+    :param subjects: list of subjects (for generating student capability)
     :param has_email_address_rate: The rate at which to generate an email address for the student
     :param has_physical_address_rate: The rate at which to generate a physical address for the student
     :param has_address_line_2_rate: The rate at which to generate a line two address for the student
     :return: The student
     """
     # Build student basics
-    s = Student() if sub_class is None else sub_class()
+    s = Student()
     s.guid = id_gen.get_uuid()
     s.grade = grade
     s.school = school
@@ -145,7 +147,7 @@ def generate_student(school: School, grade, id_gen: IDGen=IDGen, acad_year=datet
 
     # generate and store the student's capability based on demographics and school adjustment
     adj = hier_config.SCHOOL_TYPES[school.type_str]['students'].get('adjust_pld', 0.0)
-    for subject in cfg.SUBJECTS:
+    for subject in subjects:
         generator, demo = _get_level_demographics(s, subject)
         s.capability[subject] = random_capability(generator.distribution(demo), adj)
 
@@ -289,6 +291,9 @@ def _get_level_demographics(student: Student, subject):
     :param subject: assessment subject
     :return: RandomLevelByDemographics and student properties
     """
+    # hack for custom subjects
+    if subject not in cfg.LEVELS_BY_GRADE_BY_SUBJ: subject = 'Math'
+
     demographics = cfg.DEMOGRAPHICS_BY_GRADE[student.grade]
     level_breakdowns = cfg.LEVELS_BY_GRADE_BY_SUBJ[subject][student.grade]
     level_generator = RandomLevelByDemographics(demographics, level_breakdowns)
@@ -315,6 +320,7 @@ def _get_level_demographics(student: Student, subject):
 
 def repopulate_school_grade(school: School, grade, grade_students, id_gen, reg_sys,
                             acad_year=datetime.datetime.now().year,
+                            subjects: [str]=cfg.SUBJECTS,
                             additional_student_choice=pop_config.REPOPULATE_ADDITIONAL_STUDENTS):
     """
     Take a school grade and make sure it has enough students. The list of students is updated in-place.
@@ -326,6 +332,7 @@ def repopulate_school_grade(school: School, grade, grade_students, id_gen, reg_s
     @param reg_sys: The registration system this student falls under
     @param acad_year: The current academic year that the repopulation is occurring within (optional, defaults to your
                       machine clock's current year)
+    @param subjects: List of subjects (for generating new student capabilities); defaults to cfg.SUBJECTS
     @param additional_student_choice: Array of values for additional students to create in the grade
     """
     # Calculate a new theoretically student count
@@ -340,12 +347,12 @@ def repopulate_school_grade(school: School, grade, grade_students, id_gen, reg_s
 
     # Re-fill grade to this new student count
     while len(grade_students) < student_count:
-        s = generate_student(school, grade, id_gen, acad_year)
+        s = generate_student(school, grade, id_gen, acad_year, subjects)
         s.reg_sys = reg_sys
         grade_students.append(s)
 
 
-def assign_student_groups(school, grade, grade_students, id_gen: IDGen=IDGen, subjects=cfg.SUBJECTS):
+def assign_student_groups(school, grade, grade_students, id_gen: IDGen=IDGen, subjects: [str]=cfg.SUBJECTS):
     """
     Assign students to groups.
     Each student is assigned to one group per subject. The groups assigned correspond
@@ -359,22 +366,18 @@ def assign_student_groups(school, grade, grade_students, id_gen: IDGen=IDGen, su
     @param id_gen: The IDGen instance, used to make groups unique across multiple schools
     @param subjects: The list of subjects
     """
-    # generate lists of subgroups for each subject corresponding to school's group size
     num_groups = int(ceil(len(grade_students) / school.group_size))
-    groups = []
-    for _ in subjects:
+    for subject in subjects:
+        # generate lists of subgroups for each subject corresponding to school's group size
         subgroups = []
         for _ in range(num_groups):
             group_id = id_gen.get_group_id('group')
             group_name = 'G' + str(grade) + '-' + str(group_id)
             subgroups.append((group_id, group_name))
-        groups.append(subgroups)
-
-    for (i, subgroups) in enumerate(groups, start=1):
+        # assign each student a (randomly selected) group for this subject
         for grade_student in grade_students:
             (group_id, group_name) = random.choice(subgroups)
-            setattr(grade_student, "group_%i_id" % (i,), group_id)
-            setattr(grade_student, "group_%i_text" % (i,), group_name)
+            grade_student.set_group(StudentGroup(subject, group_id, group_name))
 
 
 def _generate_date_enter_us_school(grade, acad_year=datetime.datetime.now().year):
