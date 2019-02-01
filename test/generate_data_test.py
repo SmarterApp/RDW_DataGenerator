@@ -12,6 +12,6 @@ ID_GEN = IDGen()
 def test_set_configuration_regular():
     # Tests
     assert len(generate_data.ASMT_YEARS) == 3
-    assert 2015 in generate_data.ASMT_YEARS
-    assert 2016 in generate_data.ASMT_YEARS
     assert 2017 in generate_data.ASMT_YEARS
+    assert 2018 in generate_data.ASMT_YEARS
+    assert 2019 in generate_data.ASMT_YEARS

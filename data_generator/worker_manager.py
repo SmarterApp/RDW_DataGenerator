@@ -27,7 +27,7 @@ from data_generator.readers.tabulator_reader import load_assessments
 from data_generator.util.id_gen import IDGen
 
 # constants used when generating assessment packages
-ASMT_YEARS = [2015, 2016, 2017]  # Expected sorted lowest to highest
+ASMT_YEARS = [2017, 2018, 2019]  # Expected sorted lowest to highest
 
 # These are global regardless of team
 GRADES_OF_CONCERN = {3, 4, 5, 6, 7, 8, 11}  # Made as a set for intersection later

@@ -79,13 +79,17 @@ ASMT_SCALE_SCORE = {
 
 # Scorable claims by subject
 # (weight is used to generate claim scores from overall)
+# I don't like putting ELPAC in here but that subject doesn't provide item-level
+# data so we need to get the claims from somewhere ...
 CLAIM_DEFINITIONS = {'Math': [{'code': '1', 'name': 'Concepts & Procedures', 'weight': .4},
                               {'code': 'SOCK_2', 'name': 'Problem Solving and Modeling & Data Analysis', 'weight': .45},
                               {'code': '3', 'name': 'Communicating Reasoning', 'weight': .15}],
                      'ELA': [{'code': 'SOCK_R', 'name': 'Reading', 'weight': .20},
                              {'code': '2-W', 'name': 'Writing', 'weight': .25},
                              {'code': 'SOCK_LS', 'name': 'Listening', 'weight': .25},
-                             {'code': '4-CR', 'name': 'Research & Inquiry', 'weight': .30}]
+                             {'code': '4-CR', 'name': 'Research & Inquiry', 'weight': .30}],
+                     'ELPAC': [{'code': '1', 'name': 'Oral', 'weight': .50},
+                             {'code': '2', 'name': 'Literacy', 'weight': .50}]
                      }
 
 # Legacy accommodations handling in the data generator involves randomly assigning settings to the outcomes

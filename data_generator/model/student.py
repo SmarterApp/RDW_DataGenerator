@@ -55,6 +55,7 @@ class Student:
         self.elas = None
         self.elas_start_date = None
         self.prg_primary_disability = None
+        self.military_connected = None
         self.derived_demographic = None
         self.groups = []
         self.capability = {}        # map of subject -> capability, 0.0 <= value < 4.0

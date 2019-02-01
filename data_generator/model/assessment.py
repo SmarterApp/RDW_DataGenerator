@@ -11,7 +11,7 @@ class Assessment:
     """
 
     # using slots here only to avoid bugs due to typos etc.
-    __slots__ = ('guid', 'id', 'name', 'subject', 'grade', 'contract', 'mode', 'rec_id', 'type', 'year', 'version', 'bank_key',
+    __slots__ = ('guid', 'id', 'name', 'subject', 'grade', 'contract', 'mode', 'rec_id', 'type', 'year', 'version',
                  'perf_lvl_name_1', 'perf_lvl_name_2', 'perf_lvl_name_3', 'perf_lvl_name_4', 'perf_lvl_name_5', 'perf_lvl_name_6',
                  'overall_score_min', 'overall_score_max',
                  'overall_cut_point_1', 'overall_cut_point_2', 'overall_cut_point_3', 'overall_cut_point_4', 'overall_cut_point_5',
@@ -31,7 +31,6 @@ class Assessment:
         self.type = None        # SUMMATIVE, INTERIM COMPREHENSIVE, INTERIM ASSESSMENT BLOCK
         self.year = None        # academic year, e.g. 2017 for 2016-2017
         self.version = None
-        self.bank_key = None
         self.perf_lvl_name_1 = None
         self.perf_lvl_name_2 = None
         self.perf_lvl_name_3 = None
