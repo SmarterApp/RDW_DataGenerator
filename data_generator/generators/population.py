@@ -57,6 +57,7 @@ def generate_teaching_staff_member(school: School, id_gen: IDGen=IDGen, sub_clas
 
 def generate_student(school: School, grade, id_gen: IDGen=IDGen, acad_year=datetime.datetime.now().year,
                      subjects: [str]=cfg.SUBJECTS,
+                     military_connected_dist=pop_config.MILITARY_CONNECTED_DIST,
                      has_email_address_rate=pop_config.HAS_EMAIL_ADDRESS_RATE,
                      has_physical_address_rate=pop_config.HAS_PHYSICAL_ADDRESS_RATE,
                      has_address_line_2_rate=pop_config.HAS_ADDRESS_LINE_2_RATE):
@@ -137,6 +138,7 @@ def generate_student(school: School, grade, id_gen: IDGen=IDGen, acad_year=datet
     s.prg_migrant = determine_demo_option_selected(demo_config['migrant'])
     s.prg_idea = determine_demo_option_selected(demo_config['idea'])
     s.prg_primary_disability = random.choice(cfg.PRG_DISABILITY_TYPES)
+    s.military_connected = _pick_demo_option(military_connected_dist)
 
     # None-out primary disability if it doesn't make sense
     if not s.prg_iep and not s.prg_idea and not s.prg_sec504:
@@ -148,8 +150,12 @@ def generate_student(school: School, grade, id_gen: IDGen=IDGen, acad_year=datet
     # generate and store the student's capability based on demographics and school adjustment
     adj = hier_config.SCHOOL_TYPES[school.type_str]['students'].get('adjust_pld', 0.0)
     for subject in subjects:
+        # hack to make performance in ELPAC reflect student's english-learner status
+        subject_adj = adj
+        if subject == 'ELPAC' and s.elas == 'EL' and cfg.LEP_PROFICIENCY_LEVELS.index(s.lang_prof_level) < 3:
+            subject_adj += 0.4 * (cfg.LEP_PROFICIENCY_LEVELS.index(s.lang_prof_level) - 3)
         generator, demo = _get_level_demographics(s, subject)
-        s.capability[subject] = random_capability(generator.distribution(demo), adj)
+        s.capability[subject] = random_capability(generator.distribution(demo), subject_adj)
 
     return s
 

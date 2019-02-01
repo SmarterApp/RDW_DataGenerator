@@ -72,7 +72,6 @@ def generate_interim_assessment(asmt_year: int,
     sa.id = '(SBAC){}-{}-{}'.format(sa.name, asmt_year-1, asmt_year)
     sa.subject = subject
     sa.grade = grade
-    sa.bank_key = '200'
     sa.perf_lvl_name_1 = cfg.CLAIM_PERF_LEVEL_NAME_1
     sa.perf_lvl_name_2 = cfg.CLAIM_PERF_LEVEL_NAME_2
     sa.perf_lvl_name_3 = cfg.CLAIM_PERF_LEVEL_NAME_3

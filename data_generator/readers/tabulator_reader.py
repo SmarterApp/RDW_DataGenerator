@@ -80,7 +80,6 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
         asmt.type = __mapAssessmentType(row['AssessmentType'], row['AssessmentSubtype'])
         asmt.version = row['AssessmentVersion']
         asmt.year = int(row['AcademicYear'])
-        asmt.bank_key = row['BankKey']
 
         asmt.overall_score_min = __getScore(row['ScaledLow1'])
         asmt.overall_cut_point_1 = __getRowScore(row, 'ScaledHigh1')
@@ -115,19 +114,19 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
             asmt.item_total_score = 0
 
     # infer claims for custom subjects even if not parsing items
-    if not asmt.is_iab() and asmt.subject not in cfg.CLAIM_DEFINITIONS:
+    if not asmt.is_iab() and asmt.subject not in cfg.CLAIM_DEFINITIONS and 'Claim' in row:
         claim_code = row['Claim'].strip()
         if claim_code not in [claim.code for claim in asmt.claims]:
             asmt.claims.append(Claim(claim_code, claim_code, asmt.overall_score_min, asmt.overall_score_max))
 
     # infer allowed accommodations even if not parsing items
-    if len(row['ASL']) > 0:
+    if 'ASL' in row and len(row['ASL']) > 0:
         asmt.accommodations.add('AmericanSignLanguage')
-    if len(row['Braille']) > 0:
+    if 'Braille' in row and len(row['Braille']) > 0:
         asmt.accommodations.add('Braille')
-    if len(row['AllowCalculator']) > 0:
+    if 'AllowCalculator' in row and len(row['AllowCalculator']) > 0:
         asmt.accommodations.add('Calculator')
-    if len(row['Spanish']) > 0:
+    if 'Spanish' in row and len(row['Spanish']) > 0:
         asmt.accommodations.add('Spanish')
 
     if parse_item:
