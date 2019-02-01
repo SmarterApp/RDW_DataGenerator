@@ -36,7 +36,6 @@ def __asmt_to_rows(asmt):
         'AssessmentLabel': None,
         'AssessmentVersion': asmt.version,
         'AcademicYear': asmt.year,
-        'BankKey': asmt.bank_key,
         'CutPoint1': 1,
         'ScaledLow1': asmt.overall_score_min,
         'ScaledHigh1': asmt.overall_cut_point_1,

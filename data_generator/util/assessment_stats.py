@@ -178,13 +178,17 @@ def inverse_adjustment(adj: float) -> float:
 def score_given_capability(capability: float, cuts: [int]) -> (int, int):
     """
     Generate a score given a student capability. Because the capability is decimal it gives
-    us what we need to interpolate between cut point levels.
+    us what we need to interpolate between cut point levels. Randomness is added using a
+    normal distribution and scaling a level to 4 sigma. The final score is clamped to min/max.
 
     :param capability: float value [0.0, 4.0)
     :param cuts: the cut points for the levels, inc. min and max
     :return: score between min-max from cuts and level based on cuts
     """
-    score = int(cuts[0] + capability * (cuts[-1] - cuts[0]) / 4.0)
+    mu = int(cuts[0] + capability * (cuts[-1] - cuts[0]) / 4.0)
+    level = [i for (i, cut) in enumerate(cuts) if mu < cut][0]
+    sigma = (cuts[level] - cuts[level - 1]) / 8.0
+    score = min(cuts[-1] - 1, max(cuts[0], int(random.gauss(mu, sigma))))
     level = [i for (i, cut) in enumerate(cuts) if score < cut][0]
     return score, level
 

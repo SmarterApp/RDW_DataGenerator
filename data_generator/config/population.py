@@ -14,6 +14,14 @@ IFEP_RATE = 0.05   # 5% of non-LEP students will have an alternate language but 
 
 REPOPULATE_ADDITIONAL_STUDENTS = [0, 0, 1, 2, 3, 4]
 
+# Distribution of military-connected is not region or grade-based (for now)
+MILITARY_CONNECTED_DIST = {
+    None: {'name': None, 'perc': 0.90},
+    'NotMilitaryConnected': {'name': 'NotMilitaryConnected', 'perc': .075},
+    'ActiveDuty': {'name': 'ActiveDuty', 'perc': 0.015},
+    'NationalGuardOrReserve': {'name': 'NationalGuardOrReserve', 'perc': 0.01}
+}
+
 # NOTE: probabilities should correlate with cfg.DEMOGRAPHICS_BY_GRADE, specifically any 0 value there
 # should have a corresponding 0 (or lack of entry) here. For example, grade 1, race 'dmg_eth_pcf' is 0.0
 # so grade 1 ethnicity should not allow any pac_isl students.

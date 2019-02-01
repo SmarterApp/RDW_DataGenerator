@@ -89,46 +89,33 @@ def test_random_capability_with_positive_adj():
     assert 2.0 < avg < 3.5  # should be 2.9
 
 
+def _assert_score_given_capability(capability, cuts, mean_score, max_score_delta, mean_level, max_level_delta, iter=20):
+    total_score = 0
+    total_level = 0
+    for _ in range(0, iter):
+        score, level = score_given_capability(capability, cuts)
+        # print(score, level)
+        total_score += score
+        total_level += level
+    score = total_score / iter
+    level = total_level / iter
+    # print(score, level)
+    assert 0 <= abs(score - mean_score) <= max_score_delta
+    assert 0 <= abs(level - mean_level) <= max_level_delta
+
+
 def test_score_given_capability_with_two_levels():
-    score, level = score_given_capability(0, [2300, 2500, 2700])
-    assert score == 2300
-    assert level == 1
-
-    score, level = score_given_capability(1.0, [2300, 2500, 2700])
-    assert score == 2400
-    assert level == 1
-
-    score, level = score_given_capability(2.0, [2300, 2500, 2700])
-    assert score == 2500
-    assert level == 2
-
-    score, level = score_given_capability(3.0, [2300, 2500, 2700])
-    assert score == 2600
-    assert level == 2
-
-    score, level = score_given_capability(3.999, [2300, 2500, 2700])
-    assert score == 2699
-    assert level == 2
+    _assert_score_given_capability(0.0, [2300, 2500, 2700], 2300, 25, 1.0, 0.2)
+    _assert_score_given_capability(1.0, [2300, 2500, 2700], 2400, 25, 1.0, 0.4)
+    _assert_score_given_capability(2.0, [2300, 2500, 2700], 2500, 25, 1.5, 0.4)
+    _assert_score_given_capability(3.0, [2300, 2500, 2700], 2600, 25, 2.0, 0.4)
+    _assert_score_given_capability(3.99, [2300, 2500, 2700], 2699, 25, 2.0, 0.2)
 
 
 def test_score_given_capability_with_six_levels():
-    score, level = score_given_capability(0, [2300, 2400, 2500, 2600, 2700, 2800, 2900])
-    assert score == 2300
-    assert level == 1
-
-    score, level = score_given_capability(1.0, [2300, 2400, 2500, 2600, 2700, 2800, 2900])
-    assert score == 2450
-    assert level == 2
-
-    score, level = score_given_capability(2.0, [2300, 2400, 2500, 2600, 2700, 2800, 2900])
-    assert score == 2600
-    assert level == 4
-
-    score, level = score_given_capability(3.0, [2300, 2400, 2500, 2600, 2700, 2800, 2900])
-    assert score == 2750
-    assert level == 5
-
-    score, level = score_given_capability(3.999, [2300, 2400, 2500, 2600, 2700, 2800, 2900])
-    assert score == 2899
-    assert level == 6
+    _assert_score_given_capability(0.0, [2300, 2400, 2500, 2600, 2700, 2800, 2900], 2300, 15, 1.0, 0.2)
+    _assert_score_given_capability(1.0, [2300, 2400, 2500, 2600, 2700, 2800, 2900], 2450, 15, 2.0, 0.2)
+    _assert_score_given_capability(2.0, [2300, 2400, 2500, 2600, 2700, 2800, 2900], 2600, 15, 3.5, 0.2)
+    _assert_score_given_capability(3.0, [2300, 2400, 2500, 2600, 2700, 2800, 2900], 2750, 15, 5.0, 0.2)
+    _assert_score_given_capability(3.99, [2300, 2400, 2500, 2600, 2700, 2800, 2900], 2899, 15, 6.0, 0.2)
 

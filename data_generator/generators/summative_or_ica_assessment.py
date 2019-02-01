@@ -117,7 +117,6 @@ def generate_assessment(type, asmt_year, subject, grade, id_gen, from_date=None,
     sa.year = asmt_year
     sa.version = cfg.ASMT_VERSION
     sa.subject = subject
-    sa.bank_key = '200'
     # generated ICA/Summative assessments have 4 performance levels
     sa.perf_lvl_name_1 = cfg.ASMT_PERF_LEVEL_NAME_1
     sa.perf_lvl_name_2 = cfg.ASMT_PERF_LEVEL_NAME_2
@@ -186,8 +185,9 @@ def generate_assessment_outcome(date_taken: datetime.date,
     sao.claim_scores = []
     for claim, claim_score in zip(assessment.claims, claim_scores):
         stderr = random_stderr(claim_score, assessment.overall_score_min, assessment.overall_score_max)
-        sao.claim_scores.append(ClaimScore(claim, claim_score, stderr,
-                                           claim_perf_lvl(claim_score, stderr, assessment.overall_cut_point_2),
+        # SmarterBalanced claim levels are very different, based on +-1.5 stderr
+        claim_level = claim_perf_lvl(claim_score, stderr, assessment.overall_cut_point_2) if assessment.subject in cfg.SUBJECTS else [i for (i, cut) in enumerate(assessment.get_cuts()) if claim_score <= cut][0]
+        sao.claim_scores.append(ClaimScore(claim, claim_score, stderr, claim_level,
                                            max(claim.score_min, claim_score - stderr),
                                            min(claim.score_max, claim_score + stderr)))
 

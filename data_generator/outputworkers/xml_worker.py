@@ -84,7 +84,6 @@ class XmlWorker(Worker):
         # in TRT, the testId is the name and the name is the id
         test.set('testId', asmt.name)
         test.set('name', asmt.id)
-        test.set('bankKey', asmt.bank_key)
         test.set('subject', asmt.subject)
         test.set('grade', '{:02}'.format(asmt.grade))
         test.set('assessmentType', self._map_asmt_type(asmt.type))
@@ -126,6 +125,7 @@ class XmlWorker(Worker):
         self._add_examinee_attribute(examinee, 'EnglishLanguageAcquisitionStatus', student.elas, contextDateStr)
         self._add_examinee_attribute(examinee, 'EnglishLanguageAcquisitionStatusStartDate', student.elas_start_date, contextDateStr)
         self._add_examinee_attribute(examinee, 'MigrantStatus', self._map_yes_no(student.prg_migrant), contextDateStr)
+        self._add_examinee_attribute(examinee, 'MilitaryConnectedStudentIndicator', student.military_connected, contextDateStr)
         # The generated groups aren't really that useful so let's not emit them
         # self._add_examinee_attribute(examinee, 'StudentGroupName', student.group_1_text, contextDateStr)
         # self._add_examinee_attribute(examinee, 'StudentGroupName', student.group_2_text, contextDateStr)
