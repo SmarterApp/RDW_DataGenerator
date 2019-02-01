@@ -19,7 +19,7 @@ HOST="http://localhost:8080"
 ACCESS_TOKEN="sbac;dwtest@example.com;|SBAC|ASMTDATALOAD|CLIENT|SBAC||||||||||||||"
 
 echo "processing ${s} using access token ${ACCESS_TOKEN}"
-for xml in ${s}/*; do
+for xml in ${s}/*.xml; do
 #    echo "submitting $xml"
     curl -X POST -s --header "Authorization:Bearer ${ACCESS_TOKEN}" -F file=@"${xml}" ${HOST}/exams/imports | jq -c --arg FN "${xml}" '. | {file: $FN, id: .id, status: .status}'
 done
