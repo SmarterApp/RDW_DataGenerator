@@ -1,4 +1,3 @@
-# like sum, but with multiplication
 import itertools
 import math
 import random
@@ -246,15 +245,42 @@ def random_stderr(claim_score: int, claim_min: int, claim_max: int):
     return 25 + random.randint(0, 60 + round(120 * (claim_max - claim_score) / (claim_max - claim_min)))
 
 
-def claim_perf_lvl(claim_score: int, claim_error: int, perf_cut_point: int):
-    """Return claim performance level (1-3) given claim score, error and performance cut point
+def claim_perf_lvl_for_SB(claim_score: int, claim_error: int, cuts: [int]) -> int:
+    """Return claim performance level (1-3) given claim score, error and performance cut point.
+    This is calculated based on the middle cut-point plus/minus 1.5x SEM
 
     :param claim_score: claim score
     :param claim_error: claim score error
-    :param perf_cut_point: perf cut point, it's the third cut-point for an assessment
+    :param cuts: the cut points for the levels, inc. min and max
     :return: 1-3
     """
+    # the perf cut point is "cut point 2"
+    perf_cut_point = cuts[2]
     if round(claim_score + 1.5 * claim_error) < perf_cut_point: return 1
     if round(claim_score - 1.5 * claim_error) >= perf_cut_point: return 3
     return 2
 
+
+def claim_perf_lvl_for_ELPAC(claim_score: int, claim_error: int, cuts: [int]) -> int:
+    """Return claim performance level (1-3) given claim score, error and cut points.
+    This is calculated by combining the middle two levels and comparing the score.
+
+    :param claim_score: claim score
+    :param claim_error: claim score error
+    :param cuts: the cut points for the levels, inc. min and max
+    :return: 1-3
+    """
+    if claim_score <= cuts[1]: return 1
+    if claim_score <= cuts[3]: return 2
+    return 3
+
+
+def claim_perf_lvl_for_other(claim_score: int, claim_error: int, cuts: [int]) -> int:
+    """Return claim performance level given claim score, error and cut points.
+
+    :param claim_score: claim score
+    :param claim_error: claim score error
+    :param cuts: the cut points for the levels, inc. min and max
+    :return: 1-N
+    """
+    return [i for (i, cut) in enumerate(cuts[1:], 1) if claim_score <= cut][0]

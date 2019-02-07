@@ -16,7 +16,7 @@ from data_generator.model.claimscore import ClaimScore
 from data_generator.model.student import Student
 from data_generator.model.targetscore import TargetScore
 from data_generator.util.assessment_stats import random_claims
-from data_generator.util.assessment_stats import random_stderr, claim_perf_lvl, score_given_capability
+from data_generator.util.assessment_stats import random_stderr, claim_perf_lvl_for_other, score_given_capability
 from data_generator.util.id_gen import IDGen
 
 
@@ -182,13 +182,12 @@ def generate_assessment_outcome(date_taken: datetime.date,
     # hack for custom subjects: give all claims equal weight
     claim_weights = [claim['weight'] for claim in cfg.CLAIM_DEFINITIONS[assessment.subject]] if assessment.subject in cfg.CLAIM_DEFINITIONS else [1.0 / len(assessment.claims)] * len(assessment.claims)
     claim_scores = random_claims(sao.overall_score, claim_weights, assessment.overall_score_min, assessment.overall_score_max)
+    claim_level_func = cfg.CLAIM_LVL_FUNC[assessment.subject] if assessment.subject in cfg.CLAIM_LVL_FUNC else claim_perf_lvl_for_other
     sao.claim_scores = []
     for claim, claim_score in zip(assessment.claims, claim_scores):
         stderr = random_stderr(claim_score, assessment.overall_score_min, assessment.overall_score_max)
-        # For claim level, find first cut where the score is lte the high value
-        # SmarterBalanced claim levels are very different, based on +-1.5 stderr
-        claim_level = claim_perf_lvl(claim_score, stderr, assessment.overall_cut_point_2) if assessment.subject in cfg.SUBJECTS else [i for (i, cut) in enumerate(assessment.get_cuts()[1:], 1) if claim_score <= cut][0]
-        sao.claim_scores.append(ClaimScore(claim, claim_score, stderr, claim_level,
+        sao.claim_scores.append(ClaimScore(claim, claim_score, stderr,
+                                           claim_level_func(claim_score, stderr, assessment.get_cuts()),
                                            max(claim.score_min, claim_score - stderr),
                                            min(claim.score_max, claim_score + stderr)))
 

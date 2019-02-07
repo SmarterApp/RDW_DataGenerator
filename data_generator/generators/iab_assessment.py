@@ -12,7 +12,7 @@ from data_generator.model.claimscore import ClaimScore
 from data_generator.model.interimassessment import InterimAssessment
 from data_generator.model.interimassessmentoutcome import InterimAssessmentOutcome
 from data_generator.model.student import Student
-from data_generator.util.assessment_stats import random_stderr, claim_perf_lvl, score_given_capability
+from data_generator.util.assessment_stats import random_stderr, claim_perf_lvl_for_SB, score_given_capability
 from data_generator.util.id_gen import IDGen
 
 
@@ -134,7 +134,7 @@ def generate_interim_assessment_outcome(date_taken: datetime.date,
     sao.overall_score_stderr = stderr
     sao.overall_score_range_min = max(assessment.overall_score_min, sao.overall_score - stderr)
     sao.overall_score_range_max = min(assessment.overall_score_max, sao.overall_score + stderr)
-    sao.overall_perf_lvl = claim_perf_lvl(sao.overall_score, stderr, assessment.overall_cut_point_2)
+    sao.overall_perf_lvl = claim_perf_lvl_for_SB(sao.overall_score, stderr, assessment.get_cuts())
 
     # The legacy output expects there to be a claim_1_score; not really correct for IABs but for now ...
     sao.claim_scores = [ClaimScore(assessment.claims[0], sao.overall_score, sao.overall_score_stderr,

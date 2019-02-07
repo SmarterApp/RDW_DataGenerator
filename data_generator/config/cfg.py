@@ -5,6 +5,7 @@ The input configuration for the SBAC RDW project.
 import datetime
 
 from data_generator.util.assessment_stats import Properties, Stats, GradeLevels, DemographicLevels
+from data_generator.util.assessment_stats import claim_perf_lvl_for_SB, claim_perf_lvl_for_ELPAC
 
 HIERARCHY_FROM_DATE = datetime.date(2014, 9, 1)
 HIERARCHY_TO_DATE = datetime.date(9999, 12, 31)
@@ -88,9 +89,15 @@ CLAIM_DEFINITIONS = {'Math': [{'code': '1', 'name': 'Concepts & Procedures', 'we
                              {'code': '2-W', 'name': 'Writing', 'weight': .25},
                              {'code': 'SOCK_LS', 'name': 'Listening', 'weight': .25},
                              {'code': '4-CR', 'name': 'Research & Inquiry', 'weight': .30}],
-                     'ELPAC': [{'code': '1', 'name': 'Oral', 'weight': .50},
-                             {'code': '2', 'name': 'Literacy', 'weight': .50}]
+                     'ELPAC': [{'code': '1-L', 'name': 'Listening', 'weight': .25},
+                               {'code': '1-S', 'name': 'Speaking', 'weight': .25},
+                               {'code': '2-R', 'name': 'Reading', 'weight': .25},
+                               {'code': '2-W', 'name': 'Writing', 'weight': .25}]
                      }
+CLAIM_LVL_FUNC = {'Math': claim_perf_lvl_for_SB,
+                  'ELA': claim_perf_lvl_for_SB,
+                  'ELPAC': claim_perf_lvl_for_ELPAC
+                  }
 
 # Legacy accommodations handling in the data generator involves randomly assigning settings to the outcomes
 LEGACY_ACCOMMODATIONS = {  # 0: range is 0; 4: range is 4-26

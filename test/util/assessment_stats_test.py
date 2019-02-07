@@ -1,9 +1,7 @@
-"""
-
-"""
 from data_generator.util.assessment_stats import DemographicLevels, Stats, score_given_capability
 from data_generator.util.assessment_stats import RandomLevelByDemographics, Properties, GradeLevels
 from data_generator.util.assessment_stats import random_capability
+from data_generator.util.assessment_stats import claim_perf_lvl_for_SB, claim_perf_lvl_for_ELPAC
 from data_generator.util.weighted_choice import weighted_choice
 
 
@@ -119,3 +117,26 @@ def test_score_given_capability_with_six_levels():
     _assert_score_given_capability(3.0, [2300, 2400, 2500, 2600, 2700, 2800, 2900], 2750, 15, 5.0, 0.2)
     _assert_score_given_capability(3.99, [2300, 2400, 2500, 2600, 2700, 2800, 2900], 2899, 15, 6.0, 0.2)
 
+
+def test_claim_perf_level_for_SB():
+    cuts = [2300, 2400, 2500, 2600, 2700]
+    assert 1 == claim_perf_lvl_for_SB(2300, 40, cuts)
+    assert 1 == claim_perf_lvl_for_SB(2400, 40, cuts)
+    assert 2 == claim_perf_lvl_for_SB(2450, 40, cuts)
+    assert 2 == claim_perf_lvl_for_SB(2500, 40, cuts)
+    assert 2 == claim_perf_lvl_for_SB(2550, 40, cuts)
+    assert 3 == claim_perf_lvl_for_SB(2600, 40, cuts)
+    assert 3 == claim_perf_lvl_for_SB(2700, 40, cuts)
+
+
+def test_claim_perf_level_for_ELPAC():
+    cuts = [2300, 2400, 2500, 2600, 2700]
+    assert 1 == claim_perf_lvl_for_ELPAC(2300, 40, cuts)
+    assert 1 == claim_perf_lvl_for_ELPAC(2350, 40, cuts)
+    assert 1 == claim_perf_lvl_for_ELPAC(2400, 40, cuts)
+    assert 2 == claim_perf_lvl_for_ELPAC(2450, 40, cuts)
+    assert 2 == claim_perf_lvl_for_ELPAC(2500, 40, cuts)
+    assert 2 == claim_perf_lvl_for_ELPAC(2550, 40, cuts)
+    assert 2 == claim_perf_lvl_for_ELPAC(2600, 40, cuts)
+    assert 3 == claim_perf_lvl_for_ELPAC(2650, 40, cuts)
+    assert 3 == claim_perf_lvl_for_ELPAC(2700, 40, cuts)
