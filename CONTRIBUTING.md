@@ -1,10 +1,6 @@
-## RDW_DataGenerator for Developers
-
-**NOTE: recent changes to produce XML output may have broken existing functionality; don't expect the other output 
-formats to work without some testing. Yeah, sorry about that but legacy output will be deprecated soon anyway.**
+## RDW_DataGenerator for Contributors
 
 This document is targeted at developers contributing to the RDW_DataGenerator project.
-
 
 ### Version Control Conventions
 Repo: https://github.com/SmarterApp/RDW_DataGenerator
@@ -20,61 +16,70 @@ branch to `develop` to solicit code reviews and feedback. Once approved use `squ
 
 ### How do I get set up?
 This is a Python 3 project and as such you will need Python 3 installed to develop the project.
-We were using Python 3.3.6 during our development, not sure how much it matters.
+As of early 2019, the project uses 3.7.2.
 
-To set up a virtual environment, execute the following command:
+To set up a virtual environment, execute the following command where `venv-datagen` is the name of the directory where you want your environment files placed.
+```bash
+python3 -m venv venv-datagen
+```
 
-    virtualenv data-gen-env
+You can activate the virtual environment with this command (_note that `venv-datagen` is the same name that was used with the creation of the environment. If you change the name of the environment in the first command, change it in this command too_):
+```bash
+source venv-datagen/bin/activate
+python --version
+```
 
-> Where `data-gen-env` is the name of the directory where you want your environment files placed. 
+Once you have your environment activated (or you've decided not to use an environment), go into your repository and run this command to finish setup:
+```bash
+pip install -r requirements-dev.txt
+```
 
-You can activate the virtual environment with this command (_note that `data-gen-env` is the same name that was used 
-with the creation of the environment. If you change the name of the environment in the first command, change it in 
-this command too_):
+To run the test suites with coverage (and PEP8 checking if desired):
+```bash
+pytest --cov=datagen --pep8 tests/
+```
 
-    source data-gen-env/bin/activate
+You can use pytest to test PEP8 on source:
+```bash
+pytest --pep8 datagen/
+```
 
-Once you have your environment activated (or you've decided not to use an environment), go into your repository and run
-this command to finish setup:
-
-    python setup.py develop
-
-Note the use of `develop` in the call to `setup.py`. This will create a sym-link from the site-packages directory to the
-working directory of your code. If instead you use `install`, it will copy the code and changes you make to the code
-will probably not be picked up.
-
-You will need `nose` to run the test suites. Along with those, we are using
-[`coverage`](http://nedbatchelder.com/code/coverage/) for a unit testing code coverage report and
-[`pep8`](http://pep8.readthedocs.org/en/latest/) as a style checker. If you have a virtual environment, run this within
-it:
-
-    pip install nose coverage pep8
-
-Within the project is a suite of unit tests that cover a large percentage of the codebase. We are using `nose` for the
-unit tests. To run the unit tests, start from the root of the project and call:
-
-    nosetests test/*
-
-As you develop new functionality, make sure to write accompanying unit tests so as maintain good code coverage and the
-confidence that comes with it.
-
-
-### Build and Push the docker image
-Building the docker image is not automated so you must do it manually. Assuming you have Docker installed then, 
-from the root folder of the project you can build and push the image:
-
-    docker build -t fwsbac/rdw-datagen:latest .
-    docker push fwsbac/rdw-datagen
-
-Refer to README.md for instructions for running the docker image.
-
+As you develop new functionality please keep the test coverage and PEP8-compliance up.
 
 ### Running
 
-#### Running From IDE
 The README outlines how to run the generator using docker. As a developer you will want to run the generator from
-the IDE. To run from IntelliJ, from the generate_data.py tab, select `Create 'generate_data'`, set the Script 
+the IDE. To run from IntelliJ, from the generate_data.py tab, select `Create 'generate_data'`, set the Script
 Parameters to, for example, `--state_type devel --gen_sum --xml_out`, verify the other settings and run/debug.
+
+You may also invoke the script on the command line with appropriate arguments (see README.md for details on arguments).
+From the root project folder, for example:
+```bash
+python -m datagen.generate_data --gen_sum --xml_out --pkg_source ./in/src/*.ELPAC.csv --hier_source ./in/pern.csv
+```
+
+
+### Building
+
+The artifact for this project is a docker image. No eggs or wheels or anything like that.
+Assuming you have Docker installed and DockerHub configured, you can build and push the image:
+```bash
+docker build -t fwsbac/rdw-datagen:latest .
+docker push fwsbac/rdw-datagen
+```
+
+Refer to README.md for instructions for running the docker image.
+
+#### Troubleshooting the Docker Image
+If things aren't working properly and you want to get into the image, you can override the entrypoint. Comment out the
+ENTRYPOINT and CMD lines in `Dockerfile` and replace with:
+```
+CMD ["python", "-m", "datagen.generate_data", "--help"]
+```
+Then you can run the image with the shell:
+```bash
+docker run -it fwsbac/rdw-datagen /bin/sh
+```
 
 
 ### Tasks
@@ -82,40 +87,17 @@ This project was originally created to generate data for the legacy reporting da
 generate data for the new system, mostly to take advantage of the good demographics generation. As such there are a 
 number of things that may need cleaning up. And there are some enhancements/improvements. In no particular order:
 
- - [x] Scores for IAB outcomes
- - [x] Generate (writing) trait scores for WER items
  - [ ] Use only a subset of items from item bank in a particular session outcome (?)
- - [x] Session-based generation. Assign sessionId, test adminstrator, etc.
- - [x] Valid categories for IAB are 1-3, it returns 2-4
- - [x] Errors during outcome generation for ICA's read from tabulator CSV.
- - [x] ICA report is missing claim scores
- - [x] Target scores for summative assessments.
  - [ ] Combine cfg.DEMOGRAPHICS_BY_GRADE and population.DEMOGRAPHICS. They both represent demographic distribution of
  students but they have different values.
- - [x] date-taken should be passed into outcome generation, not pulled from assessment.
- - [x] min/max scores are silly (1200/2400, grade independent); should use LOSS/HOSS tables from SB docs. 
  - [ ] How are Section/Staff used? Can they be removed? Consider the session-based generation task.
- - [x] Combine remaining sbac_generators into generators.
- - [x] IDGen: clean up.
  - [ ] Stage work to avoid memory utilization problems for large generations.
- - [x] Add ability to save and load the hierarchy. Have to refactor some bits in worker_manager.
- - [x] Improve fake answers for items; based on item type of course.
- - [x] Make item score distribution correspond to item difficulty.
- - [x] Reuse IAB packages. Currently the system generates multiple ICA packages for a single year, each with a
- different `period`. It makes more sense to separate the IAB packages from the date taken. So a single IAB package
- might be used more than once during the academic year. Or even in a subsequent academic year. To do this, remove
- `period` from the package; then generate the date-taken and pass it in when generating outcomes.
- - [x] Clean up accommodations. These belong to the student profile combined with assessment-specific restrictions. When doing this update to make them realistic and consistent with current values.
  - [ ] Remove deprecated output workers. Consider that pg_worker could be repurposed as a sql_worker.
- - [x] Set admin condition of outcome based on assessment type (Summative: Valid, ICA: SD, IAB: NS)
  - [ ] Rare admin condition exceptions. Summative: IN, perhaps by session. ICA: NS, perhaps by school.
  - [ ] Rare status exceptions. Instead of "scored": "appeal", "paused", "reset". Careful, they have meanings.
  - [ ] Rare completeness/completeStatus exceptions. "partial" instead of "complete". Work in forceComplete.
- - [x] Make scores for a student consistent with student capability
- - [x] Add filipino as an ethnicity for California demographics.
  - [ ] Change student attributes when they advance. For example LEP/ELAS, IEP.
  - [ ] Address date-taken requests (see \* below)
- - [x] Store (and emit) std-err instead of (or beside) that min/max cruft.
 
 \* Currently there is a single date-taken per assessment per school/grade. This isn't particularly realistic but does
 force all students in a group to have the same date-taken so they have the same session (session name is based on
