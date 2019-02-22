@@ -302,4 +302,4 @@ def _pick_accommodation_code(default_code):
     elif default_code == 4:
         return randint(4, 26)
     else:
-        raise ValueError('invalid default_code \'%s\' (must be 0 or 4)' % (default_code,))
+        raise ValueError('invalid default_code \'{}\' (must be 0 or 4)'.format(default_code))

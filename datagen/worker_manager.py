@@ -132,7 +132,7 @@ class WorkerManager(Worker):
 
         @param state: State to generate data for
         """
-        print('Creating results for state: %s' % state.name)
+        print('Creating results for state: {}'.format(state.name))
 
         # build registration system by years
         rs_by_year = self.__build_registration_system(self.__years(assessments))
@@ -141,7 +141,7 @@ class WorkerManager(Worker):
         student_avg_count = 0
         student_unique_count = 0
         for district in districts:
-            print('\nCreating results for district %s (%s District)' % (district.name, district.type_str))
+            print('\nCreating results for district {} ({} District)'.format(district.name, district.type_str))
 
             # collect schools for the district
             district_schools = [s for s in schools if s.district == district]
@@ -150,12 +150,14 @@ class WorkerManager(Worker):
             avg_year, unique = self.__generate_district_data(district_schools, rs_by_year, assessments)
 
             # Print completion of district
-            print('District results created with average of %i students/year and %i total unique' % (avg_year, unique))
+            print('District results created with average of {} students/year and {} total unique'
+                  .format(avg_year, unique))
             student_avg_count += avg_year
             student_unique_count += unique
 
         # Print completion of state
-        print('State results created with average of %i students/year and %i total unique' % (student_avg_count, student_unique_count))
+        print('State results created with average of {} students/year and {} total unique'
+              .format(student_avg_count, student_unique_count))
 
     def __generate_assessments(self):
         """

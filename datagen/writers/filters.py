@@ -68,7 +68,7 @@ def filter_zero_padded_grade(val):
     """
     if val is None:
         return '00'
-    return '%02d' % val
+    return '{:02d}'.format(val)
 
 
 ALL_FILTERS = {

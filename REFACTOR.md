@@ -8,20 +8,10 @@
 
 #### General
 
-* Upgrade Python
-* Improve project structure
 * Code cleanup
-    * replace % formatting with '{foo}'.format(foo=foo)
-    * replace all * imports
     * use module/package scoping for all calls, i.e. `import modu` & `modu.sqrt` vs `from modu import sqrt` & `sqrt`
-    * use pep8 to check conventions
-* Improve CI
-    * Should we have a docker image for building?
-    * Have a (triggered) build that generates and publishes image
 * Improve coverage a bit
 * Should we have way to have embedded resources like Math_subject.xml available for loading?
-* Clean up legacy output
-    * (?) Do we want to keep a SQL output?
 * Consider data volumes: Do we want to keep ability to generate huge amounts of data?
     * state_types
 

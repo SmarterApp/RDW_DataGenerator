@@ -100,7 +100,7 @@ def generate_assessment(type, asmt_year, subject, grade, id_gen, from_date=None,
     """
     # Get the claim definitions for this subject
     if subject not in claim_definitions:
-        raise KeyError("Subject '%s' not found in claim definitions" % subject)
+        raise KeyError("Subject '{}' not found in claim definitions".format(subject))
 
     claims = claim_definitions[subject]
     asmt_scale_scores = cfg.ASMT_SCALE_SCORE[subject][grade]

@@ -79,7 +79,7 @@ if __name__ == '__main__':
 
     # Print statistics
     print()
-    print('Run began at:  %s' % tstart)
-    print('Run ended at:  %s' % tend)
-    print('Run run took:  %s' % (tend - tstart))
+    print('Run began at:  {}'.format(tstart))
+    print('Run ended at:  {}'.format(tend))
+    print('Run run took:  {}'.format(tend - tstart))
     print()

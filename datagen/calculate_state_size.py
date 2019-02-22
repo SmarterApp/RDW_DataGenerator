@@ -9,7 +9,7 @@ import datagen.util.hierarchy as hier_util
 
 if __name__ == '__main__':
     for state_type, state_config in state_config.STATE_TYPES.items():
-        print('Calculating for type: %s' % state_type)
+        print('Calculating for type: {}'.format(state_type))
 
         state_student_count = 0
         state_school_count = 0
@@ -45,6 +45,6 @@ if __name__ == '__main__':
             state_school_count += avg_school_count * district_count
             state_district_count += district_count
 
-        print('    Districts: %i' % state_district_count)
-        print('    Schools  : %i' % state_school_count)
-        print('    Students : %i' % state_student_count)
+        print('    Districts: {}'.format(state_district_count))
+        print('    Schools  : {}'.format(state_school_count))
+        print('    Students : {}'.format(state_student_count))

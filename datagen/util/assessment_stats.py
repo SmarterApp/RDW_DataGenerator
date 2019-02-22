@@ -220,7 +220,7 @@ def random_claims(score: int, claim_weights: [float], claim_min: int, claim_max:
         max_ = max(claim_min,
                    min(claim_max, int(math.ceil((remaining_score - remaining_weight * claim_min) / claim_weight))))
 
-        assert min_ <= max_, "%s %s" % (min_, max_)
+        assert min_ <= max_, '{} {}'.format(min_, max_)
 
         claim = random.randint(min_, max_)
         claims.append(claim)

@@ -27,7 +27,7 @@ def weighted_choice(counter: {object: float},
     i = bisect.bisect(breaks, value)
 
     if i < 0 or i >= len(elements):
-        raise AssertionError("chose a non-existent element? %s %s %s" % (counter, i, elements))
+        raise AssertionError('chose a non-existent element? {} {} {}'.format(counter, i, elements))
 
     return elements[i]
 

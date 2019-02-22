@@ -45,8 +45,8 @@ class NameInfo():
     def __str__(self):
         """String method
         """
-        return ("NameInfo:[rank: %s, name: %s, frequency: %s, cum_freq: %s]"
-                % (self.rank, self.name, self.frequency, self.cum_freq))
+        return ("NameInfo:[rank: {}, name: {}, frequency: {}, cum_freq: {}]"
+                .format(self.rank, self.name, self.frequency, self.cum_freq))
 
 
 def _read_name_files(males_first, females_first, all_last):

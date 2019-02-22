@@ -27,7 +27,7 @@ class InterimAssessment(Assessment):
                     'claim_2_name', 'claim_2_score_min', 'claim_2_score_max',
                     'claim_3_name', 'claim_3_score_min', 'claim_3_score_max',
                     'claim_4_name', 'claim_4_score_min', 'claim_4_score_max'}:
-            raise AttributeError('cannot set %s of %s' % (name, self.__class__.__qualname__))
+            raise AttributeError('cannot set {} of {}'.format(name, self.__class__.__qualname__))
 
         else:
             super().__setattr__(name, value)

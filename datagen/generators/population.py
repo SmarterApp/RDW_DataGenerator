@@ -432,7 +432,7 @@ def _generate_derived_demographic(student):
             else:
                 raise Exception('No race?')
     except Exception as ex:
-        print('Generate derived demographic column error: %s' % str(ex))
+        print('Generate derived demographic column error: {}'.format(ex))
         return -1
 
 
