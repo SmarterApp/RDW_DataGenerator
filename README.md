@@ -1,8 +1,5 @@
 ## README
 
-**NOTE: recent changes to produce XML output may have broken existing functionality; don't expect the other output 
-formats to work without some testing. Yeah, sorry about that but legacy output will be deprecated soon anyway.**
-
 This project generates sample data to be used in SBAC RDW project for functional testing.
 
 ### How do I run it?

@@ -36,7 +36,12 @@ pip install -r requirements-dev.txt
 
 To run the test suites with coverage (and PEP8 checking if desired):
 ```bash
+# just run coverage with results in console
+pytest --cov=datagen tests/
+# add PEP8 checking - but this is checking the test code for compliance
 pytest --cov=datagen --pep8 tests/
+# generate a nice html report
+pytest --cov-report html:coverage --cov=datagen tests/
 ```
 
 You can use pytest to test PEP8 on source:

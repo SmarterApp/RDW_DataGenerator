@@ -1,0 +1,17 @@
+# This Dockerfile builds an image for the data generator used by CI
+FROM python:3.7.2-alpine
+RUN mkdir /src
+COPY ./requirements*.txt /src/
+COPY ./pytest.ini /src/
+COPY ./datagen /src/datagen
+COPY ./tests /src/tests
+COPY ./test_data /src/test_data
+
+WORKDIR /src
+RUN pip install -r requirements-dev.txt
+VOLUME /out
+
+# at this point the image can be invoked to do stuff
+#docker build -f Dockerfile.dev -t datagen-dev .
+#docker run -v `pwd`:/out datagen-dev pytest --cov-report html:/out/coverage --cov=datagen tests/
+#docker run datagen-dev pytest --pep8 datagen/ > pep8.out
