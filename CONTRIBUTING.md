@@ -97,7 +97,6 @@ number of things that may need cleaning up. And there are some enhancements/impr
  students but they have different values.
  - [ ] How are Section/Staff used? Can they be removed? Consider the session-based generation task.
  - [ ] Stage work to avoid memory utilization problems for large generations.
- - [ ] Remove deprecated output workers. Consider that pg_worker could be repurposed as a sql_worker.
  - [ ] Rare admin condition exceptions. Summative: IN, perhaps by session. ICA: NS, perhaps by school.
  - [ ] Rare status exceptions. Instead of "scored": "appeal", "paused", "reset". Careful, they have meanings.
  - [ ] Rare completeness/completeStatus exceptions. "partial" instead of "complete". Work in forceComplete.

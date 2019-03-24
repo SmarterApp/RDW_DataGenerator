@@ -185,11 +185,30 @@ def score_given_capability(capability: float, cuts: [int]) -> (int, int):
     :return: score between min-max from cuts and level based on cuts
     """
     mu = int(cuts[0] + capability * (cuts[-1] - cuts[0]) / 4.0)
-    level = [i for (i, cut) in enumerate(cuts) if mu < cut][0]
+    level = performance_level(mu, cuts)
     sigma = (cuts[level] - cuts[level - 1]) / 8.0
     score = min(cuts[-1] - 1, max(cuts[0], int(random.gauss(mu, sigma))))
-    level = [i for (i, cut) in enumerate(cuts) if score < cut][0]
+    level = performance_level(score, cuts)
     return score, level
+
+
+def performance_level(score: float, cuts: [int]) -> int:
+    """
+    Compare the score against the cut-points to determine the performance level.
+    If the score is less than the min an exception is thrown.
+    If the score is greater than the max an exception is thrown.
+
+    :param score: score
+    :param cuts: the cut points for the levels, inc. min and max
+    :return: performance level for score based on cuts
+    """
+    if score < cuts[0] or score > cuts[-1]:
+        raise ValueError('invalid score {} given cut-points {}'.format(score, cuts))
+    for (i, cut) in enumerate(cuts):
+        if score < cut:
+            return i
+    # it can get here if score == max
+    return len(cuts) - 2
 
 
 def random_claims(score: int, claim_weights: [float], claim_min: int, claim_max: int) -> [int]:

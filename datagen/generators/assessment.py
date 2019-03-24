@@ -7,29 +7,14 @@ from random import choice, randrange, random, sample, randint
 from string import ascii_uppercase
 
 from datagen.config import cfg
-from datagen.config.cfg import ASMT_ITEM_BANK_FORMAT
 from datagen.generators import names, text
 from datagen.generators.text import RandomText
 from datagen.model.assessment import Assessment
 from datagen.model.assessmentoutcome import AssessmentOutcome
 from datagen.model.item import AssessmentItem
 from datagen.model.itemdata import AssessmentOutcomeItemData
-from datagen.model.segment import AssessmentSegment
 from datagen.model.student import Student
 from datagen.util.id_gen import IDGen
-
-
-def generate_assessment(sub_class=None):
-    """Generate a data_generator assessment.
-
-    :param sub_class: The sub-class of assessment to create (if requested, must be subclass of Assessment)
-    :returns: The assessment object
-    """
-    # Create the object
-    a = Assessment() if sub_class is None else sub_class()
-    a.guid = IDGen.get_uuid()
-
-    return a
 
 
 def generate_assessment_outcome(student: Student, assessment: Assessment, id_gen: IDGen):
@@ -103,50 +88,6 @@ def generate_assessment_outcome(student: Student, assessment: Assessment, id_gen
         ao.accommodations.append(('Translation', 'TDS_WL_ESNGlossary', 'Spanish'))
 
     return ao
-
-
-def generate_segment_and_item_bank(asmt: Assessment, gen_item, size, id_gen: IDGen):
-    if not gen_item:
-        asmt.segment = None
-        asmt.item_bank = []
-        asmt.item_total_score = None
-        return
-
-    # make a set of difficulty ranges favoring easy (x2), moderate (x3), hard (x1)
-    diff_low = -3.0
-    diff_mod = -2.5 + 0.2 * asmt.grade
-    diff_hard = -1.25 + 0.25 * asmt.grade
-    diff_high = 4.0
-    diff_ranges = [(diff_low, diff_mod), (diff_low, diff_mod), (diff_mod, diff_hard), (diff_mod, diff_hard),
-                   (diff_mod, diff_hard), (diff_hard, diff_high)]
-
-    segment = AssessmentSegment()
-    segment.id = id_gen.get_uuid()
-
-    item_bank = []
-    for i in range(size):
-        item = AssessmentItem()
-        item.position = i + 1
-        item.bank_key = '200'
-        item.item_key = str(id_gen.get_rec_id('asmt_item_id'))
-        item.segment_id = segment.id
-        item.type = choice(ASMT_ITEM_BANK_FORMAT)
-        if item.type == 'MC':
-            item.options_count = 4
-            item.answer_key = choice(ascii_uppercase[0:4])
-        if item.type == 'MS':
-            item.options_count = 6
-            item.answer_key = ','.join(sorted(sample(ascii_uppercase[0:6], 2)))
-        item.max_score = 1
-        item.dok = choice([1, 1, 1, 2, 2, 2, 3, 3, 4])
-        dr = choice(diff_ranges)
-        item.difficulty = dr[0] + random() * (dr[1] - dr[0])
-        item.operational = '1'
-        item_bank.append(item)
-
-    asmt.segment = segment
-    asmt.item_bank = item_bank
-    asmt.item_total_score = sum(map(lambda i: i.max_score, item_bank))
 
 
 def generate_item_data(outcome: AssessmentOutcome):

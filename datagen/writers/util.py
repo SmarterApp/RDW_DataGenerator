@@ -74,7 +74,7 @@ def _get_attr_value(attr_path, obj=None, tbl_name=None):
             return id_gen.get_rec_id(tbl_name)
     elif attr_path == 'BATCH_GUID':
         return id_gen.get_uuid()
-    elif not '.' in attr_path:
+    elif '.' not in attr_path:
         return attr_path
     elif obj is None:
         return None

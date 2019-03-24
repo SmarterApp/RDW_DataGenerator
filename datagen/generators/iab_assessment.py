@@ -4,10 +4,8 @@ An assessment generator
 
 import datetime
 
-import datagen.config.cfg as cfg
 import datagen.generators.assessment as gen_asmt_generator
 from datagen.model.assessment import Assessment
-from datagen.model.claim import Claim
 from datagen.model.claimscore import ClaimScore
 from datagen.model.interimassessment import InterimAssessment
 from datagen.model.interimassessmentoutcome import InterimAssessmentOutcome
@@ -39,61 +37,6 @@ def create_iab_outcome_object(date_taken: datetime.date,
     # Create the original outcome object
     ao = generate_interim_assessment_outcome(date_taken, student, iab_asmt, id_gen, gen_item=gen_item)
     iab_results[iab_asmt.guid].append(ao)
-
-
-def generate_interim_assessment(asmt_year: int,
-                                subject: str,
-                                block: str,
-                                grade: int,
-                                id_gen: IDGen,
-                                gen_item=True):
-    """
-    Generate an assessment object.
-
-    @param asmt_year: Assessment year
-    @param subject: Assessment subject
-    @param block: block
-    @param grade: grade
-    @param id_gen: id generator
-    @param gen_item: If should create item-level item bank
-    @returns: The assessment object
-    """
-    asmt_scale_scores = cfg.ASMT_SCALE_SCORE[subject][grade]
-
-    # Run the General generator
-    sa = gen_asmt_generator.generate_assessment(Assessment)
-
-    # Set other specifics based on SmarterBalanced conventions
-    sa.rec_id = id_gen.get_rec_id('assessment')
-    sa.type = 'INTERIM ASSESSMENT BLOCK'
-    sa.year = asmt_year
-    sa.version = cfg.ASMT_VERSION
-    sa.name = 'SBAC-IAB-FIXED-G{}{}-{}-{}-{}'\
-        .format(grade, subject[0], ''.join(c for c in block if c.isupper()), subject, grade)
-    sa.id = '(SBAC){}-{}-{}'.format(sa.name, asmt_year-1, asmt_year)
-    sa.subject = subject
-    sa.grade = grade
-    sa.perf_lvl_name_1 = cfg.CLAIM_PERF_LEVEL_NAME_1
-    sa.perf_lvl_name_2 = cfg.CLAIM_PERF_LEVEL_NAME_2
-    sa.perf_lvl_name_3 = cfg.CLAIM_PERF_LEVEL_NAME_3
-    sa.perf_lvl_name_4 = None
-    sa.perf_lvl_name_5 = None
-    sa.overall_score_min = asmt_scale_scores[0]
-    sa.overall_score_max = asmt_scale_scores[-1]
-    sa.claim_perf_lvl_name_1 = cfg.CLAIM_PERF_LEVEL_NAME_1
-    sa.claim_perf_lvl_name_2 = cfg.CLAIM_PERF_LEVEL_NAME_2
-    sa.claim_perf_lvl_name_3 = cfg.CLAIM_PERF_LEVEL_NAME_3
-    sa.overall_cut_point_1 = asmt_scale_scores[1]
-    sa.overall_cut_point_2 = asmt_scale_scores[2]
-    sa.overall_cut_point_3 = asmt_scale_scores[3]
-    # IABs don't really have claims (because they are like a claim) but there is code that expects claim_1 to exist
-    sa.claims = [Claim(block, block, asmt_scale_scores[0], asmt_scale_scores[-1])]
-    sa.effective_date = datetime.date(asmt_year-1, 8, 15)
-    sa.from_date = sa.effective_date
-    sa.to_date = cfg.ASMT_TO_DATE
-    gen_asmt_generator.generate_segment_and_item_bank(sa, gen_item, cfg.IAB_ITEM_BANK_SIZE, id_gen)
-
-    return sa
 
 
 def generate_interim_assessment_outcome(date_taken: datetime.date,

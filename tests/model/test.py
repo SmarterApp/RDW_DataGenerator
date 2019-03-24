@@ -10,13 +10,14 @@ import datagen.generators.summative_or_ica_assessment as asmt_gen
 import datagen.model.itemdata as item_lvl_data
 from datagen.model.studentgroup import StudentGroup
 from datagen.util.id_gen import IDGen
+from tests.generators.assessment_test import generate_assessment
 
 ID_GEN = IDGen()
 
 
 def test_assessment_get_object_set():
     # Create necessary objects
-    asmt = asmt_gen.generate_assessment('SUMMATIVE', 2015, 'ELA', 3, ID_GEN)
+    asmt = generate_assessment('SUMMATIVE', 2015, 'ELA', 3, ID_GEN)
 
     assert asmt.is_summative()
     assert not asmt.is_iab()
@@ -35,7 +36,7 @@ def test_assessment_outcome_get_object_set():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    asmt = asmt_gen.generate_assessment('SUMMATIVE', 2015, 'ELA', 3, ID_GEN)
+    asmt = generate_assessment('SUMMATIVE', 2015, 'ELA', 3, ID_GEN)
     student = pop_gen.generate_student(school, 3, ID_GEN)
     asmt_out = asmt_gen.generate_assessment_outcome(datetime.date(2015, 5, 15), student, asmt, ID_GEN)
 

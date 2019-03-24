@@ -1,6 +1,6 @@
 import copy
 import datetime
-import itertools
+import os
 import random
 import sys
 
@@ -22,9 +22,6 @@ from datagen.outputworkers.xml_worker import XmlWorker
 from datagen.readers.tabulator_reader import load_assessments
 from datagen.util.id_gen import IDGen
 
-# constants used when generating assessment packages
-ASMT_YEARS = [2017, 2018, 2019]  # Expected sorted lowest to highest
-
 # These are global regardless of team
 GRADES_OF_CONCERN = {3, 4, 5, 6, 7, 8, 11}  # Made as a set for intersection later
 
@@ -33,21 +30,17 @@ class WorkerManager(Worker):
     def __init__(self, args):
         self._args = args
 
-        # Save output directory
         self.out_path_root = args.out_dir
+
         self.state_cfg = {'name': args.state_name, 'code': args.state_code, 'type': args.state_type}
         self.hier_source = args.hier_source
 
-        # Set up output
         self.workers = []
         if args.xml_out:
             self.workers.append(XmlWorker(self.out_path_root))
 
         # assessment package settings
         self.pkg_source = args.pkg_source
-        self.sum_pkg = args.sum_pkg
-        self.ica_pkg = args.ica_pkg
-        self.iab_pkg = args.iab_pkg
         self.gen_sum = args.gen_sum
         self.gen_ica = args.gen_ica
         self.gen_iab = args.gen_iab
@@ -66,10 +59,16 @@ class WorkerManager(Worker):
     def run(self):
         state, districts, schools = self.__hierarchy()
 
-        assessments = self.__assessment_packages()
+        assessments = load_assessments(self.pkg_source, self.gen_sum, self.gen_ica, self.gen_iab, self.gen_item)
         if len(assessments) == 0:
             print('No assessment packages found')
             return
+
+        # generate and emit inferred command line from args
+        cl = ' '.join([('--' + k + ' ' + str(v)) for (k,v) in vars(self._args).items()])
+        print(cl)
+        with open(os.path.join(self.out_path_root, 'args.txt'), "a") as f:
+            f.write(cl)
 
         # Process the state
         self.__generate_state_data(state, districts, schools, assessments)
@@ -93,27 +92,10 @@ class WorkerManager(Worker):
 
         return state, districts, schools
 
-    def __assessment_packages(self):
-        """
-        Generate or load assessment packages based on settings
-        
-        :return: [Assessment]
-        """
-        assessments = []
-
-        if self.pkg_source == 'generate':
-            assessments.extend(self.__generate_assessments())
-            for worker in self.workers:
-                worker.write_assessments(assessments)
-        else:
-            assessments.extend(load_assessments(self.pkg_source, self.sum_pkg, self.ica_pkg, self.iab_pkg, self.gen_item))
-
-        return assessments
-
     def __years(self, assessments: [Assessment]):
         """
         Return the sorted list of years represented by assessment packages.
-        :param assessments: assessments 
+        :param assessments: assessments
         :return: sorted list of years, e.g. [2015, 2016, 2017]
         """
         return sorted(set(map(lambda asmt: asmt.year, assessments)))
@@ -158,43 +140,6 @@ class WorkerManager(Worker):
         # Print completion of state
         print('State results created with average of {} students/year and {} total unique'
               .format(student_avg_count, student_unique_count))
-
-    def __generate_assessments(self):
-        """
-        :return: generate assessments
-        """
-        assessments = []
-
-        if not (self.sum_pkg or self.ica_pkg or self.iab_pkg):
-            return assessments
-
-        # set up a progress bar
-        progress_max = len(ASMT_YEARS) * len(cfg.SUBJECTS) * len(GRADES_OF_CONCERN)
-        bar = pyprind.ProgBar(progress_max, stream=sys.stdout, title='Generating Assessments')
-
-        for year, subject, grade in itertools.product(ASMT_YEARS, cfg.SUBJECTS, GRADES_OF_CONCERN):
-            if self.sum_pkg:
-                assessments.append(self.__create_and_write_assessment('SUMMATIVE', year, subject, grade))
-            if self.ica_pkg:
-                assessments.append(self.__create_and_write_assessment('INTERIM COMPREHENSIVE', year, subject, grade))
-            if self.iab_pkg:
-                for block in cfg.IAB_NAMES[subject][grade]:
-                    assessments.append(self.__create_and_write_iab_assessment(block, year, subject, grade))
-            bar.update()
-
-        return assessments
-
-    def __create_and_write_iab_assessment(self, block, year, subject, grade):
-        asmt = iab_asmt_gen.generate_interim_assessment(year, subject, block, grade, self.id_gen, gen_item=self.gen_item)
-        for worker in self.workers:
-            worker.write_iab(asmt)
-        return asmt
-
-    def __create_and_write_assessment(self, type, year, subject, grade):
-        asmt = asmt_gen.generate_assessment(type, year, subject, grade, self.id_gen, gen_item=self.gen_item)
-        for worker in self.workers:
-            worker.write_assessment(asmt)
-        return asmt
 
     def __build_registration_system(self, years):
         """"
@@ -318,11 +263,13 @@ class WorkerManager(Worker):
                 for student in grade_students:
                     if asmt.is_iab():
                         if school.takes_interim_asmts and random.random() < cfg.IAB_STUDENT_RATE:
-                            iab_asmt_gen.create_iab_outcome_object(date_taken, student, asmt, self.id_gen,
-                                iab_results, gen_item=self.gen_item)
+                            iab_asmt_gen.create_iab_outcome_object(date_taken, student, asmt, self.id_gen, iab_results,
+                                                                   gen_item=self.gen_item)
                     else:
                         asmt_gen.create_assessment_outcome_object(date_taken, student, asmt, self.id_gen,
-                            assessment_results, asmt_skip_rates_by_subject[asmt.subject], gen_item=self.gen_item)
+                                                                  assessment_results,
+                                                                  asmt_skip_rates_by_subject[asmt.subject],
+                                                                  gen_item=self.gen_item)
 
                     # Make sure we have the student for the next run and for metrics
                     # (bit repetitive to do it in the inner loop but probably okay for now)
@@ -397,6 +344,8 @@ class WorkerManager(Worker):
         :return: new date
         """
         value += datetime.timedelta(days=random.randint(-3, 3))
-        if value.weekday() == 5: value += datetime.timedelta(days=-1)     # Sat -> Fri
-        elif value.weekday() == 6: value += datetime.timedelta(days=+1)   # Sun -> Mon
+        if value.weekday() == 5:
+            value += datetime.timedelta(days=-1)  # Sat -> Fri
+        elif value.weekday() == 6:
+            value += datetime.timedelta(days=+1)  # Sun -> Mon
         return value

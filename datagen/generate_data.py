@@ -12,9 +12,9 @@ if __name__ == '__main__':
     # Argument parsing for task-specific arguments
     parser = argparse.ArgumentParser(description='SBAC data generation utility.',
                                      epilog='Example arguments:' +
-                                            '\n  --state_type devel --gen_iab --gen_item --xml_out --out_dir out'
-                                            '\n  --state_type tiny --gen_sum --xml_out --out_dir out'
-                                            '\n  --state_type california --gen_sum --gen_ica --xml_out --out_dir out'
+                                            '\n  --state_type devel --gen_iab --gen_item --pkg-source ./in/iabs.csv'
+                                            '\n  --state_type tiny --gen_sum ./in/20*.csv'
+                                            '\n  --state_type california --gen_sum --gen_ica ./in/20*.csv'
                                      )
 
     parser.add_argument('-sn', '--state_name', dest='state_name', action='store', default='California', help='The name of the state (default=California)')
@@ -22,12 +22,7 @@ if __name__ == '__main__':
     parser.add_argument('-st', '--state_type', dest='state_type', action='store', default='tiny', help='Specify the type of state to generate data for')
 
     parser.add_argument('-hier', '--hier_source', dest='hier_source', action='store', default='generate', help='Source of hierarchy, either \'generate\' or a CSV pathname, e.g. ./in/hierarchy.csv')
-
-    group = parser.add_argument_group('packages')
-    group.add_argument('-pkg', '--pkg_source', dest='pkg_source', action='store', default='generate', help='Source of assessment packages, either \'generate\' or a glob expression matching files, e.g. ./in/20*.csv')
-    group.add_argument('-sum', '--sum_pkg', dest='sum_pkg', action='store_true', default=False, help='Load/generate summative assessment packages')
-    group.add_argument('-ica', '--ica_pkg', dest='ica_pkg', action='store_true', default=False, help='Load/generate  interim comprehensive assessment packages')
-    group.add_argument('-iab', '--iab_pkg', dest='iab_pkg', action='store_true', default=False, help='Load/generate  interim assessment block packages')
+    parser.add_argument('-pkg', '--pkg_source', dest='pkg_source', action='store', help='Source of assessment packages, a glob expression matching files, e.g. ./in/20*.csv')
 
     group = parser.add_argument_group('outcomes')
     group.add_argument('-gsum', '--gen_sum', dest='gen_sum', action='store_true', default=False, help='Generate summative outcomes')
@@ -41,28 +36,21 @@ if __name__ == '__main__':
 
     args, unknown = parser.parse_known_args()
 
-    if not (args.xml_out):
+    if not args.xml_out:
         print('Please specify at least one output format')
         print('  --xml_out   Output (TRT) XML')
         exit()
 
-    if args.gen_sum and not args.sum_pkg:
-        print('Summative outcomes (--gen_sum) assuming SUM package (specify --sum_pkg to avoid this warning)')
-        args.sum_pkg = True
+    if not args.pkg_source:
+        print('Please specify the source for assessment packages, e.g.')
+        print('  --pkg_source ./in/*.csv')
+        exit()
 
-    if args.gen_ica and not args.ica_pkg:
-        print('ICA outcomes (--gen_ica) assuming ICA package (specify --ica_pkg to avoid this warning)')
-        args.ica_pkg = True
-
-    if args.gen_iab and not args.iab_pkg:
-        print('IAB outcomes (--gen_iab) assuming IAB package (specify --iab_pkg to avoid this warning)')
-        args.iab_pkg = True
-
-    if not (args.sum_pkg or args.ica_pkg or args.iab_pkg):
+    if not (args.gen_sum or args.gen_ica or args.gen_iab):
         print('No assessment package types selected. Please specify at least one')
-        print('  --sum_pkg  Summative assessment package')
-        print('  --ica_pkg  Interim comprehensive assessment package')
-        print('  --iab_pkg  Interim assessment block package')
+        print('  --gen_sum  Summative assessment package')
+        print('  --gen_ica  Interim comprehensive assessment package')
+        print('  --gen_iab  Interim assessment block package')
         exit()
 
     worker = WorkerManager(args)

@@ -1,7 +1,9 @@
 """
 
 """
-from datagen.util.assessment_stats import DemographicLevels, Stats, score_given_capability
+import pytest
+
+from datagen.util.assessment_stats import DemographicLevels, Stats, score_given_capability, performance_level
 from datagen.util.assessment_stats import RandomLevelByDemographics, Properties, GradeLevels
 from datagen.util.assessment_stats import random_capability
 from datagen.util.weighted_choice import weighted_choice
@@ -88,6 +90,28 @@ def test_random_capability_with_positive_adj():
         avg += value
     avg /= 100.0
     assert 2.0 < avg < 3.5  # should be 2.9
+
+
+def test_performance_level():
+    assert 1 == performance_level(1150.0, [1150, 1480, 1526, 1575, 1900, 1900])
+    assert 1 == performance_level(1400.0, [1150, 1480, 1526, 1575, 1900, 1900])
+    assert 2 == performance_level(1480.0, [1150, 1480, 1526, 1575, 1900, 1900])
+    assert 2 == performance_level(1500.0, [1150, 1480, 1526, 1575, 1900, 1900])
+    assert 3 == performance_level(1526.0, [1150, 1480, 1526, 1575, 1900, 1900])
+    assert 3 == performance_level(1550.0, [1150, 1480, 1526, 1575, 1900, 1900])
+    assert 4 == performance_level(1575.0, [1150, 1480, 1526, 1575, 1900, 1900])
+    assert 4 == performance_level(1600.0, [1150, 1480, 1526, 1575, 1900, 1900])
+    assert 4 == performance_level(1900.0, [1150, 1480, 1526, 1575, 1900, 1900])
+
+
+def test_performance_level_fails_for_low_score():
+    with pytest.raises(ValueError) as e:
+        performance_level(1100.0, [1150, 1480, 1526, 1575, 1900, 1900])
+
+
+def test_performance_level_fails_for_high_score():
+    with pytest.raises(ValueError) as e:
+        performance_level(2100.0, [1150, 1480, 1526, 1575, 1900, 1900])
 
 
 def _assert_score_given_capability(capability, cuts, mean_score, max_score_delta, mean_level, max_level_delta, cnt=20):

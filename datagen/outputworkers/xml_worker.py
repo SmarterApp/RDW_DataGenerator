@@ -241,9 +241,9 @@ class XmlWorker(Worker):
         """
         Build file path for this outcome from state, district, school, and outcome rec id
         Make sure parent folders exist.
-        
-        :param outcome: 
-        :return: 
+
+        :param outcome:
+        :return:
         """
         path = os.path.join(self.out_path_root,
                             outcome.school.district.state.code,

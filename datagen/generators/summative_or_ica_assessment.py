@@ -11,11 +11,10 @@ import datagen.config.cfg as cfg
 import datagen.generators.assessment as gen_asmt_generator
 from datagen.model.assessment import Assessment
 from datagen.model.assessmentoutcome import AssessmentOutcome
-from datagen.model.claim import Claim
 from datagen.model.claimscore import ClaimScore
 from datagen.model.student import Student
 from datagen.model.targetscore import TargetScore
-from datagen.util.assessment_stats import random_claims
+from datagen.util.assessment_stats import random_claims, performance_level
 from datagen.util.assessment_stats import random_stderr, claim_perf_lvl, score_given_capability
 from datagen.util.id_gen import IDGen
 
@@ -82,64 +81,6 @@ def create_assessment_outcome_object(date_taken: datetime.date,
         ao.result_status = cfg.ASMT_STATUS_DELETED
 
 
-def generate_assessment(type, asmt_year, subject, grade, id_gen, from_date=None, to_date=None,
-                        claim_definitions=cfg.CLAIM_DEFINITIONS, gen_item=True):
-    """
-    Generate an assessment object.
-
-    @param type: Assessment type
-    @param asmt_year: Assessment year
-    @param subject: Assessment subject
-    @param grade: Assessment grade
-    @param id_gen: ID generator
-    @param from_date: Assessment from date
-    @param to_date: Assessment to date
-    @param claim_definitions: Definitions for claims to generate
-    @param gen_item: If should create item-level item bank
-    @returns: The assessment object
-    """
-    # Get the claim definitions for this subject
-    if subject not in claim_definitions:
-        raise KeyError("Subject '{}' not found in claim definitions".format(subject))
-
-    claims = claim_definitions[subject]
-    asmt_scale_scores = cfg.ASMT_SCALE_SCORE[subject][grade]
-
-    # Run the General generator
-    sa = gen_asmt_generator.generate_assessment(Assessment)
-
-    # Set other specifics based on SmarterBalanced conventions
-    sa.name = 'SBAC-{}-{}'.format(subject, grade)
-    sa.id = '(SBAC){}-{}-{}-{}'.format(sa.name, 'Spring' if type == 'SUMMATIVE' else 'Winter', asmt_year-1, asmt_year)
-    sa.subject = subject
-    sa.grade = grade
-    sa.rec_id = id_gen.get_rec_id('assessment')
-    sa.type = type
-    sa.year = asmt_year
-    sa.version = cfg.ASMT_VERSION
-    sa.subject = subject
-    # generated ICA/Summative assessments have 4 performance levels
-    sa.perf_lvl_name_1 = cfg.ASMT_PERF_LEVEL_NAME_1
-    sa.perf_lvl_name_2 = cfg.ASMT_PERF_LEVEL_NAME_2
-    sa.perf_lvl_name_3 = cfg.ASMT_PERF_LEVEL_NAME_3
-    sa.perf_lvl_name_4 = cfg.ASMT_PERF_LEVEL_NAME_4
-    sa.overall_score_min = asmt_scale_scores[0]
-    sa.overall_score_max = asmt_scale_scores[4]
-    sa.overall_cut_point_1 = asmt_scale_scores[1]
-    sa.overall_cut_point_2 = asmt_scale_scores[2]
-    sa.overall_cut_point_3 = asmt_scale_scores[3]
-    sa.claim_perf_lvl_name_1 = cfg.CLAIM_PERF_LEVEL_NAME_1
-    sa.claim_perf_lvl_name_2 = cfg.CLAIM_PERF_LEVEL_NAME_2
-    sa.claim_perf_lvl_name_3 = cfg.CLAIM_PERF_LEVEL_NAME_3
-    sa.claims = [Claim(claim['code'], claim['name'], asmt_scale_scores[0], asmt_scale_scores[-1]) for claim in claims]
-    sa.effective_date = datetime.date(asmt_year - 1, 8, 15)
-    sa.from_date = from_date if from_date is not None else sa.effective_date
-    sa.to_date = to_date if to_date is not None else cfg.ASMT_TO_DATE
-    gen_asmt_generator.generate_segment_and_item_bank(sa, gen_item, cfg.ASMT_ITEM_BANK_SIZE, id_gen)
-
-    return sa
-
-
 def generate_assessment_outcome(date_taken: datetime.date,
                                 student: Student,
                                 assessment: Assessment,
@@ -193,7 +134,7 @@ def generate_assessment_outcome(date_taken: datetime.date,
         # SmarterBalanced claim levels are very different, based on +-1.5 stderr
         claim_level = claim_perf_lvl(claim_score, stderr, assessment.overall_cut_point_2) \
             if assessment.subject in cfg.SUBJECTS \
-            else [i for (i, cut) in enumerate(assessment.get_cuts()) if claim_score <= cut][0]
+            else performance_level(claim_score, assessment.get_cuts())
         sao.claim_scores.append(ClaimScore(claim, claim_score, stderr, claim_level,
                                            max(claim.score_min, claim_score - stderr),
                                            min(claim.score_max, claim_score + stderr)))
