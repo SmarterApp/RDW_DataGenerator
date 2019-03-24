@@ -11,8 +11,8 @@ import glob
 
 from datagen.config import cfg
 from datagen.model.assessment import Assessment
-from datagen.model.claim import Claim
 from datagen.model.item import AssessmentItem
+from datagen.model.scorable import Scorable
 from datagen.model.segment import AssessmentSegment
 from datagen.util.id_gen import IDGen
 
@@ -57,6 +57,9 @@ def load_assessments_file(file, load_sum, load_ica, load_iab, load_items):
         if 'AssessmentId' not in reader.fieldnames:
             return assessments
 
+        # adjust item parsing if file appears to not have item information
+        parse_item = load_items and 'ItemId' in reader.fieldnames
+
         for row in reader:
             parse_asmt = False
             id = row['AssessmentId']
@@ -66,7 +69,7 @@ def load_assessments_file(file, load_sum, load_ica, load_iab, load_items):
                 asmt = Assessment()
                 assessments.append(asmt)
                 parse_asmt = True
-            __load_row(row, asmt, parse_asmt, load_items)
+            __load_row(row, asmt, parse_asmt, parse_item)
 
     return assessments
 
@@ -81,32 +84,24 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
         asmt.version = row['AssessmentVersion']
         asmt.year = int(row['AcademicYear'])
 
-        asmt.overall_score_min = __getScore(row['ScaledLow1'])
-        asmt.overall_cut_point_1 = __getRowScore(row, 'ScaledHigh1')
-        asmt.overall_cut_point_2 = __getRowScore(row, 'ScaledHigh2')
-        asmt.overall_cut_point_3 = __getRowScore(row, 'ScaledHigh3')
-        asmt.overall_cut_point_4 = __getRowScore(row, 'ScaledHigh4')
-        asmt.overall_cut_point_5 = __getRowScore(row, 'ScaledHigh5')
-        asmt.overall_score_max = max([s for s in [asmt.overall_cut_point_1, asmt.overall_cut_point_2,
-                                                  asmt.overall_cut_point_3, asmt.overall_cut_point_4,
-                                                  asmt.overall_cut_point_5] if s is not None])
-
         asmt.effective_date = datetime.date(asmt.year - 1, 8, 15)
         asmt.from_date = asmt.effective_date
         asmt.to_date = cfg.ASMT_TO_DATE
 
-        # claims (this is just using the hard-coded values from generator code)
-        # IABs don't really have claims (because they are like a claim) but there is code that expects claim_1 to exist
-        asmt.claim_perf_lvl_name_1 = cfg.CLAIM_PERF_LEVEL_NAME_1
-        asmt.claim_perf_lvl_name_2 = cfg.CLAIM_PERF_LEVEL_NAME_2
-        asmt.claim_perf_lvl_name_3 = cfg.CLAIM_PERF_LEVEL_NAME_3
-        if asmt.is_iab():
-            asmt.claims = [Claim(row['Claim'].strip(), row['AssessmentLabel'], asmt.overall_score_min, asmt.overall_score_max)]
-        elif asmt.subject in cfg.CLAIM_DEFINITIONS:
-            asmt.claims = [Claim(claim['code'], claim['name'], asmt.overall_score_min, asmt.overall_score_max)
-                           for claim in cfg.CLAIM_DEFINITIONS[asmt.subject]]
-        else:
+        asmt.overall = __getScorable(row, 'Scaled', 'Overall', 'Overall')
+
+        # there may be up to 6 alt scores for an assessment
+        if asmt.subject in cfg.ALT_SCORE_DEFINITIONS:
+            alt_defs = cfg.ALT_SCORE_DEFINITIONS[asmt.subject]
+            asmt.alts = [__getScorable(row, 'Alt'+str(i), alt_def['code'], alt_def['name'])
+                         for (i, alt_def) in enumerate(alt_defs, start=1)]
+
+        # claims
+        if asmt.is_iab() or asmt.subject not in cfg.CLAIM_DEFINITIONS:
             asmt.claims = []
+        else:
+            asmt.claims = [Scorable(claim['code'], claim['name'], asmt.overall.score_min, asmt.overall.score_max)
+                           for claim in cfg.CLAIM_DEFINITIONS[asmt.subject]]
 
         # if items are being parsed, create segment and list
         if parse_item:
@@ -119,7 +114,7 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
     if not asmt.is_iab() and asmt.subject not in cfg.CLAIM_DEFINITIONS and 'Claim' in row:
         claim_code = row['Claim'].strip()
         if claim_code not in [claim.code for claim in asmt.claims]:
-            asmt.claims.append(Claim(claim_code, claim_code, asmt.overall_score_min, asmt.overall_score_max))
+            asmt.claims.append(Scorable(claim_code, claim_code, asmt.overall.score_min, asmt.overall.score_max))
 
     # infer allowed accommodations even if not parsing items
     if 'ASL' in row and len(row['ASL']) > 0:
@@ -165,6 +160,23 @@ def __mapSubject(subject):
     if subject.lower() == 'ela':
         return 'ELA'
     return subject
+
+
+def __getScorable(row, prefix, code, name):
+    if prefix+'Low1' not in row:
+        return None
+
+    scorable = Scorable(code, name)
+    scorable.score_min = __getScore(row[prefix+'Low1'])
+    scorable.cut_points = [s for s in [
+        __getRowScore(row, prefix+'High1'),
+        __getRowScore(row, prefix+'High2'),
+        __getRowScore(row, prefix+'High3'),
+        __getRowScore(row, prefix+'High4'),
+        __getRowScore(row, prefix+'High5')
+    ] if s is not None]
+    scorable.score_max = max(scorable.cut_points)
+    return scorable
 
 
 def __getScore(value, default_value=None):

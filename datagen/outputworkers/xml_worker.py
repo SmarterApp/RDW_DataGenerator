@@ -191,10 +191,13 @@ class XmlWorker(Worker):
             accommodation.set('segment', '0')  # available for entire test
 
         # add scores
-        self._add_scale_score(opportunity, 'Overall', outcome.overall_score, outcome.overall_score_stderr, outcome.overall_perf_lvl)
+        self._add_scale_score(opportunity, 'Overall', outcome.overall.score, outcome.overall.stderr, outcome.overall.perf_lvl)
+        if not asmt.is_iab() and outcome.alt_scores:
+            for score in outcome.alt_scores:
+                self._add_scale_score(opportunity, score.code, score.score, score.stderr, score.perf_lvl)
         if not asmt.is_iab() and outcome.claim_scores:
-            for claim_score in outcome.claim_scores:
-                self._add_scale_score(opportunity, claim_score.claim.code, claim_score.score, claim_score.stderr, claim_score.perf_lvl)
+            for score in outcome.claim_scores:
+                self._add_scale_score(opportunity, score.code, score.score, score.stderr, score.perf_lvl)
         if asmt.is_summative() and outcome.target_scores:
             for target_score in outcome.target_scores:
                 self._add_residual_score(opportunity, target_score.id, target_score.student_residual, target_score.standard_met_residual)
@@ -271,6 +274,7 @@ class XmlWorker(Worker):
     def _add_scale_score(self, parent, measure, scale_score, scale_score_stderr, perf_lvl):
         if scale_score:
             self._add_score(parent, measure, 'ScaleScore', scale_score, scale_score_stderr)
+        if perf_lvl:
             self._add_score(parent, measure, 'PerformanceLevel', perf_lvl, '')
 
     def _add_residual_score(self, parent, measure, student_residual, standard_met_residual):

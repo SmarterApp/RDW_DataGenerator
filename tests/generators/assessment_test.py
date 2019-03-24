@@ -16,8 +16,8 @@ import datagen.generators.summative_or_ica_assessment as asmt_gen
 import datagen.model.itemdata as item_lvl_data
 from datagen.generators.assessment import generate_response, _pick_accommodation_code
 from datagen.model.assessment import Assessment
-from datagen.model.claim import Claim
 from datagen.model.item import AssessmentItem
+from datagen.model.scorable import Scorable
 from datagen.model.segment import AssessmentSegment
 from datagen.util.id_gen import IDGen
 
@@ -82,18 +82,10 @@ def test_generate_assessment_outcome_scores():
     asmt_out = asmt_gen.generate_assessment_outcome(datetime.date(2015, 5, 15), student, asmt, ID_GEN)
 
     # Tests
-    assert 2114 <= asmt_out.overall_score <= 2623
-    assert 2114 <= asmt_out.overall_score_range_min <= 2623
-    assert 2114 <= asmt_out.overall_score_range_max <= 2623
+    assert 2114 <= asmt_out.overall.score <= 2623
     assert 2114 <= asmt_out.claim_1_score <= 2623
-    assert 2114 <= asmt_out.claim_1_score_range_min <= 2623
-    assert 2114 <= asmt_out.claim_1_score_range_max <= 2623
     assert 2114 <= asmt_out.claim_2_score <= 2623
-    assert 2114 <= asmt_out.claim_2_score_range_min <= 2623
-    assert 2114 <= asmt_out.claim_2_score_range_max <= 2623
     assert 2114 <= asmt_out.claim_3_score <= 2623
-    assert 2114 <= asmt_out.claim_3_score_range_min <= 2623
-    assert 2114 <= asmt_out.claim_3_score_range_max <= 2623
 
 
 def test_generate_assessment_outcome_summative_taken_date():
@@ -778,20 +770,8 @@ def generate_assessment(asmt_type, asmt_year, subject, grade, id_gen, from_date=
     sa.year = asmt_year
     sa.version = cfg.ASMT_VERSION
     sa.subject = subject
-    # generated ICA/Summative assessments have 4 performance levels
-    sa.perf_lvl_name_1 = cfg.ASMT_PERF_LEVEL_NAME_1
-    sa.perf_lvl_name_2 = cfg.ASMT_PERF_LEVEL_NAME_2
-    sa.perf_lvl_name_3 = cfg.ASMT_PERF_LEVEL_NAME_3
-    sa.perf_lvl_name_4 = cfg.ASMT_PERF_LEVEL_NAME_4
-    sa.overall_score_min = asmt_scale_scores[0]
-    sa.overall_score_max = asmt_scale_scores[4]
-    sa.overall_cut_point_1 = asmt_scale_scores[1]
-    sa.overall_cut_point_2 = asmt_scale_scores[2]
-    sa.overall_cut_point_3 = asmt_scale_scores[3]
-    sa.claim_perf_lvl_name_1 = cfg.CLAIM_PERF_LEVEL_NAME_1
-    sa.claim_perf_lvl_name_2 = cfg.CLAIM_PERF_LEVEL_NAME_2
-    sa.claim_perf_lvl_name_3 = cfg.CLAIM_PERF_LEVEL_NAME_3
-    sa.claims = [Claim(claim['code'], claim['name'], asmt_scale_scores[0], asmt_scale_scores[-1]) for claim in claims]
+    sa.overall = Scorable('Overall', 'Overall', asmt_scale_scores[0], asmt_scale_scores[4], asmt_scale_scores[1:-1])
+    sa.claims = [Scorable(claim['code'], claim['name'], asmt_scale_scores[0], asmt_scale_scores[-1]) for claim in claims]
     sa.effective_date = datetime.date(asmt_year - 1, 8, 15)
     sa.from_date = from_date if from_date is not None else sa.effective_date
     sa.to_date = to_date if to_date is not None else cfg.ASMT_TO_DATE

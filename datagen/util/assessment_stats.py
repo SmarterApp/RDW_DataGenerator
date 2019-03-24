@@ -211,45 +211,43 @@ def performance_level(score: float, cuts: [int]) -> int:
     return len(cuts) - 2
 
 
-def random_claims(score: int, claim_weights: [float], claim_min: int, claim_max: int) -> [int]:
+def random_subscores(score: int, weights: [float], score_min: int, score_max: int) -> [int]:
     """
-    generate random claim scores such that
-
-    score == sum(claim_weight[i] * claim[i] for i in NUMBER_OF_CLAIMS)
+    generate random sub scores such that score == sum(weight[i] * subscore[i] for i in NUMBER_OF_CLAIMS)
     """
-    assert .999 < sum(claim_weights) < 1.001
+    assert .999 < sum(weights) < 1.001
 
-    # shuffle the order of claims to try to even out the distribution
-    # note: I don't think this actually produces a uniform distribution, but at least it doesn't treat claims
-    # with the same weight differently depending on their order
-    ordered = list(enumerate(claim_weights))
+    # shuffle the order of subscores to try to even out the distribution
+    # note: I don't think this actually produces a uniform distribution, but at least it doesn't
+    # treat subscores with the same weight differently depending on their order
+    ordered = list(enumerate(weights))
     random.shuffle(ordered)
-    order, claim_weights = zip(*ordered)
+    order, weights = zip(*ordered)
 
-    claims = []
+    subscores = []
     remaining_weight = 1.0
 
     remaining_score = score
 
-    for claim_weight in claim_weights:
+    for claim_weight in weights:
         remaining_weight -= claim_weight
 
-        min_ = min(claim_max,
-                   max(claim_min, int(math.floor((remaining_score - remaining_weight * claim_max) / claim_weight))))
-        max_ = max(claim_min,
-                   min(claim_max, int(math.ceil((remaining_score - remaining_weight * claim_min) / claim_weight))))
+        min_ = min(score_max,
+                   max(score_min, int(math.floor((remaining_score - remaining_weight * score_max) / claim_weight))))
+        max_ = max(score_min,
+                   min(score_max, int(math.ceil((remaining_score - remaining_weight * score_min) / claim_weight))))
 
         assert min_ <= max_, '{} {}'.format(min_, max_)
 
         claim = random.randint(min_, max_)
-        claims.append(claim)
+        subscores.append(claim)
 
         remaining_score -= claim * claim_weight
 
-    assert score - 1 <= sum(claims[i] * claim_weights[i] for i in range(len(claim_weights))) <= score + 1
+    assert score - 1 <= sum(subscores[i] * weights[i] for i in range(len(weights))) <= score + 1
 
     # unshuffle the claims
-    return tuple(claims[order.index(i)] for i in range(len(claim_weights)))
+    return tuple(subscores[order.index(i)] for i in range(len(weights)))
 
 
 def random_stderr(claim_score: int, claim_min: int, claim_max: int):

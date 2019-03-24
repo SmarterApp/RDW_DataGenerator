@@ -1,7 +1,6 @@
 from datagen.model.assessment import Assessment
 from datagen.model.assessmentoutcome import AssessmentOutcome
 from datagen.model.institutionhierarchy import InstitutionHierarchy
-from datagen.model.interimassessmentoutcome import InterimAssessmentOutcome
 from datagen.model.registrationsystem import RegistrationSystem
 from datagen.model.student import Student
 
@@ -62,7 +61,7 @@ class Worker:
         """
         pass
 
-    def write_iab_outcome(self, results: [InterimAssessmentOutcome], assessment_guid):
+    def write_iab_outcome(self, results: [AssessmentOutcome], assessment_guid):
         """ write iab outcome for the given assessment id
         """
         pass

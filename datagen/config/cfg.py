@@ -46,19 +46,11 @@ ASMT_STATUS_DELETED = 'D'
 
 ASMT_VERSION = 'V1'
 
-ASMT_PERF_LEVEL_NAME_1 = 'Minimal Understanding'
-ASMT_PERF_LEVEL_NAME_2 = 'Partial Understanding'
-ASMT_PERF_LEVEL_NAME_3 = 'Adequate Understanding'
-ASMT_PERF_LEVEL_NAME_4 = 'Thorough Understanding'
 
-CLAIM_PERF_LEVEL_NAME_1 = 'Below Standard'
-CLAIM_PERF_LEVEL_NAME_2 = 'At/Near Standard'
-CLAIM_PERF_LEVEL_NAME_3 = 'Above Standard'
-
-# Scorable claims by subject
-# (weight is used to generate claim scores from overall)
+# Scorable claims by subject (weight is used to generate claim scores from overall)
 # I don't like putting ELPAC in here but that subject doesn't provide item-level
-# data so we need to get the claims from somewhere ...
+# data so we need to get the claims from somewhere. A better solution would be
+# to read in a subject.xml definition file but for now ...
 CLAIM_DEFINITIONS = {'Math': [{'code': '1', 'name': 'Concepts & Procedures', 'weight': .4},
                               {'code': 'SOCK_2', 'name': 'Problem Solving and Modeling & Data Analysis', 'weight': .45},
                               {'code': '3', 'name': 'Communicating Reasoning', 'weight': .15}],
@@ -66,9 +58,15 @@ CLAIM_DEFINITIONS = {'Math': [{'code': '1', 'name': 'Concepts & Procedures', 'we
                              {'code': '2-W', 'name': 'Writing', 'weight': .25},
                              {'code': 'SOCK_LS', 'name': 'Listening', 'weight': .25},
                              {'code': '4-CR', 'name': 'Research & Inquiry', 'weight': .30}],
-                     'ELPAC': [{'code': '1', 'name': 'Oral', 'weight': .50},
-                               {'code': '2', 'name': 'Literacy', 'weight': .50}]
+                     'ELPAC': [{'code': '1-L', 'name': 'Listening', 'weight': .25},
+                               {'code': '1-S', 'name': 'Speaking', 'weight': .25},
+                               {'code': '2-R', 'name': 'Reading', 'weight': .25},
+                               {'code': '2-W', 'name': 'Writing', 'weight': .25}]
                      }
+# Just like claim definitions, hardcoding this sucks. But it'll do for now.
+ALT_SCORE_DEFINITIONS = { 'ELPAC': [{'code':'1', 'name': 'Oral', 'weight': .50},
+                                    {'code':'2', 'name': 'Literacy', 'weight': .50}]
+                        }
 
 # Legacy accommodations handling in the data generator involves randomly assigning settings to the outcomes
 LEGACY_ACCOMMODATIONS = {  # 0: range is 0; 4: range is 4-26

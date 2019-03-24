@@ -11,10 +11,10 @@ import datagen.config.cfg as cfg
 import datagen.generators.assessment as gen_asmt_generator
 from datagen.model.assessment import Assessment
 from datagen.model.assessmentoutcome import AssessmentOutcome
-from datagen.model.claimscore import ClaimScore
+from datagen.model.score import Score
 from datagen.model.student import Student
 from datagen.model.targetscore import TargetScore
-from datagen.util.assessment_stats import random_claims, performance_level
+from datagen.util.assessment_stats import random_subscores, performance_level
 from datagen.util.assessment_stats import random_stderr, claim_perf_lvl, score_given_capability
 from datagen.util.id_gen import IDGen
 
@@ -114,30 +114,41 @@ def generate_assessment_outcome(date_taken: datetime.date,
     gen_asmt_generator.set_opportunity_dates(sao)
 
     # use the student capability to generate an overall score and performance level
-    sao.overall_score, sao.overall_perf_lvl = \
-        score_given_capability(student.capability[assessment.subject], assessment.get_cuts())
+    overall = Score('Overall')
+    overall.score, overall.perf_lvl = \
+        score_given_capability(student.capability[assessment.subject], assessment.overall.get_cuts())
+    overall.stderr = random_stderr(overall.score, assessment.overall.score_min, assessment.overall.score_max)
+    sao.overall = overall
 
-    stderr = random_stderr(sao.overall_score, assessment.overall_score_min, assessment.overall_score_max)
-    sao.overall_score_stderr = stderr
-    sao.overall_score_range_min = max(assessment.overall_score_min, sao.overall_score - stderr)
-    sao.overall_score_range_max = min(assessment.overall_score_max, sao.overall_score + stderr)
+    # generate alt scores if indicated
+    # note that we're using the overall min/max scores; some day we should use alt-specific values
+    if assessment.alts and len(assessment.alts) > 0:
+        sao.alt_scores = []
+        alt_weights = [alt['weight'] for alt in cfg.ALT_SCORE_DEFINITIONS[assessment.subject]]
+        alt_scores = random_subscores(overall.score, alt_weights, assessment.overall.score_min, assessment.overall.score_max)
+        for alt, alt_score in zip(assessment.alts, alt_scores):
+            sao.alt_scores.append(
+                Score(alt.code, alt_score,
+                      random_stderr(alt_score, assessment.overall.score_min, assessment.overall.score_max),
+                      performance_level(alt_score, alt.get_cuts())))
 
-    # use (arbitrary) claim weights to generate claim scores
-    # hack for custom subjects: give all claims equal weight
+    # generate claim scores
     claim_weights = [claim['weight'] for claim in cfg.CLAIM_DEFINITIONS[assessment.subject]] \
         if assessment.subject in cfg.CLAIM_DEFINITIONS else [1.0 / len(assessment.claims)] * len(assessment.claims)
-    claim_scores = random_claims(
-        sao.overall_score, claim_weights, assessment.overall_score_min, assessment.overall_score_max)
+    claim_scores = random_subscores(overall.score, claim_weights, assessment.overall.score_min, assessment.overall.score_max)
+    # another hard-coded thing i don't like but i'm tired ...
+    emit_score = False if assessment.subject == 'ELPAC' else True
     sao.claim_scores = []
     for claim, claim_score in zip(assessment.claims, claim_scores):
-        stderr = random_stderr(claim_score, assessment.overall_score_min, assessment.overall_score_max)
-        # SmarterBalanced claim levels are very different, based on +-1.5 stderr
-        claim_level = claim_perf_lvl(claim_score, stderr, assessment.overall_cut_point_2) \
+        stderr = random_stderr(claim_score, assessment.overall.score_min, assessment.overall.score_max)
+        # SmarterBalanced claim levels are 1-3 based on +-1.5 stderr
+        # (ELPAC will use this too; i have no idea if that is correct but i know the spec
+        #  indicates their levels are 1-3 and i don't know what else to base it on.)
+        claim_level = claim_perf_lvl(claim_score, stderr, assessment.overall.cut_points[1]) \
             if assessment.subject in cfg.SUBJECTS \
-            else performance_level(claim_score, assessment.get_cuts())
-        sao.claim_scores.append(ClaimScore(claim, claim_score, stderr, claim_level,
-                                           max(claim.score_min, claim_score - stderr),
-                                           min(claim.score_max, claim_score + stderr)))
+            else performance_level(claim_score, assessment.overall.get_cuts())
+        sao.claim_scores.append(Score(claim.code, claim_score, stderr, claim_level) if emit_score else
+                                Score(claim.code, None, None, claim_level))
 
     # for summative assessments, if the items have target information, generate target residuals
     # NOTE: these are really fake values, with no real correlation to overall/item scores:

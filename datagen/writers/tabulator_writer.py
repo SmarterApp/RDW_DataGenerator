@@ -37,18 +37,21 @@ def __asmt_to_rows(asmt):
         'AssessmentVersion': asmt.version,
         'AcademicYear': asmt.year,
         'CutPoint1': 1,
-        'ScaledLow1': asmt.overall_score_min,
-        'ScaledHigh1': asmt.overall_cut_point_1,
+        'ScaledLow1': asmt.overall.score_min,
+        'ScaledHigh1': asmt.overall.cut_points[0],
         'CutPoint2': 2,
-        'ScaledLow2': asmt.overall_cut_point_1,
-        'ScaledHigh2': asmt.overall_cut_point_2,
+        'ScaledLow2': asmt.overall.cut_points[0],
+        'ScaledHigh2': asmt.overall.cut_points[1],
         'CutPoint3': 3,
-        'ScaledLow3': asmt.overall_cut_point_2,
-        'ScaledHigh3': asmt.overall_cut_point_3,
+        'ScaledLow3': asmt.overall.cut_points[1],
+        'ScaledHigh3': asmt.overall.cut_points[2],
         'CutPoint4': 4,
-        'ScaledLow4': asmt.overall_cut_point_3,
-        'ScaledHigh4': asmt.overall_score_max,
+        'ScaledLow4': asmt.overall.cut_points[2],
+        'ScaledHigh4': asmt.overall.score_max,
     }
+
+    # TODO - add alt-score columns
+
     if not asmt.item_bank or len(asmt.item_bank) == 0:
         return [row]
 
