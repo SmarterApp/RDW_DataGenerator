@@ -55,28 +55,6 @@ CLAIM_PERF_LEVEL_NAME_1 = 'Below Standard'
 CLAIM_PERF_LEVEL_NAME_2 = 'At/Near Standard'
 CLAIM_PERF_LEVEL_NAME_3 = 'Above Standard'
 
-# for each subject and grade, the LOSS, CP12, CP23, CP34, HOSS
-ASMT_SCALE_SCORE = {
-    'Math': {
-        3:  [2189, 2381, 2436, 2501, 2621],
-        4:  [2204, 2411, 2485, 2549, 2659],
-        5:  [2219, 2455, 2528, 2579, 2700],
-        6:  [2235, 2473, 2552, 2610, 2748],
-        7:  [2250, 2484, 2567, 2635, 2778],
-        8:  [2265, 2504, 2586, 2653, 2802],
-        11: [2280, 2543, 2628, 2718, 2862]
-    },
-    'ELA': {
-        3:  [2114, 2367, 2432, 2490, 2623],
-        4:  [2131, 2416, 2473, 2533, 2663],
-        5:  [2201, 2442, 2502, 2582, 2701],
-        6:  [2210, 2457, 2531, 2618, 2724],
-        7:  [2258, 2479, 2552, 2649, 2745],
-        8:  [2288, 2487, 2567, 2668, 2769],
-        11: [2299, 2493, 2583, 2682, 2795]
-    }
-}
-
 # Scorable claims by subject
 # (weight is used to generate claim scores from overall)
 # I don't like putting ELPAC in here but that subject doesn't provide item-level

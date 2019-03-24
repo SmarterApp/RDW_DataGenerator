@@ -23,6 +23,28 @@ from datagen.util.id_gen import IDGen
 
 ID_GEN = IDGen()
 
+# for each subject and grade, the LOSS, CP12, CP23, CP34, HOSS
+ASMT_SCALE_SCORE = {
+    'Math': {
+        3:  [2189, 2381, 2436, 2501, 2621],
+        4:  [2204, 2411, 2485, 2549, 2659],
+        5:  [2219, 2455, 2528, 2579, 2700],
+        6:  [2235, 2473, 2552, 2610, 2748],
+        7:  [2250, 2484, 2567, 2635, 2778],
+        8:  [2265, 2504, 2586, 2653, 2802],
+        11: [2280, 2543, 2628, 2718, 2862]
+    },
+    'ELA': {
+        3:  [2114, 2367, 2432, 2490, 2623],
+        4:  [2131, 2416, 2473, 2533, 2663],
+        5:  [2201, 2442, 2502, 2582, 2701],
+        6:  [2210, 2457, 2531, 2618, 2724],
+        7:  [2258, 2479, 2552, 2649, 2745],
+        8:  [2288, 2487, 2567, 2668, 2769],
+        11: [2299, 2493, 2583, 2682, 2795]
+    }
+}
+
 
 def test_generate_item_data():
     item_data = item_lvl_data.AssessmentOutcomeItemData()
@@ -720,14 +742,14 @@ def __create_assessment_outcome_objects(student, asmt_summ, interim_asmts, id_ge
                                                   update_rate, False)
 
 
-def generate_assessment(type, asmt_year, subject, grade, id_gen, from_date=None, to_date=None,
+def generate_assessment(asmt_type, asmt_year, subject, grade, id_gen, from_date=None, to_date=None,
                         claim_definitions=cfg.CLAIM_DEFINITIONS, gen_item=True):
     """
     The datagen module used to have the ability to generate assessments. That is no longer available
     (the assessment packages are loaded from tabulator output) so we need a helper method that can
     be used to generate a test assessment object used to generate assessment outcomes.
     
-    @param type: Assessment type
+    @param asmt_type: Assessment asmt_type
     @param asmt_year: Assessment year
     @param subject: Assessment subject
     @param grade: Assessment grade
@@ -743,16 +765,16 @@ def generate_assessment(type, asmt_year, subject, grade, id_gen, from_date=None,
         raise KeyError("Subject '{}' not found in claim definitions".format(subject))
 
     claims = claim_definitions[subject]
-    asmt_scale_scores = cfg.ASMT_SCALE_SCORE[subject][grade]
+    asmt_scale_scores = ASMT_SCALE_SCORE[subject][grade]
 
     sa = Assessment() 
     sa.guid = IDGen.get_uuid()
     sa.name = 'SBAC-{}-{}'.format(subject, grade)
-    sa.id = '(SBAC){}-{}-{}-{}'.format(sa.name, 'Spring' if type == 'SUMMATIVE' else 'Winter', asmt_year-1, asmt_year)
+    sa.id = '(SBAC){}-{}-{}-{}'.format(sa.name, 'Spring' if asmt_type == 'SUMMATIVE' else 'Winter', asmt_year - 1, asmt_year)
     sa.subject = subject
     sa.grade = grade
     sa.rec_id = id_gen.get_rec_id('assessment')
-    sa.type = type
+    sa.type = asmt_type
     sa.year = asmt_year
     sa.version = cfg.ASMT_VERSION
     sa.subject = subject
@@ -819,4 +841,4 @@ def generate_segment_and_item_bank(asmt: Assessment, gen_item, size, id_gen: IDG
 
     asmt.segment = segment
     asmt.item_bank = item_bank
-    asmt.item_total_score = sum(map(lambda i: i.max_score, item_bank))
+    asmt.item_total_score = sum(map(lambda x: x.max_score, item_bank))
