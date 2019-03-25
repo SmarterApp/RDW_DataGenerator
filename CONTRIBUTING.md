@@ -92,7 +92,7 @@ This project was originally created to generate data for the legacy reporting da
 generate data for the new system, mostly to take advantage of the good demographics generation. As such there are a 
 number of things that may need cleaning up. And there are some enhancements/improvements. In no particular order:
 
- - [ ] Load subject definition files instead of hard-coding claim and alt-score definitions (see cfg.py)
+ - [ ] Load subject definition files instead of hard-coding claim and alt-score definitions.
  - [ ] Use only a subset of items from item bank in a particular session outcome (?)
  - [ ] Combine cfg.DEMOGRAPHICS_BY_GRADE and population.DEMOGRAPHICS. They both represent demographic distribution of
  students but they have different values.
@@ -102,6 +102,7 @@ number of things that may need cleaning up. And there are some enhancements/impr
  - [ ] Rare status exceptions. Instead of "scored": "appeal", "paused", "reset". Careful, they have meanings.
  - [ ] Rare completeness/completeStatus exceptions. "partial" instead of "complete". Work in forceComplete.
  - [ ] Change student attributes when they advance. For example LEP/ELAS, IEP.
+ - [ ] Correlate certain attributes. For example, all ELPAC students should have LEP=Yes, ELAS=EL.
  - [ ] Address date-taken requests (see \* below)
 
 \* Currently there is a single date-taken per assessment per school/grade. This isn't particularly realistic but does
