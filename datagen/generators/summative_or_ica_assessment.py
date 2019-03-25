@@ -145,7 +145,7 @@ def generate_assessment_outcome(date_taken: datetime.date,
         # (ELPAC will use this too; i have no idea if that is correct but i know the spec
         #  indicates their levels are 1-3 and i don't know what else to base it on.)
         claim_level = claim_perf_lvl(claim_score, stderr, assessment.overall.cut_points[1]) \
-            if assessment.subject in cfg.SUBJECTS \
+            if assessment.subject in cfg.CLAIM_DEFINITIONS \
             else performance_level(claim_score, assessment.overall.get_cuts())
         sao.claim_scores.append(Score(claim.code, claim_score, stderr, claim_level) if emit_score else
                                 Score(claim.code, None, None, claim_level))
