@@ -197,6 +197,20 @@ def generate_response(aid: AssessmentOutcomeItemData, item: AssessmentItem, capa
             aid.response_value = ','.join(
                 sorted(sample(ascii_uppercase[0:item.options_count].replace(item.answer_key[0], ''), 2)))
             aid.score = 0
+    elif item.type == 'EBSR':  # evidence-based selected response
+        # usually requires two responses, the second may be: not required, single choice, multi-select
+        # answer key examples: "B;D", "D", "A;C,E"; options_count is always 0, max_score is 1
+        aid.page_time = 1000 * randrange(10, 60)
+        answers = item.answer_key.split(';')
+        if correct:
+            aid.response_value = _generate_ebsr_response(answers[0], answers[1] if len(answers) > 1 else None)
+            aid.score = item.max_score
+        else:
+            wrong_answers = ascii_uppercase[0:4].replace(answers[0], '')
+            wrong_answer = wrong_answers[randrange(len(wrong_answers))]
+            # it doesn't really matter what the second value is, so just reuse the first answer
+            aid.response_value = _generate_ebsr_response(wrong_answer, wrong_answer)
+            aid.score = 0
     elif item.type == 'SA' or item.type == 'ER':  # short answer text response
         aid.page_time = 1000 * randrange(60, 300)
         aid.response_value = text.paragraph()
@@ -207,13 +221,12 @@ def generate_response(aid: AssessmentOutcomeItemData, item: AssessmentItem, capa
     elif item.type == 'WER':  # writing extended response (lots of text, shorter for wrong answer; has sub-scores)
         aid.page_time = 1000 * randrange(120, 600)
         if correct:
-            aid.response_value = generate_wer_response(randint(3, 8))
+            aid.response_value = _generate_wer_response(randint(3, 8))
             aid.sub_scores = [randrange(1, 5), randrange(1, 5), randrange(0, 3)]
         else:
-            aid.response_value = generate_wer_response(1)
+            aid.response_value = _generate_wer_response(1)
             aid.sub_scores = [randrange(0, 2), randrange(0, 2), 0]
         aid.score = ceil((aid.sub_scores[0] + aid.sub_scores[1]) / 2.0) + aid.sub_scores[2]
-    # elif item.type == 'EBSR':   # evidence-based selected response (letter response)
     # elif item.type == 'MI':     # match interaction (seems like choice of two for multiple statements)
     # elif item.type == 'HTQ':    # hot text (is answer the text choices or position? multi-select)
     # elif item.type == 'EQ':     # equation response ?
@@ -225,9 +238,15 @@ def generate_response(aid: AssessmentOutcomeItemData, item: AssessmentItem, capa
         aid.score = item.max_score if correct else randrange(0, item.max_score)
 
 
-def generate_wer_response(paragraphs):
+def _generate_wer_response(paragraphs):
     rt = RandomText()
     return '\n\n'.join(('<p>\n' + rt.paragraph() + '\n</p>') for _ in range(paragraphs))
+
+
+def _generate_ebsr_response(answer1, answer2):
+    response1 = '<response id="EBSR1"><value>' + answer1 + '</value></response>'
+    response2 = ('<response id="EBSR2"><value>' + answer2 + '</value></response>') if answer2 else ''
+    return '<itemResponse>' + response1 + response2 + '</itemResponse>'
 
 
 def _pick_accommodation_code(default_code):

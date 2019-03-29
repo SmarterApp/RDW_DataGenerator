@@ -638,6 +638,48 @@ def test_generate_response_for_ms():
             assert aid.response_value == 'B,F'
 
 
+def test_generate_response_for_typical_ebsr():
+    item = AssessmentItem()
+    item.type = 'EBSR'
+    item.options_count = 0
+    item.answer_key = 'B;D'
+    item.max_score = 1
+    item.difficulty = 2
+
+    for _ in range(0, 100):
+        aid = item_lvl_data.AssessmentOutcomeItemData()
+        generate_response(aid, item)
+
+        assert aid.is_selected == '1'
+        assert aid.page_time > 0
+        if aid.score == 0:
+            assert '<value>B' not in aid.response_value
+        else:
+            assert aid.score == 1
+            assert aid.response_value == '<itemResponse><response id="EBSR1"><value>B</value></response><response id="EBSR2"><value>D</value></response></itemResponse>'
+
+
+def test_generate_response_for_single_response_ebsr():
+    item = AssessmentItem()
+    item.type = 'EBSR'
+    item.options_count = 0
+    item.answer_key = 'B'
+    item.max_score = 1
+    item.difficulty = 2
+
+    for _ in range(0, 100):
+        aid = item_lvl_data.AssessmentOutcomeItemData()
+        generate_response(aid, item)
+
+        assert aid.is_selected == '1'
+        assert aid.page_time > 0
+        if aid.score == 0:
+            assert '<value>B' not in aid.response_value
+        else:
+            assert aid.score == 1
+            assert aid.response_value == '<itemResponse><response id="EBSR1"><value>B</value></response></itemResponse>'
+
+
 def test_generate_response_for_sa():
     item = AssessmentItem()
     item.type = 'SA'
@@ -809,9 +851,12 @@ def generate_segment_and_item_bank(asmt: Assessment, gen_item, size, id_gen: IDG
         if item.type == 'MC':
             item.options_count = 4
             item.answer_key = choice(ascii_uppercase[0:4])
-        if item.type == 'MS':
+        elif item.type == 'MS':
             item.options_count = 6
             item.answer_key = ','.join(sorted(sample(ascii_uppercase[0:6], 2)))
+        elif item.type == 'EBSR':
+            item.options_count = 0
+            item.answer_key = ';'.join(sorted(sample(ascii_uppercase[0:4], 2)))
         item.max_score = 1
         item.dok = choice([1, 1, 1, 2, 2, 2, 3, 3, 4])
         dr = choice(diff_ranges)
