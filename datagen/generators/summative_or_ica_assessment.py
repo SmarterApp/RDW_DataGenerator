@@ -117,7 +117,8 @@ def generate_assessment_outcome(date_taken: datetime.date,
     overall = Score('Overall')
     overall.score, overall.perf_lvl = \
         score_given_capability(student.capability[assessment.subject], assessment.overall.get_cuts())
-    overall.stderr = random_stderr(overall.score, assessment.overall.score_min, assessment.overall.score_max)
+    # ELPAC doesn't calculate overall stderr
+    overall.stderr = None if assessment.subject == 'ELPAC' else random_stderr(overall.score, assessment.overall.score_min, assessment.overall.score_max)
     sao.overall = overall
 
     # generate alt scores if indicated

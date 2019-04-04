@@ -19,10 +19,7 @@ This has to match configuration in in datagen/config/state_type.py. Examples inc
 > * `--hier_source FILE_NAME`: Specify the source file for the hierarchy
 
 > Select what should be generated and output:
-> * `--sum_pkg`: generate/load summative assessment (SUM) packages
-> * `--ica_pkg`: generate/load interim comprehensive assessment (ICA) packages
-> * `--iab_pkg`: generate/load interim assessment block (IAB) packages
-> * `--pkg_source`: either `generate` (default) or glob path where tabulator CSV files are located
+> * `--pkg_source`: glob path where tabulator CSV files are located
 > * `--gen_sum`: generate SUM outcomes
 > * `--gen_ica`: generate ICA outcomes
 > * `--gen_iab`: generate IAB outcomes
@@ -86,7 +83,7 @@ Perhaps a bit simpler is to have a datagen folder with just what you need and ma
 ```
 mkdir ~/datagen
 cp /where/ever/it/is/2018.Math.csv ~/datagen
-docker run -v ~/datagen:/out -v ~/datagen:/in fwsbac/rdw-datagen --state_type tiny --gen_sum --xml_out --pkg_source /in/*.csv
+docker run -v ~/datagen:/out -v ~/datagen:/in fwsbac/rdw-datagen --hier_source /in/pern.csv --gen_sum --xml_out --pkg_source /in/20*.csv
 ls -al ~/datagen
 ```
 
