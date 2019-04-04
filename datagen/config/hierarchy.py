@@ -60,7 +60,7 @@ SCHOOL_TYPES = {
          'students': {'min': 75, 'max': 125, 'avg': 100},
          'group_size': 20
          },
-    'K12':
+    'K12 School':
         {'type': 'K12 School',
          'grades': [1, 2, 3, 4, 5, 6, 7, 8, 11],
          'students': {'min': 100, 'max': 150, 'avg': 125},
