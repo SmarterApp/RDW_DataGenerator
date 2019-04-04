@@ -286,7 +286,7 @@ class XmlWorker(Worker):
         score.set('measureOf', measure)
         score.set('measureLabel', label)
         score.set('value', str(value))
-        score.set('standardError', str(stderr))
+        score.set('standardError', str(stderr) if stderr else '')
 
     def _add_score_info(self, parent, dimension, points):
         scoreInfo = SubElement(parent, 'ScoreInfo')
