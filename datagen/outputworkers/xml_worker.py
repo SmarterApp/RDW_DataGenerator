@@ -85,7 +85,7 @@ class XmlWorker(Worker):
         test.set('testId', asmt.name)
         test.set('name', asmt.id)
         test.set('subject', asmt.subject)
-        test.set('grade', '{:02}'.format(asmt.grade))
+        test.set('grade', self._map_grade(asmt.grade))
         test.set('assessmentType', self._map_asmt_type(asmt.type))
         test.set('academicYear', str(asmt.year))
         test.set('assessmentVersion', asmt.version)
@@ -105,7 +105,7 @@ class XmlWorker(Worker):
         self._add_examinee_attribute(examinee, 'MiddleName', student.middle_name, contextDateStr)
         self._add_examinee_attribute(examinee, 'LastOrSurname', student.last_name, contextDateStr)
         self._add_examinee_attribute(examinee, 'Sex', self._map_gender(student.gender), contextDateStr)
-        self._add_examinee_attribute(examinee, 'GradeLevelWhenAssessed', '{:02}'.format(student.grade), contextDateStr)
+        self._add_examinee_attribute(examinee, 'GradeLevelWhenAssessed', self._map_grade(student.grade), contextDateStr)
         self._add_examinee_attribute(examinee, 'HispanicOrLatinoEthnicity', self._map_yes_no(student.eth_hispanic), contextDateStr)
         self._add_examinee_attribute(examinee, 'AmericanIndianOrAlaskaNative', self._map_yes_no(student.eth_amer_ind), contextDateStr)
         self._add_examinee_attribute(examinee, 'Asian', self._map_yes_no(student.eth_asian), contextDateStr)
@@ -312,3 +312,6 @@ class XmlWorker(Worker):
         if student.held_back: return 'HeldBack'
         if student.transfer: return 'Transfer'
         return 'Normal'
+
+    def _map_grade(self, value):
+        return 'KG' if value == 0 else '{:02}'.format(value)
