@@ -48,7 +48,7 @@ def load_assessments_file(file, load_sum, load_ica, load_iab, load_items):
     assessments = []
 
     def should_process(subtype):
-        return (subtype == 'SUM' and load_sum) or (subtype == 'ICA' and load_ica) or (subtype == 'IAB' and load_iab)
+        return ((subtype == 'SUM' or subtype == 'summative') and load_sum) or (subtype == 'ICA' and load_ica) or (subtype == 'IAB' and load_iab)
 
     asmt = None
     with open(file) as csvfile:
@@ -79,7 +79,7 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
         asmt.id = row['AssessmentId']
         asmt.name = row['AssessmentName']
         asmt.subject = __mapSubject(row['AssessmentSubject'])
-        asmt.grade = int(row['AssessmentGrade'])
+        asmt.grade = __mapGrade(row['AssessmentGrade'])
         asmt.type = __mapAssessmentType(row['AssessmentType'], row['AssessmentSubtype'])
         asmt.version = row['AssessmentVersion']
         asmt.year = int(row['AcademicYear'])
@@ -149,7 +149,7 @@ def __mapAssessmentType(type, subtype):
         return 'INTERIM ASSESSMENT BLOCK'
     if subtype == 'ICA':
         return 'INTERIM COMPREHENSIVE'
-    if subtype == 'SUM':
+    if subtype == 'SUM' or subtype == 'summative':
         return 'SUMMATIVE'
     raise Exception('Unexpected assessment type {}-{}'.format(type, subtype))
 
@@ -160,6 +160,13 @@ def __mapSubject(subject):
     if subject.lower() == 'ela':
         return 'ELA'
     return subject
+
+
+def __mapGrade(grade):
+    # we're going to be sneaky and make KG grade 0
+    if grade.lower() == 'kg':
+        return 0
+    return int(grade)
 
 
 def __getScorable(row, prefix, code, name):

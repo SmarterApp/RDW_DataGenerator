@@ -21,7 +21,7 @@ class Assessment:
         self.id = None          # conventional SBAC assessment id, e.g. (SBAC)SBAC-Math-8-Winter-2016-2017
         self.name = None        # conventional SBAC assessment name, e.g. SBAC-Math-8
         self.subject = None
-        self.grade = None       # integer
+        self.grade = None       # integer, KG=0, G1=1, ..., G13=13; doesn't handle HS, UG, PS, etc.
         self.contract = 'SBAC'
         self.mode = 'online'
         self.rec_id = None      # record id, used to link output records

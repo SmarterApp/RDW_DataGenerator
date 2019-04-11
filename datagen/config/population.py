@@ -27,6 +27,25 @@ MILITARY_CONNECTED_DIST = {
 # so grade 1 ethnicity should not allow any pac_isl students.
 DEMOGRAPHICS = {
     'california': {
+        # these (KG) values were just copied from grade 1
+        '0': {'gender': {'male': {'name': 'Male', 'perc': .5134},
+                         'female': {'name': 'Female', 'perc': .4866}},
+              'ethnicity': {'amer_ind': {'name': 'American Indian', 'perc': .0059},
+                            'black': {'name': 'Black or African American', 'perc': .0594},
+                            'hispanic': {'name': 'Hispanic or Latino', 'perc': .5356},
+                            'asian': {'name': 'Asian', 'perc': .051},
+                            'filipino': {'name': 'Filipino', 'perc': .038},
+                            'pac_isl': {'name': 'Native Hawaiian/Other Pacific Islander', 'perc': .0054},
+                            'white': {'name': 'White', 'perc': .2492},
+                            'multi': {'name': 'Multiethnic', 'perc': .0273},
+                            'none': {'name': 'Not Stated', 'perc': .0057}},
+              'iep': {'name': 'Students with Disabilities (IEP)', 'perc': .11},
+              '504': {'name': '504 Plan', 'perc': .07},
+              'lep': {'name': 'LEP', 'perc': .301},
+              'idea': {'name': 'IDEA Indicator', 'perc': .1},
+              'econ_dis': {'name': 'Economically Disadvantaged', 'perc': .53},
+              'migrant': {'name': 'Migrant Status', 'perc': .0355}
+              },
         '1': {'gender': {'male': {'name': 'Male', 'perc': .5134},
                          'female': {'name': 'Female', 'perc': .4866}},
               'ethnicity': {'amer_ind': {'name': 'American Indian', 'perc': .0059},
@@ -252,6 +271,25 @@ DEMOGRAPHICS = {
                }
     },
     'typical1': {
+        # these (KG) values were just copied from grade 1
+        '0': {'gender': {'male': {'name': 'Male', 'perc': .50},
+                         'female': {'name': 'Female', 'perc': .48},
+                         'none': {'name': 'Not Stated', 'perc': .02}},
+              'ethnicity': {'amer_ind': {'name': 'American Indian', 'perc': .01},
+                            'black': {'name': 'Black or African American', 'perc': .18},
+                            'hispanic': {'name': 'Hispanic or Latino', 'perc': .23},
+                            'asian': {'name': 'Asian', 'perc': .07},
+                            'pac_isl': {'name': 'Native Hawaiian/Other Pacific Islander', 'perc': .03},
+                            'white': {'name': 'White', 'perc': .45},
+                            'multi': {'name': 'Multiethnic', 'perc': .01},
+                            'none': {'name': 'Not Stated', 'perc': .02}},
+              'iep': {'name': 'Students with Disabilities (IEP)', 'perc': .15},
+              '504': {'name': '504 Plan', 'perc': .07},
+              'lep': {'name': 'LEP', 'perc': .09},
+              'idea': {'name': 'IDEA Indicator', 'perc': .1},
+              'econ_dis': {'name': 'Economically Disadvantaged', 'perc': .57},
+              'migrant': {'name': 'Migrant Status', 'perc': .0355}
+              },
         '1': {'gender': {'male': {'name': 'Male', 'perc': .50},
                          'female': {'name': 'Female', 'perc': .48},
                          'none': {'name': 'Not Stated', 'perc': .02}},

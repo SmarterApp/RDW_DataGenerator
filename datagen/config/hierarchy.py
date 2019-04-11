@@ -56,13 +56,13 @@ SCHOOL_TYPES = {
          },
     'Elementary School':
         {'type': 'Elementary School',
-         'grades': [3, 4, 5],
+         'grades': [0, 1, 2, 3, 4, 5],
          'students': {'min': 75, 'max': 125, 'avg': 100},
          'group_size': 20
          },
     'K12 School':
         {'type': 'K12 School',
-         'grades': [1, 2, 3, 4, 5, 6, 7, 8, 11],
+         'grades': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
          'students': {'min': 100, 'max': 150, 'avg': 125},
          'group_size': 30
          },
@@ -82,7 +82,7 @@ SCHOOL_TYPES = {
          },
     'Poor Elementary School':
         {'type': 'Elementary School',
-         'grades': [3, 4, 5],
+         'grades': [0, 1, 2, 3, 4, 5],
          'students': {'min': 75, 'max': 125, 'avg': 100},
          'group_size': 30,
          'adjust_pld': -0.6
@@ -103,7 +103,7 @@ SCHOOL_TYPES = {
          },
     'Good Elementary School':
         {'type': 'Elementary School',
-         'grades': [3, 4, 5],
+         'grades': [0, 1, 2, 3, 4, 5],
          'students': {'min': 75, 'max': 125, 'avg': 100},
          'group_size': 15,
          'adjust_pld': 0.5
@@ -122,7 +122,7 @@ SCHOOL_TYPES = {
          },
     'Big Elementary School':
         {'type': 'Elementary School',
-         'grades': [3, 4, 5],
+         'grades': [0, 1, 2, 3, 4, 5],
          'students': {'min': 100, 'max': 200, 'avg': 150},
          'group_size': 20
          },
@@ -146,13 +146,13 @@ SCHOOL_TYPES = {
          },
     'Tiny Elementary School':
         {'type': 'Elementary School',
-         'grades': [3, 4, 5],
+         'grades': [0, 1, 2, 3, 4, 5],
          'students': {'min': 5, 'max': 10, 'avg': 7},
          'group_size': 10
          },
     'Tiny K12 School':
         {'type': 'K12 School',
-         'grades': [1, 2, 3, 4, 5, 6, 7, 8, 11],
+         'grades': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
          'students': {'min': 5, 'max': 10, 'avg': 7},
          'group_size': 10
          },

@@ -108,6 +108,14 @@ class WorkerManager(Worker):
         """
         return sorted(set(map(lambda asmt: asmt.subject, assessments)))
 
+    def __grades(self, assessments: [Assessment]):
+        """
+        Return the set of grades represented by assessment packages.
+        :param assessments: assessments
+        :return: set of grades, e.g. {1, 2, 6}
+        """
+        return set(map(lambda asmt: asmt.grade, assessments))
+
     def __generate_state_data(self, state: State, districts: [District], schools: [School], assessments: [Assessment]):
         """
         Generate an entire data set for a single state.
@@ -189,8 +197,12 @@ class WorkerManager(Worker):
         # get range of years from assessment packages
         years = self.__years(assessments)
 
+        # start with "standard" SB grades and add any grade found in the assessments
+        hierarchy_grades = GRADES_OF_CONCERN
+        hierarchy_grades.update(self.__grades(assessments))
+
         # calculate the progress bar max and start the progress
-        progress_max = len(hier_gen.set_up_schools_with_grades(schools, GRADES_OF_CONCERN)) * len(years)
+        progress_max = len(hier_gen.set_up_schools_with_grades(schools, hierarchy_grades)) * len(years)
         bar = pyprind.ProgBar(progress_max, stream=sys.stdout, title='Generating assessments outcome for schools')
 
         for year in years:
@@ -198,7 +210,7 @@ class WorkerManager(Worker):
             reg_system = reg_sys_by_year[year]
 
             # Set up a dictionary of schools and their grades
-            schools_with_grades = hier_gen.set_up_schools_with_grades(schools, GRADES_OF_CONCERN)
+            schools_with_grades = hier_gen.set_up_schools_with_grades(schools, hierarchy_grades)
 
             # Advance the students forward in the grades
             for guid, student in students.items():
