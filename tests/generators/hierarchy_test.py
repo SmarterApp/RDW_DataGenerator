@@ -132,7 +132,7 @@ def test_sort_schools_by_grade():
                                                        midl_school_2, high_school])
 
     # Tests
-    assert len(schools_by_grade.keys()) == 7
+    assert len(schools_by_grade.keys()) == 10
     assert len(schools_by_grade[3]) == 3
     assert len(schools_by_grade[4]) == 3
     assert len(schools_by_grade[5]) == 3
