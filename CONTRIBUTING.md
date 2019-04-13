@@ -75,6 +75,15 @@ docker push fwsbac/rdw-datagen
 
 Refer to README.md for instructions for running the docker image.
 
+#### CI Build
+
+The CI system uses docker to build the build environment. If you want to replicate it do something like:
+```bash
+find . -name "*.pyc" -o -name "__pycache__" -delete
+docker build -f Dockerfile.dev -t datagen-dev .
+docker run -v `pwd`:/out datagen-dev pytest --cov-report html:/out/coverage --cov=datagen tests/
+```
+
 #### Troubleshooting the Docker Image
 If things aren't working properly and you want to get into the image, you can override the entrypoint. Comment out the
 ENTRYPOINT and CMD lines in `Dockerfile` and replace with:
