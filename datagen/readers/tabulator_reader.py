@@ -139,7 +139,8 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
         item.operational = '0' if row['IsFieldTest'] == 'true' else '1'
         item.answer_key = row['AnswerKey'] if 'AnswerKey' in row else None
         item.options_count = int(row['NumberOfAnswerOptions']) if 'NumberOfAnswerOptions' in row else 0
-        item.target = row['ClaimContentTarget'].strip() if 'ClaimContentTarget' in row else None
+        # these are messy in tabulator output so split, strip, rejoin
+        item.target = '|'.join(t.strip() for t in row['ClaimContentTarget'].split('|')) if 'ClaimContentTarget' in row else None
         asmt.item_bank.append(item)
         asmt.item_total_score += item.max_score
 
