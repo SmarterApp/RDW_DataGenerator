@@ -1,0 +1,34 @@
+{
+  "districts": [
+    {
+      "entityId": "99900010000000",
+      "entityType": "DISTRICT",
+      "parentEntityType": "STATE",
+      "entityName": "Demo District",
+      "parentEntityId": "CA"
+    }
+  ],
+  "institutions": [
+    {
+      "entityId": "99900010000001",
+      "entityType": "INSTITUTION",
+      "parentEntityType": "DISTRICT",
+      "entityName": "Demo Elementary",
+      "parentEntityId": "99900010000000"
+    },
+    {
+      "entityId": "99900010000002",
+      "entityType": "INSTITUTION",
+      "parentEntityType": "DISTRICT",
+      "entityName": "Demo Middle",
+      "parentEntityId": "99900010000000"
+    },
+    {
+      "entityId": "99900010000003",
+      "entityType": "INSTITUTION",
+      "parentEntityType": "DISTRICT",
+      "entityName": "Demo High School",
+      "parentEntityId": "99900010000000"
+    }
+  ]
+}
