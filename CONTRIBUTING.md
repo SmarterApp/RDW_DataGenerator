@@ -102,6 +102,7 @@ generate data for the new system, mostly to take advantage of the good demograph
 number of things that may need cleaning up. And there are some enhancements/improvements. In no particular order:
 
  - [ ] Load subject definition files instead of hard-coding claim and alt-score definitions.
+ - [ ] Occasionally a (summative?) test result should be missing target scores
  - [ ] Use only a subset of items from item bank in a particular session outcome (?)
  - [ ] Combine cfg.DEMOGRAPHICS_BY_GRADE and population.DEMOGRAPHICS. They both represent demographic distribution of
  students but they have different values.
@@ -110,6 +111,7 @@ number of things that may need cleaning up. And there are some enhancements/impr
  - [ ] Rare admin condition exceptions. Summative: IN, perhaps by session. ICA: NS, perhaps by school.
  - [ ] Rare status exceptions. Instead of "scored": "appeal", "paused", "reset". Careful, they have meanings.
  - [ ] Rare completeness/completeStatus exceptions. "partial" instead of "complete". Work in forceComplete.
+ - [ ] Rare unscored tests.
  - [ ] Change student attributes when they advance. For example LEP/ELAS, IEP.
  - [ ] Correlate certain attributes. For example, all ELPAC students should have LEP=Yes, ELAS=EL.
  - [ ] Address date-taken requests (see \* below)

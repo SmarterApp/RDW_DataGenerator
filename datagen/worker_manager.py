@@ -31,6 +31,7 @@ class WorkerManager(Worker):
         self._args = args
 
         self.out_path_root = args.out_dir
+        os.makedirs(self.out_path_root, exist_ok=True)
 
         self.state_cfg = {'name': args.state_name, 'code': args.state_code, 'type': args.state_type}
         self.hier_source = args.hier_source
