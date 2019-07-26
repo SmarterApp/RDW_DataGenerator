@@ -99,9 +99,7 @@ Create EC2 instance using Amazon Linux or CentOS image. Then ...
     mkdir out
     docker run -v ~/out:/out fwsbac/rdw-datagen --state_type tiny --gen_ica --gen_iab --gen_item --xml_out
 
-#### Update the student responses for EQ, MI, TI, HTQ, and EBSR items
-The generator currently does not format the student response for these four item types correctly. A seperate C# command line app was written to update the responses. This app must be run after the TRTs have been generated. The app is found here:
 
-https://github.com/SmarterApp/AP_ItemMaintenanceTools/tree/master/RemediateTrtItemResponse
-
-Note that the current version of the app accepts a configuration only for practice items. A configuration file for operational items will need to be developed.
+#### Update the student responses for EQ, MI, TI, HTQ items
+The generator has been modified to provide student responses for these item types (based on the config file in https://github.com/SmarterApp/AP_ItemMaintenanceTools/tree/master/RemediateTrtItemResponse). 
+Currently this is for practice items only (many are based on the actual item key); it will have to be made to work for operational items too at some point. And perhaps it could be driven by a configuration file or even modified tabulator output to make updates easier.
