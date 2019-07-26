@@ -227,11 +227,27 @@ def generate_response(aid: AssessmentOutcomeItemData, item: AssessmentItem, capa
             aid.response_value = _generate_wer_response(1)
             aid.sub_scores = [randrange(0, 2), randrange(0, 2), 0]
         aid.score = ceil((aid.sub_scores[0] + aid.sub_scores[1]) / 2.0) + aid.sub_scores[2]
-    # elif item.type == 'MI':     # match interaction (seems like choice of two for multiple statements)
-    # elif item.type == 'HTQ':    # hot text (is answer the text choices or position? multi-select)
-    # elif item.type == 'EQ':     # equation response ?
+    elif item.type == 'EQ':  # equation response
+        aid.page_time = 1000 * randrange(10, 60)
+        # note that this doesn't consider whether answer is correct or not, just hardcoded response
+        aid.response_value = '<response> <math xmlns="http://www.w3.org/1998/Math/MathML"> <mstyle displaystyle="true"> <mn>2</mn> <mn>0</mn> <mn>1</mn> </mstyle> </math> </response>'
+        aid.score = item.max_score if correct else randrange(0, item.max_score)
+    elif item.type == 'HTQ':  # hot text
+        aid.page_time = 1000 * randrange(10, 60)
+        # note that this doesn't consider whether answer is correct or not, just hardcoded response
+        aid.response_value = _generate_htq_response(item.item_key)
+        aid.score = item.max_score if correct else randrange(0, item.max_score)
+    elif item.type == 'MI':  # match interaction
+        aid.page_time = 1000 * randrange(10, 60)
+        # note that this doesn't consider whether answer is correct or not, just hardcoded response
+        aid.response_value = _generate_mi_response(item.item_key)
+        aid.score = item.max_score if correct else randrange(0, item.max_score)
+    elif item.type == 'TI':  # table interaction
+        aid.page_time = 1000 * randrange(10, 60)
+        # note that this doesn't consider whether answer is correct or not, just hardcoded response
+        aid.response_value = _generate_ti_response(item.item_key)
+        aid.score = item.max_score if correct else randrange(0, item.max_score)
     # elif item.type == 'GI':     # grid item response ?
-    # elif item.type == 'TI':     # table interaction ?
     else:
         aid.page_time = 1000 * randrange(2, 60)
         aid.response_value = ('good ' if correct else 'poor ') + item.type + ' response'
@@ -247,6 +263,115 @@ def _generate_ebsr_response(answer1, answer2):
     response1 = '<response id="EBSR1"><value>' + answer1 + '</value></response>'
     response2 = ('<response id="EBSR2"><value>' + answer2 + '</value></response>') if answer2 else ''
     return '<itemResponse>' + response1 + response2 + '</itemResponse>'
+
+
+HTQValueMap = {
+    '96010': [1],
+    '182822': [5],
+    '182827': [3],
+    '182835': [2],
+    '182851': [5],
+    '182854': [6],
+    '182879': [1, 6],
+    '182898': [2],
+    '182936': [3, 6],
+    '182951': [2],
+    '182958': [2, 10],
+    '182964': [2, 3, 5],
+    '182966': [2, 3, 5],
+    '182979': [3],
+    '182994': [1],
+    '183002': [2, 3, 5],
+    '183018': [1, 4],
+    '183040': [4, 6],
+    '183043': [2, 3, 5],
+    '183045': [5],
+    '183052': [1, 6],
+    '183060': [4],
+    '183074': [6, 10],
+    '183084': [1, 6],
+    '183091': [2, 3, 8],
+    '183093': [1, 4],
+    '183145': [1, 6],
+    '183154': [1, 6],
+    '183187': [3, 7]
+}
+
+
+def _generate_htq_response(item_key):
+    value = ''.join(['<value>' + str(v) + '</value>' for v in HTQValueMap[item_key]]) if item_key in HTQValueMap else ''
+    return '<itemReponse><response id=\'1\'>' + value + '</response></itemResponse>'
+
+
+MIValueMap = {
+    '182637': ['1 a', '2 c', '3 b'],
+    '182643': ['1 a', '2 a', '3 b'],
+    '182646': ['1 a', '2 b'],
+    '182666': ['1 a', '2 c', '3 b'],
+    '182697': ['1 a', '2 c', '3 b', '4 c'],
+    '182702': ['1 a', '2 c', '3 b', '4 c'],
+    '182825': ['1 a', '2 c', '3 b'],
+    '182830': ['1 a', '2 b', '3 b', '4 a'],
+    '182863': ['1 a', '2 b', '3 b', '4 a'],
+    '182944': ['1 a', '2 b', '3 d'],
+    '182956': ['1 a', '2 b', '3 b', '4 a', '5 c'],
+    '182982': ['1 a', '2 b', '3 b', '4 a', '5 a'],
+    '183063': ['1 a', '2 c', '3 b'],
+    '183082': ['1 a', '2 c'],
+    '183086': ['1 a', '2 b', '3 c', '4 a'],
+    '183133': ['1 a', '2 b', '3 c', '4 a'],
+    '183270': ['1 a', '2 b', '3 c', '4 a'],
+    '183272': ['1 a', '2 c', '3 b'],
+    '183278': ['1 a', '2 b', '3 c', '4 a'],
+    '183288': ['1 a', '2 b', '3 c', '4 a'],
+    '183290': ['1 a', '2 b', '3 b'],
+    '183312': ['1 a', '2 b', '3 c', '4 a'],
+    '183344': ['1 a', '2 b', '3 b'],
+    '183352': ['1 a', '2 b', '3 b', '4 a', '5 a', '6 b'],
+    '183383': ['1 a', '2 b', '3 c', '4 a'],
+    '183385': ['1 a', '2 b', '3 b'],
+    '183387': ['1 a', '2 b', '3 b'],
+    '183529': ['1 a', '2 b', '3 b'],
+    '183531': ['1 a', '2 b', '3 b'],
+    '183533': ['1 a', '2 b', '3 b'],
+    '183535': ['1 a', '2 c', '3 b'],
+    '183539': ['1 a', '2 b', '3 b'],
+    '183541': ['1 a', '2 b', '3 b'],
+    '183579': ['1 a', '2 b', '3 b'],
+    '183581': ['1 a', '2 b', '3 c', '4 a'],
+    '183585': ['1 a', '2 b', '3 b', '4 a', '5 a'],
+    '183587': ['1 a', '2 b', '3 b'],
+    '183603': ['1 a', '2 b', '3 b'],
+    '183605': ['1 a', '2 c', '3 d'],
+    '183611': ['1 a', '2 b', '3 b'],
+    '183613': ['1 a', '2 b', '3 b', '4 a', '5 a'],
+    '183625': ['1 a', '2 b', '3 b', '4 a', '5 a'],
+    '183629': ['1 a', '2 b', '3 b'],
+    '183679': ['1 a', '2 c', '3 d']
+}
+
+
+def _generate_mi_response(item_key):
+    value = ''.join(['<value>' + v + '</value>' for v in MIValueMap[item_key]]) if item_key in MIValueMap else ''
+    return '<itemReponse><response id="RESPONSE">' + value + '</response></itemResponse>'
+
+
+TIValueMap = {
+    '183499': '<tr><th id="col0"/><th id="col1"/></tr><tr><td>2</td><td/></tr><tr><td/><td/></tr><tr><td/><td/></tr><tr><td/><td>54</td></tr>',
+    '183501': '<tr><th id="col0"/><th id="col1"/></tr><tr><td/><td/></tr><tr><td>4</td><td/></tr><tr><td/><td>9.25</td></tr><tr><td/><td>12.30</td></tr><tr><td>18</td><td/></tr>',
+    '183415': '<tr><th id="col0"/><th id="col1"/><th id="col2"/><th id="col3"/></tr><tr><td/><td>45</td><td>78</td><td>85</td></tr><tr><td/><td>9</td><td>2</td><td>20</td></tr><tr><td/><td>6</td><td>3</td><td>9</td></tr>',
+    '183555': '<tr><th id="col0"/><th id="col1"/></tr><tr><td/><td>5</td></tr><tr><td/><td>6</td></tr><tr><td/><td>7</td></tr><tr><td/><td>8</td></tr><tr><td/><td>9</td></tr>',
+    '183246': '<tr><th id="col0"/><th id="col1"/><th id="col2"/><th id="col3"/></tr><tr><td/><td>18</td><td/><td/></tr><tr><td/><td>25</td><td/><td/></tr><tr><td/><td/><td/><td/></tr>',
+    '183694': '<tr><th id="col0"/><th id="col1"/><th id="col2"/></tr><tr><td/><td>6</td><td>9</td></tr><tr><td/><td>0</td><td>3</td></tr>',
+    '182798': '<tr><th id="col0"/><th id="col1"/><th id="col2"/><th id="col3"/></tr><tr><td/><td>6</td><td>8</td><td>20</td></tr>',
+    '182803': '<tr><th id="col0"/><th id="col1"/><th id="col2"/></tr><tr><td/><td/><td>10:00 a.m.</td></tr><tr><td/><td>10:15 a.m.</td><td>10:30 a.m.</td></tr><tr><td/><td>10:30 a.m.</td><td>11:30 a.m.</td></tr><tr><td/><td>11:30 a.m.</td><td>1:00 p.m.</td></tr><tr><td/><td>1:00 p.m.</td><td/></tr><tr><td/><td/><td/></tr>',
+    '183695': '<tr><th id="col0"/><th id="col1"/><th id="col2"/></tr><tr><td/><td>5</td><td>8</td></tr><tr><td/><td>10</td><td>3</td></tr><tr><td/><td>56</td><td>9</td></tr>'
+}
+
+
+def _generate_ti_response(item_key):
+    table = TIValueMap[item_key] if item_key in TIValueMap else ''
+    return '<responseSpec><responseTable>' + table + '</responseTable></responseSpec>'
 
 
 def _pick_accommodation_code(default_code):
