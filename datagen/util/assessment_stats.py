@@ -152,8 +152,8 @@ def random_capability(distribution: [float], adj: float = 0.0) -> float:
     values = [0.0] + list(itertools.accumulate(distribution))
     value = random.uniform(0, values[-1])
     for i in range(0, n):
-        if value < values[i+1]:
-            return adjust_capability(i + ((value - values[i]) / (values[i+1] - values[i])), adj)
+        if value < values[i + 1]:
+            return adjust_capability(i + ((value - values[i]) / (values[i + 1] - values[i])), adj)
 
 
 def adjust_capability(capability: float, adj: float) -> float:

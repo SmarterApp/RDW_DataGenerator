@@ -713,22 +713,60 @@ def test_generate_response_for_wer():
         assert len(aid.sub_scores) == 3
 
 
-def test_generate_response_for_other():
+def test_generate_response_for_eq():
     item = AssessmentItem()
     item.type = 'EQ'
     item.max_score = 1
     item.difficulty = 2
 
+    # EQ response is always the same
     aid = item_lvl_data.AssessmentOutcomeItemData()
     generate_response(aid, item)
 
-    assert aid.is_selected == '1'
-    assert aid.page_time > 1000
-    if aid.score == 0:
-        assert 'good' not in aid.response_value
-    else:
-        assert aid.score == 1
-        assert 'good' in aid.response_value
+    assert 'MathML' in aid.response_value
+    assert aid.score in (0, 1)
+
+
+def test_generate_response_for_htq():
+    item = AssessmentItem()
+    item.type = 'HTQ'
+    item.item_key = '182879'
+    item.max_score = 1
+    item.difficulty = 2
+
+    # HTQ response is always the same for a given item
+    aid = item_lvl_data.AssessmentOutcomeItemData()
+    generate_response(aid, item)
+    assert '<value>6</value>' in aid.response_value
+    assert aid.score in (0, 1)
+
+
+def test_generate_response_for_mi():
+    item = AssessmentItem()
+    item.type = 'MI'
+    item.item_key = '182956'
+    item.max_score = 1
+    item.difficulty = 2
+
+    # MI response is always the same for a given item
+    aid = item_lvl_data.AssessmentOutcomeItemData()
+    generate_response(aid, item)
+    assert '<value>5 c</value>' in aid.response_value
+    assert aid.score in (0, 1)
+
+
+def test_generate_response_for_ti():
+    item = AssessmentItem()
+    item.type = 'TI'
+    item.item_key = '183415'
+    item.max_score = 1
+    item.difficulty = 2
+
+    # TI response is always the same for a given item
+    aid = item_lvl_data.AssessmentOutcomeItemData()
+    generate_response(aid, item)
+    assert '<tr><th' in aid.response_value
+    assert aid.score in (0, 1)
 
 
 def test_generate_response_low_capability():
@@ -805,13 +843,13 @@ def generate_assessment(asmt_type, asmt_year, subject, grade, id_gen, from_date=
     sa.guid = IDGen.get_uuid()
     sa.name = 'SBAC-{}-{}'.format(subject, grade)
     sa.id = '(SBAC){}-{}-{}-{}'.format(sa.name, 'Spring' if asmt_type == 'SUMMATIVE' else 'Winter', asmt_year - 1, asmt_year)
-    sa.subject = subject
+    sa.subject_code = subject
     sa.grade = grade
     sa.rec_id = id_gen.get_rec_id('assessment')
     sa.type = asmt_type
     sa.year = asmt_year
     sa.version = cfg.ASMT_VERSION
-    sa.subject = subject
+    sa.subject_code = subject
     sa.overall = Scorable('Overall', 'Overall', asmt_scale_scores[0], asmt_scale_scores[4], asmt_scale_scores[1:-1])
     sa.claims = [Scorable(claim['code'], claim['name'], asmt_scale_scores[0], asmt_scale_scores[-1]) for claim in claims]
     sa.effective_date = datetime.date(asmt_year - 1, 8, 15)

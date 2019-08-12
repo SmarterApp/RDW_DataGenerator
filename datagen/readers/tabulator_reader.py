@@ -78,7 +78,7 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
     if parse_asmt:
         asmt.id = row['AssessmentId']
         asmt.name = row['AssessmentName']
-        asmt.subject = __mapSubject(row['AssessmentSubject'])
+        asmt.subject_code = __mapSubject(row['AssessmentSubject'])
         asmt.grade = __mapGrade(row['AssessmentGrade'])
         asmt.type = __mapAssessmentType(row['AssessmentType'], row['AssessmentSubtype'])
         asmt.version = row['AssessmentVersion']
@@ -91,17 +91,17 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
         asmt.overall = __getScorable(row, 'Scaled', 'Overall', 'Overall')
 
         # there may be up to 6 alt scores for an assessment
-        if asmt.subject in cfg.ALT_SCORE_DEFINITIONS:
-            alt_defs = cfg.ALT_SCORE_DEFINITIONS[asmt.subject]
-            asmt.alts = [__getScorable(row, 'Alt'+str(i), alt_def['code'], alt_def['name'])
+        if asmt.subject_code in cfg.ALT_SCORE_DEFINITIONS:
+            alt_defs = cfg.ALT_SCORE_DEFINITIONS[asmt.subject_code]
+            asmt.alts = [__getScorable(row, 'Alt' + str(i), alt_def['code'], alt_def['name'])
                          for (i, alt_def) in enumerate(alt_defs, start=1)]
 
         # claims
-        if asmt.is_iab() or asmt.subject not in cfg.CLAIM_DEFINITIONS:
+        if asmt.is_iab() or asmt.subject_code not in cfg.CLAIM_DEFINITIONS:
             asmt.claims = []
         else:
             asmt.claims = [Scorable(claim['code'], claim['name'], asmt.overall.score_min, asmt.overall.score_max)
-                           for claim in cfg.CLAIM_DEFINITIONS[asmt.subject]]
+                           for claim in cfg.CLAIM_DEFINITIONS[asmt.subject_code]]
 
         # if items are being parsed, create segment and list
         if parse_item:
@@ -111,7 +111,7 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
             asmt.item_total_score = 0
 
     # infer claims for custom subjects even if not parsing items
-    if not asmt.is_iab() and asmt.subject not in cfg.CLAIM_DEFINITIONS and 'Claim' in row:
+    if not asmt.is_iab() and asmt.subject_code not in cfg.CLAIM_DEFINITIONS and 'Claim' in row:
         claim_code = row['Claim'].strip()
         if claim_code not in [claim.code for claim in asmt.claims]:
             asmt.claims.append(Scorable(claim_code, claim_code, asmt.overall.score_min, asmt.overall.score_max))
@@ -155,12 +155,12 @@ def __mapAssessmentType(type, subtype):
     raise Exception('Unexpected assessment type {}-{}'.format(type, subtype))
 
 
-def __mapSubject(subject):
-    if subject.lower() == 'math':
+def __mapSubject(subject_code):
+    if subject_code.lower() == 'math':
         return 'Math'
-    if subject.lower() == 'ela':
+    if subject_code.lower() == 'ela':
         return 'ELA'
-    return subject
+    return subject_code
 
 
 def __mapGrade(grade):
@@ -171,17 +171,17 @@ def __mapGrade(grade):
 
 
 def __getScorable(row, prefix, code, name):
-    if prefix+'Low1' not in row:
+    if prefix + 'Low1' not in row:
         return None
 
     scorable = Scorable(code, name)
-    scorable.score_min = __getScore(row[prefix+'Low1'])
+    scorable.score_min = __getScore(row[prefix + 'Low1'])
     scorable.cut_points = [s for s in [
-        __getRowScore(row, prefix+'High1'),
-        __getRowScore(row, prefix+'High2'),
-        __getRowScore(row, prefix+'High3'),
-        __getRowScore(row, prefix+'High4'),
-        __getRowScore(row, prefix+'High5')
+        __getRowScore(row, prefix + 'High1'),
+        __getRowScore(row, prefix + 'High2'),
+        __getRowScore(row, prefix + 'High3'),
+        __getRowScore(row, prefix + 'High4'),
+        __getRowScore(row, prefix + 'High5')
     ] if s is not None]
     scorable.score_max = max(scorable.cut_points)
     return scorable

@@ -74,7 +74,7 @@ def generate_interim_assessment_outcome(date_taken: datetime.date,
     # note that IAB level is calculated differently using SB formulae
     overall = Score('Overall')
     overall.score, level = \
-        score_given_capability(student.capability[assessment.subject], assessment.overall.get_cuts())
+        score_given_capability(student.capability[assessment.subject_code], assessment.overall.get_cuts())
     overall.stderr = random_stderr(overall.score, assessment.overall.score_min, assessment.overall.score_max)
     overall.perf_lvl = claim_perf_lvl(overall.score, overall.stderr, assessment.overall.cut_points[1])
     sao.overall = overall

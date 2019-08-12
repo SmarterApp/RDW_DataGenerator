@@ -11,7 +11,7 @@ class Assessment:
     """
 
     # using slots here only to avoid bugs due to typos etc.
-    __slots__ = ('guid', 'id', 'name', 'subject', 'grade', 'contract', 'mode', 'rec_id', 'type', 'year', 'version',
+    __slots__ = ('guid', 'id', 'name', 'subject_code', 'grade', 'contract', 'mode', 'rec_id', 'type', 'year', 'version',
                  'overall', 'alts', 'claims',
                  'from_date', 'to_date', 'effective_date', 'segment', 'accommodations',
                  'item_bank', 'item_total_score')
@@ -20,7 +20,7 @@ class Assessment:
         self.guid = None
         self.id = None          # conventional SBAC assessment id, e.g. (SBAC)SBAC-Math-8-Winter-2016-2017
         self.name = None        # conventional SBAC assessment name, e.g. SBAC-Math-8
-        self.subject = None
+        self.subject_code = None
         self.grade = None       # integer, KG=0, G1=1, ..., G13=13; doesn't handle HS, UG, PS, etc.
         self.contract = 'SBAC'
         self.mode = 'online'

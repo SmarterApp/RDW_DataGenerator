@@ -56,7 +56,7 @@ def generate_teaching_staff_member(school: School, id_gen: IDGen=IDGen, sub_clas
 
 
 def generate_student(school: School, grade, id_gen: IDGen=IDGen, acad_year=datetime.datetime.now().year,
-                     subjects: [str]=cfg.SUBJECTS,
+                     subject_codes: [str]=cfg.SUBJECT_CODES,
                      military_connected_dist=pop_config.MILITARY_CONNECTED_DIST,
                      has_email_address_rate=pop_config.HAS_EMAIL_ADDRESS_RATE,
                      has_physical_address_rate=pop_config.HAS_PHYSICAL_ADDRESS_RATE,
@@ -69,7 +69,7 @@ def generate_student(school: School, grade, id_gen: IDGen=IDGen, acad_year=datet
     :param id_gen: id generator
     :param acad_year: The current academic year this student is being created for (optional, defaults to your machine
                       clock's current year)
-    :param subjects: list of subjects (for generating student capability)
+    :param subject_codes: list of subject codes (for generating student capability)
     :param has_email_address_rate: The rate at which to generate an email address for the student
     :param has_physical_address_rate: The rate at which to generate a physical address for the student
     :param has_address_line_2_rate: The rate at which to generate a line two address for the student
@@ -149,13 +149,13 @@ def generate_student(school: School, grade, id_gen: IDGen=IDGen, acad_year=datet
 
     # generate and store the student's capability based on demographics and school adjustment
     adj = hier_config.SCHOOL_TYPES[school.type_str]['students'].get('adjust_pld', 0.0)
-    for subject in subjects:
+    for subject_code in subject_codes:
         # hack to make performance in ELPAC reflect student's english-learner status
         subject_adj = adj
-        if subject == 'ELPAC' and s.elas == 'EL' and cfg.LEP_PROFICIENCY_LEVELS.index(s.lang_prof_level) < 3:
+        if subject_code == 'ELPAC' and s.elas == 'EL' and cfg.LEP_PROFICIENCY_LEVELS.index(s.lang_prof_level) < 3:
             subject_adj += 0.4 * (cfg.LEP_PROFICIENCY_LEVELS.index(s.lang_prof_level) - 3)
-        generator, demo = _get_level_demographics(s, subject)
-        s.capability[subject] = random_capability(generator.distribution(demo), subject_adj)
+        generator, demo = _get_level_demographics(s, subject_code)
+        s.capability[subject_code] = random_capability(generator.distribution(demo), subject_adj)
 
     return s
 
@@ -289,21 +289,21 @@ def _pick_demo_option(sub_config):
     return weighted_choice({name: obj['perc'] for name, obj in sub_config.items()})
 
 
-def _get_level_demographics(student: Student, subject):
+def _get_level_demographics(student: Student, subject_code):
     """
     Creates the assessment stats generator and corresponding student demographics.
     They can be used to make calls in RandomLevelByDemographics like random_level and distribution
 
     :param student: student
-    :param subject: assessment subject
+    :param subject_code: subject code
     :return: RandomLevelByDemographics and student properties
     """
     # hack for custom subjects
-    if subject not in cfg.LEVELS_BY_GRADE_BY_SUBJ:
-        subject = 'Math'
+    if subject_code not in cfg.LEVELS_BY_GRADE_BY_SUBJ:
+        subject_code = 'Math'
 
     demographics = cfg.DEMOGRAPHICS_BY_GRADE[student.grade]
-    level_breakdowns = cfg.LEVELS_BY_GRADE_BY_SUBJ[subject][student.grade]
+    level_breakdowns = cfg.LEVELS_BY_GRADE_BY_SUBJ[subject_code][student.grade]
     level_generator = RandomLevelByDemographics(demographics, level_breakdowns)
 
     student_race = ('dmg_eth_2mr' if student.eth_multi else
@@ -328,7 +328,7 @@ def _get_level_demographics(student: Student, subject):
 
 def repopulate_school_grade(school: School, grade, grade_students, id_gen, reg_sys,
                             acad_year=datetime.datetime.now().year,
-                            subjects: [str]=cfg.SUBJECTS,
+                            subject_codes: [str]=cfg.SUBJECT_CODES,
                             additional_student_choice=pop_config.REPOPULATE_ADDITIONAL_STUDENTS):
     """
     Take a school grade and make sure it has enough students. The list of students is updated in-place.
@@ -340,7 +340,7 @@ def repopulate_school_grade(school: School, grade, grade_students, id_gen, reg_s
     @param reg_sys: The registration system this student falls under
     @param acad_year: The current academic year that the repopulation is occurring within (optional, defaults to your
                       machine clock's current year)
-    @param subjects: List of subjects (for generating new student capabilities); defaults to cfg.SUBJECTS
+    @param subject_codes: List of subject codes (for generating new student capabilities); defaults to cfg.SUBJECTS
     @param additional_student_choice: Array of values for additional students to create in the grade
     """
     # Calculate a new theoretically student count
@@ -355,12 +355,12 @@ def repopulate_school_grade(school: School, grade, grade_students, id_gen, reg_s
 
     # Re-fill grade to this new student count
     while len(grade_students) < student_count:
-        s = generate_student(school, grade, id_gen, acad_year, subjects)
+        s = generate_student(school, grade, id_gen, acad_year, subject_codes)
         s.reg_sys = reg_sys
         grade_students.append(s)
 
 
-def assign_student_groups(school, grade, grade_students, id_gen: IDGen=IDGen, subjects: [str]=cfg.SUBJECTS):
+def assign_student_groups(school, grade, grade_students, id_gen: IDGen=IDGen, subject_codes: [str]=cfg.SUBJECT_CODES):
     """
     Assign students to groups.
     Each student is assigned to one group per subject. The groups assigned correspond
@@ -372,10 +372,10 @@ def assign_student_groups(school, grade, grade_students, id_gen: IDGen=IDGen, su
     @param grade: The grade in the school to assign groupings to.
     @param grade_students: The students currently in the grade for this school
     @param id_gen: The IDGen instance, used to make groups unique across multiple schools
-    @param subjects: The list of subjects
+    @param subject_codes: The list of subject codes
     """
     num_groups = int(ceil(len(grade_students) / school.group_size))
-    for subject in subjects:
+    for subject_code in subject_codes:
         # generate lists of subgroups for each subject corresponding to school's group size
         subgroups = []
         for _ in range(num_groups):
@@ -385,7 +385,7 @@ def assign_student_groups(school, grade, grade_students, id_gen: IDGen=IDGen, su
         # assign each student a (randomly selected) group for this subject
         for grade_student in grade_students:
             (group_id, group_name) = random.choice(subgroups)
-            grade_student.set_group(StudentGroup(subject, group_id, group_name))
+            grade_student.set_group(StudentGroup(subject_code, group_id, group_name))
 
 
 def _generate_date_enter_us_school(grade, acad_year=datetime.datetime.now().year):
@@ -515,8 +515,8 @@ def _generate_date_lep_exit(grade, acad_year=datetime.datetime.now().year):
 
 
 def _apply_capability_adjustments(student: Student, adjustments: [float]):
-    for subject, capability in student.capability.items():
+    for subject_code, capability in student.capability.items():
         value = capability
         for adj in adjustments:
             value = adjust_capability(value, adj)
-        student.capability[subject] = value
+        student.capability[subject_code] = value

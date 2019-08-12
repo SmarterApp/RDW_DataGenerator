@@ -12,4 +12,4 @@ class Class:
         self.guid = None
         self.school = None
         self.name = None
-        self.subject = None
+        self.subject_code = None

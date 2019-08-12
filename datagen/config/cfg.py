@@ -24,7 +24,7 @@ PRG_DISABILITY_TYPES = [None, None,  # Allow blanks and give them higher weight
 
 HAS_ASMT_RESULT_IN_SR_FILE_RATE = .985  # The rate at which students with assessment results are in the SR CSV file
 
-SUBJECTS = ['ELA', 'Math']
+SUBJECT_CODES = ['ELA', 'Math']
 
 # for the FROM_DATE use 8/15 of the assessment year (minus one)
 ASMT_TO_DATE = datetime.date(9999, 12, 31)

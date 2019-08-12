@@ -359,4 +359,3 @@ DISTRICT_TYPES = {
               }
          },
 }
-

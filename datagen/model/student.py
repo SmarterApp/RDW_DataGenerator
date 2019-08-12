@@ -58,7 +58,7 @@ class Student:
         self.military_connected = None
         self.derived_demographic = None
         self.groups = []
-        self.capability = {}        # map of subject -> capability, 0.0 <= value < 4.0
+        self.capability = {}        # map of subject_code -> capability, 0.0 <= value < 4.0
 
     @property
     def name(self):
@@ -97,14 +97,14 @@ class Student:
         :param new_group: student group
         """
         for i, group in enumerate(self.groups):
-            if group.subject == new_group.subject:
+            if group.subject_code == new_group.subject_code:
                 self.groups[i] = new_group
                 return
         self.groups.append(new_group)
 
-    def get_group(self, subject: str):
+    def get_group(self, subject_code: str):
         for group in self.groups:
-            if group.subject == subject:
+            if group.subject_code == subject_code:
                 return group
         return None
 

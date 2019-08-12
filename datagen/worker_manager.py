@@ -66,7 +66,7 @@ class WorkerManager(Worker):
             return
 
         # generate and emit inferred command line from args
-        cl = ' '.join([('--' + k + ' ' + str(v)) for (k,v) in vars(self._args).items()])
+        cl = ' '.join([('--' + k + ' ' + str(v)) for (k, v) in vars(self._args).items()])
         print(cl)
         with open(os.path.join(self.out_path_root, 'args.txt'), "a") as f:
             f.write(cl)
@@ -101,13 +101,13 @@ class WorkerManager(Worker):
         """
         return sorted(set(map(lambda asmt: asmt.year, assessments)))
 
-    def __subjects(self, assessments: [Assessment]):
+    def __subject_codes(self, assessments: [Assessment]):
         """
-        Return the sorted list of subjects represented by assessment packages.
+        Return the sorted list of subject codes represented by assessment packages.
         :param assessments: assessments
-        :return: sorted list of subjects, e.g. ['ELA', 'Math']
+        :return: sorted list of subject codes, e.g. ['ELA', 'Math']
         """
-        return sorted(set(map(lambda asmt: asmt.subject, assessments)))
+        return sorted(set(map(lambda asmt: asmt.subject_code, assessments)))
 
     def __grades(self, assessments: [Assessment]):
         """
@@ -220,8 +220,10 @@ class WorkerManager(Worker):
                 student.rec_id = self.id_gen.get_rec_id('student')
 
                 # Move the student forward (false from the advance method means the student disappears)
+                # If the student is now in a grade that isn't a concern (i.e. no assessments) leave them out
                 if pop_gen.advance_student(student, schools_by_grade):
-                    schools_with_grades[student.school][student.grade].append(student)
+                    if student.grade in schools_with_grades[student.school]:
+                        schools_with_grades[student.school][student.grade].append(student)
 
             # With the students moved around, we will re-populate empty grades
             # and create assessments with outcomes for the students
@@ -246,14 +248,14 @@ class WorkerManager(Worker):
         state = district.state
 
         # get all subjects represented by assessment packages
-        subjects = self.__subjects(assessments)
+        subject_codes = self.__subject_codes(assessments)
 
         # Grab the assessment rates by subjects
         asmt_skip_rates_by_subject = state.config['subject_skip_percentages']
         # hack for custom subjects
-        for subject in subjects:
-            if subject not in asmt_skip_rates_by_subject:
-                asmt_skip_rates_by_subject[subject] = asmt_skip_rates_by_subject['Math']
+        for subject_code in subject_codes:
+            if subject_code not in asmt_skip_rates_by_subject:
+                asmt_skip_rates_by_subject[subject_code] = asmt_skip_rates_by_subject['Math']
 
         # Process the whole school
         assessment_results = {}
@@ -264,13 +266,15 @@ class WorkerManager(Worker):
 
         for grade, grade_students in grades.items():
             # Potentially re-populate the student population
-            pop_gen.repopulate_school_grade(school, grade, grade_students, self.id_gen, reg_system, year, subjects)
+            pop_gen.repopulate_school_grade(school, grade, grade_students, self.id_gen, reg_system, year, subject_codes)
             student_count += len(grade_students)
-
-            pop_gen.assign_student_groups(school, grade, grade_students, self.id_gen, subjects)
 
             # collect any assessments for this year and grade
             asmts = list(filter(lambda asmt: asmt.year == year and asmt.grade == grade, assessments))
+
+            # note: only use subjects for the assessments for this year and grade
+            pop_gen.assign_student_groups(school, grade, grade_students, self.id_gen, self.__subject_codes(asmts))
+
             for asmt in asmts:
                 date_taken = self.__date_taken_for_asmt(asmt)
                 for student in grade_students:
@@ -281,7 +285,7 @@ class WorkerManager(Worker):
                     else:
                         asmt_gen.create_assessment_outcome_object(date_taken, student, asmt, self.id_gen,
                                                                   assessment_results,
-                                                                  asmt_skip_rates_by_subject[asmt.subject],
+                                                                  asmt_skip_rates_by_subject[asmt.subject_code],
                                                                   gen_item=self.gen_item)
 
                     # Make sure we have the student for the next run and for metrics
@@ -341,7 +345,7 @@ class WorkerManager(Worker):
         :return: date taken
         """
         if asmt.is_iab():
-            date_taken = datetime.date(asmt.year-1, 9, 15) + datetime.timedelta(days=random.randint(0, 180))
+            date_taken = datetime.date(asmt.year - 1, 9, 15) + datetime.timedelta(days=random.randint(0, 180))
         elif asmt.is_summative():
             date_taken = datetime.date(asmt.year, 5, 10)
         else:

@@ -37,36 +37,36 @@ def generate_assessment_outcome(student: Student, assessment: Assessment, id_gen
 
     # Create legacy accommodations details
     # hack for custom subjects
-    subject = assessment.subject if assessment.subject in cfg.SUBJECTS else 'ELA'
+    subject_code = assessment.subject_code if assessment.subject_code in cfg.SUBJECT_CODES else 'ELA'
     ao.acc_asl_video_embed = _pick_accommodation_code(
-        cfg.LEGACY_ACCOMMODATIONS['acc_asl_video_embed'][subject])
+        cfg.LEGACY_ACCOMMODATIONS['acc_asl_video_embed'][subject_code])
     ao.acc_print_on_demand_items_nonembed = _pick_accommodation_code(
-        cfg.LEGACY_ACCOMMODATIONS['acc_print_on_demand_items_nonembed'][subject])
+        cfg.LEGACY_ACCOMMODATIONS['acc_print_on_demand_items_nonembed'][subject_code])
     ao.acc_noise_buffer_nonembed = _pick_accommodation_code(
-        cfg.LEGACY_ACCOMMODATIONS['acc_noise_buffer_nonembed'][subject])
-    ao.acc_braile_embed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_braile_embed'][subject])
+        cfg.LEGACY_ACCOMMODATIONS['acc_noise_buffer_nonembed'][subject_code])
+    ao.acc_braile_embed = _pick_accommodation_code(cfg.LEGACY_ACCOMMODATIONS['acc_braile_embed'][subject_code])
     ao.acc_closed_captioning_embed = _pick_accommodation_code(
-        cfg.LEGACY_ACCOMMODATIONS['acc_closed_captioning_embed'][subject])
+        cfg.LEGACY_ACCOMMODATIONS['acc_closed_captioning_embed'][subject_code])
     ao.acc_text_to_speech_embed = _pick_accommodation_code(
-        cfg.LEGACY_ACCOMMODATIONS['acc_text_to_speech_embed'][subject])
+        cfg.LEGACY_ACCOMMODATIONS['acc_text_to_speech_embed'][subject_code])
     ao.acc_abacus_nonembed = _pick_accommodation_code(
-        cfg.LEGACY_ACCOMMODATIONS['acc_abacus_nonembed'][subject])
+        cfg.LEGACY_ACCOMMODATIONS['acc_abacus_nonembed'][subject_code])
     ao.acc_alternate_response_options_nonembed = _pick_accommodation_code(
-        cfg.LEGACY_ACCOMMODATIONS['acc_alternate_response_options_nonembed'][subject])
+        cfg.LEGACY_ACCOMMODATIONS['acc_alternate_response_options_nonembed'][subject_code])
     ao.acc_calculator_nonembed = _pick_accommodation_code(
-        cfg.LEGACY_ACCOMMODATIONS['acc_calculator_nonembed'][subject])
+        cfg.LEGACY_ACCOMMODATIONS['acc_calculator_nonembed'][subject_code])
     ao.acc_multiplication_table_nonembed = _pick_accommodation_code(
-        cfg.LEGACY_ACCOMMODATIONS['acc_multiplication_table_nonembed'][subject])
+        cfg.LEGACY_ACCOMMODATIONS['acc_multiplication_table_nonembed'][subject_code])
     ao.acc_print_on_demand_nonembed = _pick_accommodation_code(
-        cfg.LEGACY_ACCOMMODATIONS['acc_asl_video_embed'][subject])
+        cfg.LEGACY_ACCOMMODATIONS['acc_asl_video_embed'][subject_code])
     ao.acc_read_aloud_nonembed = _pick_accommodation_code(
-        cfg.LEGACY_ACCOMMODATIONS['acc_read_aloud_nonembed'][subject])
+        cfg.LEGACY_ACCOMMODATIONS['acc_read_aloud_nonembed'][subject_code])
     ao.acc_scribe_nonembed = _pick_accommodation_code(
-        cfg.LEGACY_ACCOMMODATIONS['acc_scribe_nonembed'][subject])
+        cfg.LEGACY_ACCOMMODATIONS['acc_scribe_nonembed'][subject_code])
     ao.acc_speech_to_text_nonembed = _pick_accommodation_code(
-        cfg.LEGACY_ACCOMMODATIONS['acc_speech_to_text_nonembed'][subject])
+        cfg.LEGACY_ACCOMMODATIONS['acc_speech_to_text_nonembed'][subject_code])
     ao.acc_streamline_mode = _pick_accommodation_code(
-        cfg.LEGACY_ACCOMMODATIONS['acc_streamline_mode'][subject])
+        cfg.LEGACY_ACCOMMODATIONS['acc_streamline_mode'][subject_code])
 
     # Create real accommodations based on assessment and other data.
     # Yeah, this should be driven by configuration at some point but for now, let's get a couple emitted ...
@@ -100,8 +100,8 @@ def generate_item_data(outcome: AssessmentOutcome):
         return
 
     # answer rate depends on student capability
-    capability = outcome.student.capability[
-        asmt.subject] if outcome.student.capability and asmt.subject in outcome.student.capability else None
+    capability = outcome.student.capability[asmt.subject_code] \
+        if outcome.student.capability and asmt.subject_code in outcome.student.capability else None
     answer_rate = (0.88 + 0.03 * capability) if capability is not None else 0.94
     admin_date = datetime.combine(outcome.date_taken, time(hour=randrange(7, 14)))
     resp_date = admin_date
@@ -133,7 +133,7 @@ def generate_item_data(outcome: AssessmentOutcome):
 def generate_session(outcome: [AssessmentOutcome]):
     """ generate and set session based on date, student group for this subject
     """
-    group = outcome.student.get_group(outcome.assessment.subject)
+    group = outcome.student.get_group(outcome.assessment.subject_code)
     if not outcome.date_taken and not group:
         return
 

@@ -13,11 +13,11 @@ from datagen.model.student import Student
 from datagen.util.id_gen import IDGen as id_gen
 
 
-def generate_class(name, subject, school: School, sub_class=None):
+def generate_class(name, subject_code, school: School, sub_class=None):
     """Generate a class for a subject in a school.
 
     :param name: The name of the class
-    :param subject: The subject this class covers
+    :param subject_code: The subject this class covers
     :param school: The school containing the class
     :param sub_class: The sub-class of class to create (if requested, must be subclass of Class)
     :returns: A class object
@@ -27,7 +27,7 @@ def generate_class(name, subject, school: School, sub_class=None):
     c.guid = id_gen.get_uuid()
     c.school = school
     c.name = name
-    c.subject = subject
+    c.subject_code = subject_code
 
     return c
 

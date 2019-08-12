@@ -44,7 +44,7 @@ pytest --cov=datagen --pep8 tests/
 pytest --cov-report html:coverage --cov=datagen tests/
 ```
 
-You can use pytest to test PEP8 on source:
+You can use pytest to test PEP8 on source (`pytest.ini` is configured to hide some warnings):
 ```bash
 pytest --pep8 datagen/
 ```
@@ -121,3 +121,23 @@ force all students in a group to have the same date-taken so they have the same 
 date-taken and group name). The ask is to have all students in a group have the same session with 0-3 students of the
 group in a second session, sometimes. Then the date-taken for a school/grade should be spread out, not all the same day.
 Perhaps use school attributes to control when assessments are given.
+
+
+
+#### WIP - subject files
+
+Load subject files and replace:
+* SUBJECTS
+* CLAIM_DEFINITIONS
+* ALT_SCORE_DEFINITIONS
+
+Need to:
+* Create Subject model
+    * claims
+    * alt-scores
+    * ?stderr flag?
+    * ?english-related flag?
+* Create reader for Subject
+* Distinguish between subject_code and subject (all current usage is subject_code)
+* Change LEVELS_BY_GRADE_BY_SUBJ, probably just remove the BY_SUBJ part
+    * although there is english-capability considerations in a few places, perhaps have an english-related flag in the subject?

@@ -116,16 +116,16 @@ def generate_assessment_outcome(date_taken: datetime.date,
     # use the student capability to generate an overall score and performance level
     overall = Score('Overall')
     overall.score, overall.perf_lvl = \
-        score_given_capability(student.capability[assessment.subject], assessment.overall.get_cuts())
+        score_given_capability(student.capability[assessment.subject_code], assessment.overall.get_cuts())
     # ELPAC doesn't calculate overall stderr
-    overall.stderr = None if assessment.subject == 'ELPAC' else random_stderr(overall.score, assessment.overall.score_min, assessment.overall.score_max)
+    overall.stderr = None if assessment.subject_code == 'ELPAC' else random_stderr(overall.score, assessment.overall.score_min, assessment.overall.score_max)
     sao.overall = overall
 
     # generate alt scores if indicated
     # note that we're using the overall min/max scores; some day we should use alt-specific values
     if assessment.alts and len(assessment.alts) > 0:
         sao.alt_scores = []
-        alt_weights = [alt['weight'] for alt in cfg.ALT_SCORE_DEFINITIONS[assessment.subject]]
+        alt_weights = [alt['weight'] for alt in cfg.ALT_SCORE_DEFINITIONS[assessment.subject_code]]
         alt_scores = random_subscores(overall.score, alt_weights, assessment.overall.score_min, assessment.overall.score_max)
         for alt, alt_score in zip(assessment.alts, alt_scores):
             sao.alt_scores.append(
@@ -135,11 +135,11 @@ def generate_assessment_outcome(date_taken: datetime.date,
 
     # generate claim scores if indicated
     if assessment.claims and len(assessment.claims) > 0:
-        claim_weights = [claim['weight'] for claim in cfg.CLAIM_DEFINITIONS[assessment.subject]] \
-            if assessment.subject in cfg.CLAIM_DEFINITIONS else [1.0 / len(assessment.claims)] * len(assessment.claims)
+        claim_weights = [claim['weight'] for claim in cfg.CLAIM_DEFINITIONS[assessment.subject_code]] \
+            if assessment.subject_code in cfg.CLAIM_DEFINITIONS else [1.0 / len(assessment.claims)] * len(assessment.claims)
         claim_scores = random_subscores(overall.score, claim_weights, assessment.overall.score_min, assessment.overall.score_max)
         # another hard-coded thing i don't like but i'm tired ...
-        emit_score = False if assessment.subject == 'ELPAC' else True
+        emit_score = False if assessment.subject_code == 'ELPAC' else True
         sao.claim_scores = []
         for claim, claim_score in zip(assessment.claims, claim_scores):
             stderr = random_stderr(claim_score, assessment.overall.score_min, assessment.overall.score_max)
@@ -147,7 +147,7 @@ def generate_assessment_outcome(date_taken: datetime.date,
             # (ELPAC will use this too; i have no idea if that is correct but i know the spec
             #  indicates their levels are 1-3 and i don't know what else to base it on.)
             claim_level = claim_perf_lvl(claim_score, stderr, assessment.overall.cut_points[1]) \
-                if assessment.subject in cfg.CLAIM_DEFINITIONS \
+                if assessment.subject_code in cfg.CLAIM_DEFINITIONS \
                 else performance_level(claim_score, assessment.overall.get_cuts())
             sao.claim_scores.append(Score(claim.code, claim_score, stderr, claim_level) if emit_score else
                                     Score(claim.code, None, None, claim_level))
@@ -159,7 +159,7 @@ def generate_assessment_outcome(date_taken: datetime.date,
     if assessment.is_summative() and assessment.item_bank and any(item.target for item in assessment.item_bank):
         # collect the unique targets from all items
         targets = Counter(item.target for item in assessment.item_bank if item.target)
-        offset = (student.capability[assessment.subject] - 2.0) / 2.0
+        offset = (student.capability[assessment.subject_code] - 2.0) / 2.0
         sao.target_scores = [TargetScore(t, random.uniform(-0.1, +0.1), random.triangular(-1.0, +1.0, offset))
                              for t in targets.keys()]
 

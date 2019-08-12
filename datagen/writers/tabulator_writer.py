@@ -29,7 +29,7 @@ def __asmt_to_rows(asmt):
     row = {
         'AssessmentId': asmt.id,
         'AssessmentName': asmt.name,
-        'AssessmentSubject': asmt.subject,
+        'AssessmentSubject': asmt.subject_code,
         'AssessmentGrade': asmt.grade,
         'AssessmentType': __map_type(asmt),
         'AssessmentSubtype': __map_subtype(asmt),
