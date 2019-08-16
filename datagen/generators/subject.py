@@ -51,6 +51,11 @@ def set_custom_defaults(subject: Subject):
         subject.emit_claim_score = False
 
     subject.sbac_claim_levels = subject.code in ['Math', 'ELA', 'ELPAC']
+    subject.el_adjacent = get_el_adjacent(subject.code)
+
+
+def get_el_adjacent(subject_code: str):
+    return subject_code in ['ELA', 'ELPAC']
 
 
 def __set_default_alt_score_weights(subject: Subject):

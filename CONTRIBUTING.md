@@ -101,7 +101,6 @@ This project was originally created to generate data for the legacy reporting da
 generate data for the new system, mostly to take advantage of the good demographics generation. As such there are a 
 number of things that may need cleaning up. And there are some enhancements/improvements. In no particular order:
 
- - [ ] Load subject definition files instead of hard-coding claim and alt-score definitions.
  - [ ] Occasionally a (summative?) test result should be missing target scores
  - [ ] Use only a subset of items from item bank in a particular session outcome (?)
  - [ ] Combine cfg.DEMOGRAPHICS_BY_GRADE and population.DEMOGRAPHICS. They both represent demographic distribution of
@@ -121,26 +120,3 @@ force all students in a group to have the same date-taken so they have the same 
 date-taken and group name). The ask is to have all students in a group have the same session with 0-3 students of the
 group in a second session, sometimes. Then the date-taken for a school/grade should be spread out, not all the same day.
 Perhaps use school attributes to control when assessments are given.
-
-
-
-#### WIP - subject files
-
-Load subject files and replace:
-* SUBJECTS
-* CLAIM_DEFINITIONS
-* ALT_SCORE_DEFINITIONS
-
-Need to:
-* Create Subject model
-    * claims
-        * ? custom weights ? maybe just look them up by exception
-    * alt-scores
-    * ?english-related flag?
-    * flag: SB claims are based on +/- 1.5 stderr; others are based on cutpoints
-    * flag: ELPAC doesn't emit overall stderr (just the score)
-    * flag: ELPAC doesn't emit claim scores (just claim levels)
-* Create reader for Subject
-* Change LEVELS_BY_GRADE_BY_SUBJ, probably just remove the BY_SUBJ part
-    * although there is english-capability considerations in a few places, perhaps have an english-related flag in the subject?
-* Pass subjects when loading assessments

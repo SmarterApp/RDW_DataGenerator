@@ -189,7 +189,6 @@ DEMOGRAPHICS_BY_GRADE = {
 # is based on observations of overall production score distributions. I'm assuming the original
 # values were based on an authoritative source with better granularity but the values just don't
 # match up with what is seen in real data.
-# TODO - remove subject specificity (is that a good thing?)
 LEVELS_BY_GRADE_BY_SUBJ = {
     "Math": {
         # these (KG) values were just copied from grade 1
