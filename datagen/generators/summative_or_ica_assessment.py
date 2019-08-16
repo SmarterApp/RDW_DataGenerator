@@ -116,9 +116,8 @@ def generate_assessment_outcome(date_taken: datetime.date,
     # use the student capability to generate an overall score and performance level
     overall = Score('Overall')
     overall.score, overall.perf_lvl = \
-        score_given_capability(student.capability[assessment.subject_code], assessment.overall.get_cuts())
-    # ELPAC doesn't calculate overall stderr
-    overall.stderr = None if assessment.subject_code == 'ELPAC' else random_stderr(overall.score, assessment.overall.score_min, assessment.overall.score_max)
+        score_given_capability(student.capability[assessment.subject.code], assessment.overall.get_cuts())
+    overall.stderr = random_stderr(overall.score, assessment.overall.score_min, assessment.overall.score_max) if assessment.subject.emit_overall_stderr else None
     sao.overall = overall
 
     # generate alt scores if indicated
@@ -137,19 +136,13 @@ def generate_assessment_outcome(date_taken: datetime.date,
     if assessment.claims and len(assessment.claims) > 0:
         claim_weights = [claim_def.weight for claim_def in assessment.claims]
         claim_scores = random_subscores(overall.score, claim_weights, assessment.overall.score_min, assessment.overall.score_max)
-        # another hard-coded thing i don't like but i'm tired ...
-        emit_score = False if assessment.subject_code == 'ELPAC' else True
         sao.claim_scores = []
         for claim, claim_score in zip(assessment.claims, claim_scores):
             stderr = random_stderr(claim_score, assessment.overall.score_min, assessment.overall.score_max)
-            # SmarterBalanced claim levels are 1-3 based on +-1.5 stderr
-            # (ELPAC will use this too; i have no idea if that is correct but i know the spec
-            #  indicates their levels are 1-3 and i don't know what else to base it on.)
             claim_level = claim_perf_lvl(claim_score, stderr, assessment.overall.cut_points[1]) \
-                if assessment.subject_code in cfg.CLAIM_DEFINITIONS \
-                else performance_level(claim_score, assessment.overall.get_cuts())
-            sao.claim_scores.append(Score(claim.code, claim_score, stderr, claim_level) if emit_score else
-                                    Score(claim.code, None, None, claim_level))
+                if assessment.subject.sbac_claim_levels else performance_level(claim_score, assessment.overall.get_cuts())
+            sao.claim_scores.append(Score(claim.code, claim_score, stderr, claim_level) \
+                if assessment.subject.emit_claim_score else Score(claim.code, None, None, claim_level))
 
     # for summative assessments, if the items have target information, generate target residuals
     # NOTE: these are really fake values, with no real correlation to overall/item scores:
@@ -158,7 +151,7 @@ def generate_assessment_outcome(date_taken: datetime.date,
     if assessment.is_summative() and assessment.item_bank and any(item.target for item in assessment.item_bank):
         # collect the unique targets from all items
         targets = Counter(item.target for item in assessment.item_bank if item.target)
-        offset = (student.capability[assessment.subject_code] - 2.0) / 2.0
+        offset = (student.capability[assessment.subject.code] - 2.0) / 2.0
         sao.target_scores = [TargetScore(t, random.uniform(-0.1, +0.1), random.triangular(-1.0, +1.0, offset))
                              for t in targets.keys()]
 

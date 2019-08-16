@@ -19,6 +19,7 @@ This has to match configuration in in datagen/config/state_type.py. Examples inc
 > * `--hier_source FILE_NAME`: Specify the source file for the hierarchy
 
 > Select what should be generated and output:
+> * `--subject_source`: glob path where subject definition XML files are located, or `generate` to use SBAC default Math and ELA
 > * `--pkg_source`: glob path where tabulator CSV files are located
 > * `--gen_sum`: generate SUM outcomes
 > * `--gen_ica`: generate ICA outcomes

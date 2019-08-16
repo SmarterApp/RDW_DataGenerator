@@ -86,7 +86,7 @@ class XmlWorker(Worker):
         # in TRT, the testId is the name and the name is the id
         test.set('testId', asmt.name)
         test.set('name', asmt.id)
-        test.set('subject', asmt.subject_code)
+        test.set('subject', asmt.subject.code)
         test.set('grade', self._map_grade(asmt.grade))
         test.set('assessmentType', self._map_asmt_type(asmt.type))
         test.set('academicYear', str(asmt.year))
@@ -140,7 +140,7 @@ class XmlWorker(Worker):
         # self._add_examinee_attribute(examinee, 'StudentGroupName', student.group_9_text, contextDateStr)
         # self._add_examinee_attribute(examinee, 'StudentGroupName', student.group_10_text, contextDateStr)
         self._add_examinee_attribute(examinee, 'Advancement', self._map_advancement(student), contextDateStr)
-        self._add_examinee_attribute(examinee, 'Capability', student.capability.get(asmt.subject_code, 0.0), contextDateStr)
+        self._add_examinee_attribute(examinee, 'Capability', student.capability.get(asmt.subject.code, 0.0), contextDateStr)
 
         school = outcome.school
         self._add_examinee_relationship(examinee, 'StateAbbreviation', school.district.state.code, contextDateStr)

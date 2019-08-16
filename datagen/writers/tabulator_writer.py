@@ -31,7 +31,7 @@ def __asmt_to_rows(asmt: Assessment):
     row = {
         'AssessmentId': asmt.id,
         'AssessmentName': asmt.name,
-        'AssessmentSubject': asmt.subject_code,
+        'AssessmentSubject': asmt.subject.code,
         'AssessmentGrade': asmt.grade,
         'AssessmentType': 'summative' if asmt.is_summative() else 'interim',
         'AssessmentSubtype': asmt.type,

@@ -24,8 +24,6 @@ PRG_DISABILITY_TYPES = [None, None,  # Allow blanks and give them higher weight
 
 HAS_ASMT_RESULT_IN_SR_FILE_RATE = .985  # The rate at which students with assessment results are in the SR CSV file
 
-SUBJECT_CODES = ['ELA', 'Math']
-
 # for the FROM_DATE use 8/15 of the assessment year (minus one)
 ASMT_TO_DATE = datetime.date(9999, 12, 31)
 
@@ -46,32 +44,6 @@ ASMT_STATUS_DELETED = 'D'
 
 ASMT_VERSION = 'V1'
 
-
-# Scorable claims by subject (weight is used to generate claim scores from overall)
-# I don't like putting ELPAC in here but that subject doesn't provide item-level
-# data so we need to get the claims from somewhere. A better solution would be
-# to read in a subject.xml definition file but for now ...
-CLAIM_DEFINITIONS = {'Math': [{'code': '1', 'name': 'Concepts & Procedures', 'weight': .4},
-                              {'code': 'SOCK_2', 'name': 'Problem Solving and Modeling & Data Analysis', 'weight': .45},
-                              {'code': '3', 'name': 'Communicating Reasoning', 'weight': .15}],
-                     'ELA': [{'code': 'SOCK_R', 'name': 'Reading', 'weight': .20},
-                             {'code': '2-W', 'name': 'Writing', 'weight': .25},
-                             {'code': 'SOCK_LS', 'name': 'Listening', 'weight': .25},
-                             {'code': '4-CR', 'name': 'Research & Inquiry', 'weight': .30}],
-                     'ELPAC': [{'code': '1-L', 'name': 'Listening', 'weight': .25},
-                               {'code': '1-S', 'name': 'Speaking', 'weight': .25},
-                               {'code': '2-R', 'name': 'Reading', 'weight': .25},
-                               {'code': '2-W', 'name': 'Writing', 'weight': .25}]
-                     }
-# Just like claim definitions, hardcoding this sucks. But it'll do for now.
-ALT_SCORE_DEFINITIONS = {'ELPAC': [{'code': '1', 'name': 'Oral', 'weight': .50},
-                                   {'code': '2', 'name': 'Literacy', 'weight': .50}],
-                         'Science': [{'code': 'PHYS', 'name': 'Physics', 'weight': .30},
-                                     {'code': 'CHEM', 'name': 'Chemistry', 'weight': .30},
-                                     {'code': 'BIO', 'name': 'Biology', 'weight': .20},
-                                     {'code': 'GEO', 'name': 'Geology', 'weight': .10},
-                                     {'code': 'ASTRO', 'name': 'Astronomy', 'weight': .10}, ]
-                         }
 
 # Legacy accommodations handling in the data generator involves randomly assigning settings to the outcomes
 LEGACY_ACCOMMODATIONS = {  # 0: range is 0; 4: range is 4-26
@@ -217,6 +189,7 @@ DEMOGRAPHICS_BY_GRADE = {
 # is based on observations of overall production score distributions. I'm assuming the original
 # values were based on an authoritative source with better granularity but the values just don't
 # match up with what is seen in real data.
+# TODO - remove subject specificity (is that a good thing?)
 LEVELS_BY_GRADE_BY_SUBJ = {
     "Math": {
         # these (KG) values were just copied from grade 1

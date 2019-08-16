@@ -9,8 +9,8 @@ import random
 from math import ceil
 
 import datagen.config.cfg as cfg
-import datagen.config.population as pop_config
 import datagen.config.hierarchy as hier_config
+import datagen.config.population as pop_config
 import datagen.generators.names as name_gen
 from datagen.model.district import District
 from datagen.model.school import School
@@ -55,8 +55,7 @@ def generate_teaching_staff_member(school: School, id_gen: IDGen=IDGen, sub_clas
     return s
 
 
-def generate_student(school: School, grade, id_gen: IDGen=IDGen, acad_year=datetime.datetime.now().year,
-                     subject_codes: [str]=cfg.SUBJECT_CODES,
+def generate_student(school: School, grade, id_gen: IDGen, acad_year, subject_codes: [str],
                      military_connected_dist=pop_config.MILITARY_CONNECTED_DIST,
                      has_email_address_rate=pop_config.HAS_EMAIL_ADDRESS_RATE,
                      has_physical_address_rate=pop_config.HAS_PHYSICAL_ADDRESS_RATE,
@@ -327,8 +326,7 @@ def _get_level_demographics(student: Student, subject_code):
 
 
 def repopulate_school_grade(school: School, grade, grade_students, id_gen, reg_sys,
-                            acad_year=datetime.datetime.now().year,
-                            subject_codes: [str]=cfg.SUBJECT_CODES,
+                            acad_year, subject_codes: [str],
                             additional_student_choice=pop_config.REPOPULATE_ADDITIONAL_STUDENTS):
     """
     Take a school grade and make sure it has enough students. The list of students is updated in-place.
@@ -360,7 +358,7 @@ def repopulate_school_grade(school: School, grade, grade_students, id_gen, reg_s
         grade_students.append(s)
 
 
-def assign_student_groups(school, grade, grade_students, id_gen: IDGen=IDGen, subject_codes: [str]=cfg.SUBJECT_CODES):
+def assign_student_groups(school, grade, grade_students, id_gen: IDGen, subject_codes: [str]):
     """
     Assign students to groups.
     Each student is assigned to one group per subject. The groups assigned correspond

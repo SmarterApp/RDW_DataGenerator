@@ -37,7 +37,7 @@ def generate_assessment_outcome(student: Student, assessment: Assessment, id_gen
 
     # Create legacy accommodations details
     # hack for custom subjects
-    subject_code = assessment.subject_code if assessment.subject_code in cfg.SUBJECT_CODES else 'ELA'
+    subject_code = assessment.subject.code if assessment.subject.code in ['Math', 'ELA'] else 'ELA'
     ao.acc_asl_video_embed = _pick_accommodation_code(
         cfg.LEGACY_ACCOMMODATIONS['acc_asl_video_embed'][subject_code])
     ao.acc_print_on_demand_items_nonembed = _pick_accommodation_code(
@@ -100,8 +100,8 @@ def generate_item_data(outcome: AssessmentOutcome):
         return
 
     # answer rate depends on student capability
-    capability = outcome.student.capability[asmt.subject_code] \
-        if outcome.student.capability and asmt.subject_code in outcome.student.capability else None
+    capability = outcome.student.capability[asmt.subject.code] \
+        if outcome.student.capability and asmt.subject.code in outcome.student.capability else None
     answer_rate = (0.88 + 0.03 * capability) if capability is not None else 0.94
     admin_date = datetime.combine(outcome.date_taken, time(hour=randrange(7, 14)))
     resp_date = admin_date
@@ -133,7 +133,7 @@ def generate_item_data(outcome: AssessmentOutcome):
 def generate_session(outcome: [AssessmentOutcome]):
     """ generate and set session based on date, student group for this subject
     """
-    group = outcome.student.get_group(outcome.assessment.subject_code)
+    group = outcome.student.get_group(outcome.assessment.subject.code)
     if not outcome.date_taken and not group:
         return
 

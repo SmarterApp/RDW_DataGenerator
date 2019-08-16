@@ -12,6 +12,7 @@ import datagen.generators.iab_assessment as iab_asmt_gen
 import datagen.generators.population as pop_gen
 import datagen.generators.summative_or_ica_assessment as asmt_gen
 import datagen.util.hierarchy as hier_util
+from datagen.generators.subject import generate_default_subjects
 from datagen.model.assessment import Assessment
 from datagen.model.district import District
 from datagen.model.registrationsystem import RegistrationSystem
@@ -19,6 +20,7 @@ from datagen.model.school import School
 from datagen.model.state import State
 from datagen.outputworkers.worker import Worker
 from datagen.outputworkers.xml_worker import XmlWorker
+from datagen.readers.subject_reader import load_subjects
 from datagen.readers.tabulator_reader import load_assessments
 from datagen.util.id_gen import IDGen
 
@@ -40,6 +42,8 @@ class WorkerManager(Worker):
         if args.xml_out:
             self.workers.append(XmlWorker(self.out_path_root))
 
+        self.subject_source = args.subject_source
+
         # assessment package settings
         self.pkg_source = args.pkg_source
         self.gen_sum = args.gen_sum
@@ -60,7 +64,15 @@ class WorkerManager(Worker):
     def run(self):
         state, districts, schools = self.__hierarchy()
 
-        assessments = load_assessments(self.pkg_source, self.gen_sum, self.gen_ica, self.gen_iab, self.gen_item)
+        if self.subject_source == 'generate' or self.subject_source == 'default':
+            subjects = generate_default_subjects()
+        else:
+            subjects = load_subjects(self.subject_source)
+        if len(subjects) == 0:
+            print('No subject definitions found')
+            return
+
+        assessments = load_assessments(self.pkg_source, subjects, self.gen_sum, self.gen_ica, self.gen_iab, self.gen_item)
         if len(assessments) == 0:
             print('No assessment packages found')
             return
@@ -107,7 +119,7 @@ class WorkerManager(Worker):
         :param assessments: assessments
         :return: sorted list of subject codes, e.g. ['ELA', 'Math']
         """
-        return sorted(set(map(lambda asmt: asmt.subject_code, assessments)))
+        return sorted(set(map(lambda asmt: asmt.subject.code, assessments)))
 
     def __grades(self, assessments: [Assessment]):
         """
@@ -242,7 +254,7 @@ class WorkerManager(Worker):
         # Return the average student count
         return int(student_count // len(years)), unique_student_count
 
-    def __process_school(self, grades, school, students, unique_students, reg_system: RegistrationSystem, year, assessments):
+    def __process_school(self, grades, school, students, unique_students, reg_system: RegistrationSystem, year, assessments: [Assessment]):
 
         district = school.district
         state = district.state
@@ -285,7 +297,7 @@ class WorkerManager(Worker):
                     else:
                         asmt_gen.create_assessment_outcome_object(date_taken, student, asmt, self.id_gen,
                                                                   assessment_results,
-                                                                  asmt_skip_rates_by_subject[asmt.subject_code],
+                                                                  asmt_skip_rates_by_subject[asmt.subject.code],
                                                                   gen_item=self.gen_item)
 
                     # Make sure we have the student for the next run and for metrics

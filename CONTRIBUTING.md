@@ -134,10 +134,13 @@ Load subject files and replace:
 Need to:
 * Create Subject model
     * claims
+        * ? custom weights ? maybe just look them up by exception
     * alt-scores
-    * ?stderr flag?
     * ?english-related flag?
+    * flag: SB claims are based on +/- 1.5 stderr; others are based on cutpoints
+    * flag: ELPAC doesn't emit overall stderr (just the score)
+    * flag: ELPAC doesn't emit claim scores (just claim levels)
 * Create reader for Subject
-* Distinguish between subject_code and subject (all current usage is subject_code)
 * Change LEVELS_BY_GRADE_BY_SUBJ, probably just remove the BY_SUBJ part
     * although there is english-capability considerations in a few places, perhaps have an english-related flag in the subject?
+* Pass subjects when loading assessments
