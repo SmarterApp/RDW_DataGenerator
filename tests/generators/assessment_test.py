@@ -15,6 +15,7 @@ import datagen.generators.population as pop_gen
 import datagen.generators.summative_or_ica_assessment as asmt_gen
 import datagen.model.itemdata as item_lvl_data
 from datagen.generators.assessment import generate_response, _pick_accommodation_code
+from datagen.generators.subject import generate_default_subjects
 from datagen.model.assessment import Assessment
 from datagen.model.item import AssessmentItem
 from datagen.model.scorable import Scorable
@@ -65,7 +66,7 @@ def test_generate_assessment_outcome_default_status():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015, ['ELA', 'Math'])
     asmt_out = asmt_gen.generate_assessment_outcome(datetime.date(2015, 5, 15), student, asmt, ID_GEN)
 
     # Test
@@ -78,7 +79,7 @@ def test_generate_assessment_outcome_scores():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015, ['ELA', 'Math'])
     asmt_out = asmt_gen.generate_assessment_outcome(datetime.date(2015, 5, 15), student, asmt, ID_GEN)
 
     # Tests
@@ -94,7 +95,7 @@ def test_generate_assessment_outcome_summative_taken_date():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015, ['ELA', 'Math'])
     asmt_out = asmt_gen.generate_assessment_outcome(datetime.date(2015, 5, 15), student, asmt, ID_GEN)
 
     # Test
@@ -107,7 +108,7 @@ def test_generate_assessment_outcome_interim_taken_date():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015, ['ELA', 'Math'])
     asmt_out = asmt_gen.generate_assessment_outcome(datetime.date(2015, 5, 15), student, asmt, ID_GEN)
 
     # Test
@@ -120,7 +121,7 @@ def test_generate_assessment_outcome_accommodations_ela():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015, ['ELA', 'Math'])
     asmt_out = asmt_gen.generate_assessment_outcome(datetime.date(2015, 5, 15), student, asmt, ID_GEN)
 
     # Tests
@@ -147,7 +148,7 @@ def test_generate_assessment_outcome_accommodations_math():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015, ['ELA', 'Math'])
     asmt_out = asmt_gen.generate_assessment_outcome(datetime.date(2015, 5, 15), student, asmt, ID_GEN)
 
     # Tests
@@ -193,7 +194,7 @@ def test_create_assessment_outcome_object_item_data():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015, ['ELA', 'Math'])
     outcomes = {}
 
     # Create outcomes
@@ -211,7 +212,7 @@ def test_create_assessment_outcome_object_skipped():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015, ['ELA', 'Math'])
     outcomes = {}
 
     # Create outcomes
@@ -228,7 +229,7 @@ def test_create_assessment_outcome_object_one_active_result():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015, ['ELA', 'Math'])
     outcomes = {}
 
     # Create outcomes
@@ -247,7 +248,7 @@ def test_create_assessment_outcome_object_retake_results():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015, ['ELA', 'Math'])
     outcomes = {}
 
     # Create outcomes
@@ -268,7 +269,7 @@ def test_create_assessment_outcome_object_one_deleted_result():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015, ['ELA', 'Math'])
     outcomes = {}
 
     # Create outcomes
@@ -287,7 +288,7 @@ def test_create_assessment_outcome_object_update_no_second_delete_results():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015, ['ELA', 'Math'])
     outcomes = {}
 
     # Create outcomes
@@ -308,7 +309,7 @@ def test_create_assessment_outcome_object_update_second_delete_results():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015, ['ELA', 'Math'])
     outcomes = {}
 
     # Create outcomes
@@ -329,7 +330,7 @@ def test_create_assessment_outcome_objects_no_interims_skipped():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015, ['ELA', 'Math'])
     outcomes = {}
 
     # Create outcomes
@@ -346,7 +347,7 @@ def test_create_assessment_outcome_objects_no_interims_one_active_result():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015, ['ELA', 'Math'])
     outcomes = {}
 
     # Create outcomes
@@ -365,7 +366,7 @@ def test_create_assessment_outcome_objects_no_interims_retake_results():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015, ['ELA', 'Math'])
     outcomes = {}
 
     # Create outcomes
@@ -386,7 +387,7 @@ def test_create_assessment_outcome_objects_no_interim_one_deleted_result():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015, ['ELA', 'Math'])
     outcomes = {}
 
     # Create outcomes
@@ -405,7 +406,7 @@ def test_create_assessment_outcome_objects_no_interim_update_no_second_delete_re
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015, ['ELA', 'Math'])
     outcomes = {}
 
     # Create outcomes
@@ -426,7 +427,7 @@ def test_create_assessment_outcome_objects_no_interim_update_second_delete_resul
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015, ['ELA', 'Math'])
     outcomes = {}
 
     # Create outcomes
@@ -448,7 +449,7 @@ def test_create_assessment_outcome_objects_interims_skipped():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015, ['ELA', 'Math'])
     outcomes = {}
 
     # Create outcomes
@@ -466,7 +467,7 @@ def test_create_assessment_outcome_objects_interims_one_active_result():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015, ['ELA', 'Math'])
     outcomes = {}
 
     # Create outcomes
@@ -490,7 +491,7 @@ def test_create_assessment_outcome_objects_interims_retake_results():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015, ['ELA', 'Math'])
     outcomes = {}
 
     # Create outcomes
@@ -520,7 +521,7 @@ def test_create_assessment_outcome_objects_interim_one_deleted_result():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015, ['ELA', 'Math'])
     outcomes = {}
 
     # Create outcomes
@@ -544,7 +545,7 @@ def test_create_assessment_outcome_objects_interim_update_no_second_delete_resul
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015, ['ELA', 'Math'])
     outcomes = {}
 
     # Create outcomes
@@ -574,7 +575,7 @@ def test_create_assessment_outcome_objects_interim_update_second_delete_results(
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN, 2015)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015, ['ELA', 'Math'])
     outcomes = {}
 
     # Create outcomes
@@ -814,8 +815,7 @@ def __create_assessment_outcome_objects(student, asmt_summ, interim_asmts, id_ge
                                                   update_rate, False)
 
 
-def generate_assessment(asmt_type, asmt_year, subject, grade, id_gen, from_date=None, to_date=None,
-                        claim_definitions=cfg.CLAIM_DEFINITIONS, gen_item=True):
+def generate_assessment(asmt_type, asmt_year, subject_code, grade, id_gen, from_date=None, to_date=None, gen_item=True):
     """
     The datagen module used to have the ability to generate assessments. That is no longer available
     (the assessment packages are loaded from tabulator output) so we need a helper method that can
@@ -823,35 +823,33 @@ def generate_assessment(asmt_type, asmt_year, subject, grade, id_gen, from_date=
     
     @param asmt_type: Assessment asmt_type
     @param asmt_year: Assessment year
-    @param subject: Assessment subject
+    @param subject_code: Assessment subject
     @param grade: Assessment grade
     @param id_gen: ID generator
     @param from_date: Assessment from date
     @param to_date: Assessment to date
-    @param claim_definitions: Definitions for claims to generate
     @param gen_item: If should create item-level item bank
     @returns: The assessment object
     """
-    # Get the claim definitions for this subject
-    if subject not in claim_definitions:
-        raise KeyError("Subject '{}' not found in claim definitions".format(subject))
+    # use the default subjects
+    subject = next((s for s in generate_default_subjects() if s.code == subject_code), None)
+    if not subject:
+        raise KeyError("Subject '{}' not found in default definitions".format(subject_code))
 
-    claims = claim_definitions[subject]
-    asmt_scale_scores = ASMT_SCALE_SCORE[subject][grade]
+    asmt_scale_scores = ASMT_SCALE_SCORE[subject_code][grade]
 
     sa = Assessment() 
     sa.guid = IDGen.get_uuid()
-    sa.name = 'SBAC-{}-{}'.format(subject, grade)
+    sa.name = 'SBAC-{}-{}'.format(subject_code, grade)
     sa.id = '(SBAC){}-{}-{}-{}'.format(sa.name, 'Spring' if asmt_type == 'SUM' else 'Winter', asmt_year - 1, asmt_year)
-    sa.subject_code = subject
+    sa.subject = subject
     sa.grade = grade
     sa.rec_id = id_gen.get_rec_id('assessment')
     sa.type = asmt_type
     sa.year = asmt_year
     sa.version = cfg.ASMT_VERSION
-    sa.subject_code = subject
     sa.overall = Scorable('Overall', 'Overall', asmt_scale_scores[0], asmt_scale_scores[4], asmt_scale_scores[1:-1])
-    sa.claims = [Scorable(claim['code'], claim['name'], asmt_scale_scores[0], asmt_scale_scores[-1]) for claim in claims]
+    sa.claims = [Scorable(claim.code, claim.name, asmt_scale_scores[0], asmt_scale_scores[-1]) for claim in subject.claims]
     for claim in sa.claims:
         claim.weight = 1.0 / len(sa.claims)
     sa.effective_date = datetime.date(asmt_year - 1, 8, 15)

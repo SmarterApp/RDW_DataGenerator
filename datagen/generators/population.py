@@ -9,9 +9,10 @@ import random
 from math import ceil
 
 import datagen.config.cfg as cfg
-import datagen.config.population as pop_config
 import datagen.config.hierarchy as hier_config
+import datagen.config.population as pop_config
 import datagen.generators.names as name_gen
+from datagen.generators.subject import get_el_adjacent
 from datagen.model.district import District
 from datagen.model.school import School
 from datagen.model.staff import DistrictStaff, TeachingStaff
@@ -55,8 +56,7 @@ def generate_teaching_staff_member(school: School, id_gen: IDGen=IDGen, sub_clas
     return s
 
 
-def generate_student(school: School, grade, id_gen: IDGen=IDGen, acad_year=datetime.datetime.now().year,
-                     subject_codes: [str]=cfg.SUBJECT_CODES,
+def generate_student(school: School, grade, id_gen: IDGen, acad_year, subject_codes: [str],
                      military_connected_dist=pop_config.MILITARY_CONNECTED_DIST,
                      has_email_address_rate=pop_config.HAS_EMAIL_ADDRESS_RATE,
                      has_physical_address_rate=pop_config.HAS_PHYSICAL_ADDRESS_RATE,
@@ -150,9 +150,9 @@ def generate_student(school: School, grade, id_gen: IDGen=IDGen, acad_year=datet
     # generate and store the student's capability based on demographics and school adjustment
     adj = hier_config.SCHOOL_TYPES[school.type_str]['students'].get('adjust_pld', 0.0)
     for subject_code in subject_codes:
-        # hack to make performance in ELPAC reflect student's english-learner status
+        # hack to make performance in EL-related subjects reflect student's english-learner status
         subject_adj = adj
-        if subject_code == 'ELPAC' and s.elas == 'EL' and cfg.LEP_PROFICIENCY_LEVELS.index(s.lang_prof_level) < 3:
+        if get_el_adjacent(subject_code) and s.elas == 'EL' and cfg.LEP_PROFICIENCY_LEVELS.index(s.lang_prof_level) < 3:
             subject_adj += 0.4 * (cfg.LEP_PROFICIENCY_LEVELS.index(s.lang_prof_level) - 3)
         generator, demo = _get_level_demographics(s, subject_code)
         s.capability[subject_code] = random_capability(generator.distribution(demo), subject_adj)
@@ -298,12 +298,9 @@ def _get_level_demographics(student: Student, subject_code):
     :param subject_code: subject code
     :return: RandomLevelByDemographics and student properties
     """
-    # hack for custom subjects
-    if subject_code not in cfg.LEVELS_BY_GRADE_BY_SUBJ:
-        subject_code = 'Math'
-
     demographics = cfg.DEMOGRAPHICS_BY_GRADE[student.grade]
-    level_breakdowns = cfg.LEVELS_BY_GRADE_BY_SUBJ[subject_code][student.grade]
+    # hack for custom subjects
+    level_breakdowns = cfg.LEVELS_BY_GRADE_BY_SUBJ['ELA' if get_el_adjacent(subject_code) else 'Math'][student.grade]
     level_generator = RandomLevelByDemographics(demographics, level_breakdowns)
 
     student_race = ('dmg_eth_2mr' if student.eth_multi else
@@ -327,8 +324,7 @@ def _get_level_demographics(student: Student, subject_code):
 
 
 def repopulate_school_grade(school: School, grade, grade_students, id_gen, reg_sys,
-                            acad_year=datetime.datetime.now().year,
-                            subject_codes: [str]=cfg.SUBJECT_CODES,
+                            acad_year, subject_codes: [str],
                             additional_student_choice=pop_config.REPOPULATE_ADDITIONAL_STUDENTS):
     """
     Take a school grade and make sure it has enough students. The list of students is updated in-place.
@@ -360,7 +356,7 @@ def repopulate_school_grade(school: School, grade, grade_students, id_gen, reg_s
         grade_students.append(s)
 
 
-def assign_student_groups(school, grade, grade_students, id_gen: IDGen=IDGen, subject_codes: [str]=cfg.SUBJECT_CODES):
+def assign_student_groups(school, grade, grade_students, id_gen: IDGen, subject_codes: [str]):
     """
     Assign students to groups.
     Each student is assigned to one group per subject. The groups assigned correspond

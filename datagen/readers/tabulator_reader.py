@@ -14,14 +14,16 @@ from datagen.model.assessment import Assessment
 from datagen.model.item import AssessmentItem
 from datagen.model.scorable import Scorable
 from datagen.model.segment import AssessmentSegment
+from datagen.model.subject import Subject
 from datagen.util.id_gen import IDGen
 
 
-def load_assessments(glob_pattern, load_sum, load_ica, load_iab, load_items):
+def load_assessments(glob_pattern, subjects: [Subject], load_sum, load_ica, load_iab, load_items) -> [Assessment]:
     """
     Load assessments from any csv file in the given directory
 
     :param glob_pattern: file pattern to match and load
+    :param subjects: subject definitions, correlated to assessments by subject code
     :param load_sum: True to load summative assessments
     :param load_ica: True to load ICAs
     :param load_iab: True to load IABs
@@ -30,15 +32,16 @@ def load_assessments(glob_pattern, load_sum, load_ica, load_iab, load_items):
     """
     assessments = []
     for file in (glob.glob(glob_pattern)):
-        assessments.extend(load_assessments_file(file, load_sum, load_ica, load_iab, load_items))
+        assessments.extend(load_assessments_file(file, subjects, load_sum, load_ica, load_iab, load_items))
     return assessments
 
 
-def load_assessments_file(file, load_sum, load_ica, load_iab, load_items):
+def load_assessments_file(file, subjects: [Subject], load_sum, load_ica, load_iab, load_items) -> [Assessment]:
     """
     Load assessments from a single tabulator csv file
 
     :param file: path of file to read
+    :param subjects: subject definitions, correlated to assessments by subject code
     :param load_sum: True to load summative assessments
     :param load_ica: True to load ICAs
     :param load_iab: True to load IABs
@@ -48,7 +51,8 @@ def load_assessments_file(file, load_sum, load_ica, load_iab, load_items):
     assessments = []
 
     def should_process(subtype):
-        return ((subtype == 'SUM' or subtype == 'summative') and load_sum) or (subtype == 'ICA' and load_ica) or (subtype == 'IAB' and load_iab)
+        return ((subtype == 'SUM' or subtype == 'summative') and load_sum) \
+               or (subtype == 'ICA' and load_ica) or (subtype == 'IAB' and load_iab)
 
     asmt = None
     with open(file) as csvfile:
@@ -63,12 +67,26 @@ def load_assessments_file(file, load_sum, load_ica, load_iab, load_items):
         for row in reader:
             parse_asmt = False
             id = row['AssessmentId']
+
             if not asmt or asmt.id != id:
-                if not should_process(row['AssessmentSubtype']):
+                # only load requested assessment types
+                subtype = row['AssessmentSubtype']
+                if not should_process(subtype):
+                    print('Skipping assessment {} because type {} is not being loaded'.format(id, subtype))
                     continue
+
+                # don't load assessments for unknown subjects
+                subject_code = __mapSubject(row['AssessmentSubject'])
+                subject = next((subject for subject in subjects if subject.code.upper() == subject_code.upper()), None)
+                if not subject:
+                    print('Skipping assessment {} for unknown subject {}'.format(id, subject_code))
+                    continue
+
                 asmt = Assessment()
+                asmt.subject = subject
                 assessments.append(asmt)
                 parse_asmt = True
+
             __load_row(row, asmt, parse_asmt, parse_item)
 
     return assessments
@@ -78,7 +96,6 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
     if parse_asmt:
         asmt.id = row['AssessmentId']
         asmt.name = row['AssessmentName']
-        asmt.subject_code = __mapSubject(row['AssessmentSubject'])
         asmt.grade = __mapGrade(row['AssessmentGrade'])
         asmt.type = __mapAssessmentType(row['AssessmentType'], row['AssessmentSubtype'])
         asmt.version = row['AssessmentVersion']
@@ -91,22 +108,16 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
         asmt.overall = __getScorable(row, 'Scaled', 'Overall', 'Overall')
 
         # there may be up to 6 alt scores for an assessment
-        if asmt.subject_code in cfg.ALT_SCORE_DEFINITIONS:
-            alt_defs = cfg.ALT_SCORE_DEFINITIONS[asmt.subject_code]
-            asmt.alts = [__getScorable(row, 'Alt' + str(i), alt_def['code'], alt_def['name'])
-                         for (i, alt_def) in enumerate(alt_defs, start=1)]
-            for alt, alt_def in zip(asmt.alts, alt_defs):
-                alt.weight = alt_def['weight']
+        if asmt.subject.alts:
+            asmt.alts = [__getScorable(row, 'Alt' + str(i), alt_def.code, alt_def.name, alt_def.weight)
+                         for (i, alt_def) in enumerate(asmt.subject.alts, start=1)]
 
         # claims
-        if asmt.is_iab() or asmt.subject_code not in cfg.CLAIM_DEFINITIONS:
+        if asmt.is_iab() or not asmt.subject.claims:
             asmt.claims = []
         else:
-            claim_defs = cfg.CLAIM_DEFINITIONS[asmt.subject_code]
-            asmt.claims = [Scorable(claim_def['code'], claim_def['name'], asmt.overall.score_min, asmt.overall.score_max)
-                           for claim_def in claim_defs]
-            for claim, claim_def in zip(asmt.claims, claim_defs):
-                claim.weight = claim_def['weight']
+            asmt.claims = [__copyScorable(claim_def, asmt.overall.score_min, asmt.overall.score_max)
+                           for claim_def in asmt.subject.claims]
 
         # if items are being parsed, create segment and list
         if parse_item:
@@ -114,12 +125,6 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
             asmt.segment.id = IDGen.get_uuid()
             asmt.item_bank = []
             asmt.item_total_score = 0
-
-    # infer claims for custom subjects even if not parsing items
-    if not asmt.is_iab() and asmt.subject_code not in cfg.CLAIM_DEFINITIONS and 'Claim' in row:
-        claim_code = row['Claim'].strip()
-        if claim_code not in [claim.code for claim in asmt.claims]:
-            asmt.claims.append(Scorable(claim_code, claim_code, asmt.overall.score_min, asmt.overall.score_max))
 
     # infer allowed accommodations even if not parsing items
     if 'ASL' in row and len(row['ASL']) > 0:
@@ -175,7 +180,7 @@ def __mapGrade(grade):
     return int(grade)
 
 
-def __getScorable(row, prefix, code, name):
+def __getScorable(row, prefix, code, name, weight=None):
     if prefix + 'Low1' not in row:
         return None
 
@@ -189,6 +194,13 @@ def __getScorable(row, prefix, code, name):
         __getRowScore(row, prefix + 'High5')
     ] if s is not None]
     scorable.score_max = max(scorable.cut_points)
+    scorable.weight = weight
+    return scorable
+
+
+def __copyScorable(source: Scorable, score_min, score_max):
+    scorable = Scorable(source.code, source.name, score_min, score_max)
+    scorable.weight = source.weight
     return scorable
 
 

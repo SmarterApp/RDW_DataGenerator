@@ -22,6 +22,7 @@ if __name__ == '__main__':
     parser.add_argument('-st', '--state_type', dest='state_type', action='store', default='tiny', help='Specify the type of state to generate data for')
 
     parser.add_argument('-hier', '--hier_source', dest='hier_source', action='store', default='generate', help='Source of hierarchy, either \'generate\' or a CSV pathname, e.g. ./in/hierarchy.csv')
+    parser.add_argument('-sub', '--subject_source', dest='subject_source', action='store', default='generate', help='Source of subject definitions files, either \'generate\' or a glob expression matching files, e.g. ./in/*_subject.xml')
     parser.add_argument('-pkg', '--pkg_source', dest='pkg_source', action='store', help='Source of assessment packages, a glob expression matching files, e.g. ./in/20*.csv')
 
     group = parser.add_argument_group('outcomes')

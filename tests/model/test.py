@@ -29,7 +29,7 @@ def test_assessment_outcome():
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
     asmt = generate_assessment('SUM', 2015, 'ELA', 3, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015, ['ELA', 'Math'])
     asmt_out = asmt_gen.generate_assessment_outcome(datetime.date(2015, 5, 15), student, asmt, ID_GEN)
 
 
@@ -61,7 +61,7 @@ def test_student():
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
     reg_sys = hier_gen.generate_registration_system(2015, '2014-02-27', ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015, ['ELA', 'Math'])
     student.reg_sys = reg_sys
 
 
@@ -69,7 +69,7 @@ def test_student_set_get_groups():
     state = hier_gen.generate_state('devel', 'Example State', 'ES', ID_GEN)
     district = hier_gen.generate_district('Small Average', state, ID_GEN)
     school = hier_gen.generate_school('Elementary School', district, ID_GEN)
-    student = pop_gen.generate_student(school, 3, ID_GEN)
+    student = pop_gen.generate_student(school, 3, ID_GEN, 2015, ['ELA', 'Math'])
 
     student.set_group(StudentGroup('ELA', '100', 'G3-100'))
     assert student.get_group('ELA').name == 'G3-100'
