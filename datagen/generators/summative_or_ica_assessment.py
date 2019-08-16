@@ -102,7 +102,7 @@ def generate_assessment_outcome(date_taken: datetime.date,
 
     # Set other specifics
     sao.school = student.school
-    sao.admin_condition = 'Valid' if assessment.type == 'SUMMATIVE' else 'SD'
+    sao.admin_condition = 'Valid' if assessment.is_summative() else 'SD'
     sao.date_taken = date_taken
     gen_asmt_generator.generate_session(sao)
 
@@ -125,7 +125,7 @@ def generate_assessment_outcome(date_taken: datetime.date,
     # note that we're using the overall min/max scores; some day we should use alt-specific values
     if assessment.alts and len(assessment.alts) > 0:
         sao.alt_scores = []
-        alt_weights = [alt['weight'] for alt in cfg.ALT_SCORE_DEFINITIONS[assessment.subject_code]]
+        alt_weights = [alt_def.weight for alt_def in assessment.alts]
         alt_scores = random_subscores(overall.score, alt_weights, assessment.overall.score_min, assessment.overall.score_max)
         for alt, alt_score in zip(assessment.alts, alt_scores):
             sao.alt_scores.append(
@@ -135,8 +135,7 @@ def generate_assessment_outcome(date_taken: datetime.date,
 
     # generate claim scores if indicated
     if assessment.claims and len(assessment.claims) > 0:
-        claim_weights = [claim['weight'] for claim in cfg.CLAIM_DEFINITIONS[assessment.subject_code]] \
-            if assessment.subject_code in cfg.CLAIM_DEFINITIONS else [1.0 / len(assessment.claims)] * len(assessment.claims)
+        claim_weights = [claim_def.weight for claim_def in assessment.claims]
         claim_scores = random_subscores(overall.score, claim_weights, assessment.overall.score_min, assessment.overall.score_max)
         # another hard-coded thing i don't like but i'm tired ...
         emit_score = False if assessment.subject_code == 'ELPAC' else True

@@ -4,6 +4,8 @@ A writer producing output like the assessment package tabulator.
 """
 import csv
 
+from datagen.model.assessment import Assessment
+
 TabulatorFieldNames = [
     'AssessmentId', 'AssessmentName', 'AssessmentSubject', 'AssessmentGrade', 'AssessmentType', 'AssessmentSubtype',
     'AssessmentLabel', 'AssessmentVersion', 'AcademicYear', 'FullItemKey', 'BankKey', 'ItemId', 'Filename', 'Version',
@@ -25,14 +27,14 @@ def write_assessments(file, asmts):
             writer.writerows(__asmt_to_rows(asmt))
 
 
-def __asmt_to_rows(asmt):
+def __asmt_to_rows(asmt: Assessment):
     row = {
         'AssessmentId': asmt.id,
         'AssessmentName': asmt.name,
         'AssessmentSubject': asmt.subject_code,
         'AssessmentGrade': asmt.grade,
-        'AssessmentType': __map_type(asmt),
-        'AssessmentSubtype': __map_subtype(asmt),
+        'AssessmentType': 'summative' if asmt.is_summative() else 'interim',
+        'AssessmentSubtype': asmt.type,
         'AssessmentLabel': None,
         'AssessmentVersion': asmt.version,
         'AcademicYear': asmt.year,
@@ -69,14 +71,3 @@ def __asmt_to_rows(asmt):
         row['IsActive'] = 'TRUE'
         rows.append(row.copy())
     return rows
-
-
-def __map_type(asmt):
-    if asmt.type == 'SUMMATIVE': return 'summative'
-    return 'interim'
-
-
-def __map_subtype(asmt):
-    if asmt.type == 'SUMMATIVE': return 'SUM'
-    if asmt.type == 'INTERIM COMPREHENSIVE': return 'ICA'
-    return 'IAB'

@@ -9,7 +9,7 @@ class Scorable:
     Info about something (claim, alt, overall) that is scorable
     """
 
-    __slots__ = ('code', 'name', 'score_min', 'score_max', 'cut_points')
+    __slots__ = ('code', 'name', 'score_min', 'score_max', 'cut_points', 'weight')
 
     def __init__(self, code: str = None, name: str = None,
                  score_min: int = None, score_max: int = None, cut_points: [int] = None):
@@ -18,6 +18,7 @@ class Scorable:
         self.score_min = score_min    # e.g. 2250
         self.score_max = score_max    # e.g. 2780
         self.cut_points = cut_points  # list of cut_points
+        self.weight = None            # e.g. 0.25
 
     def get_cuts(self):
         """

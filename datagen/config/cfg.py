@@ -930,7 +930,7 @@ LEVELS_BY_GRADE_BY_SUBJ = {
 
 # BEGIN interim assessment configuration ##
 
-# % of students that have might take at least 1 interim assessment block
+# % of students that have might take at least 1 IAB
 IAB_STUDENT_RATE = 0.90
 
 # In the following, the year is the year adjustment (offset of the year from the start of the schoolyear)

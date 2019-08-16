@@ -23,8 +23,8 @@ def load_assessments(glob_pattern, load_sum, load_ica, load_iab, load_items):
 
     :param glob_pattern: file pattern to match and load
     :param load_sum: True to load summative assessments
-    :param load_ica: True to load interim comprehensive assessments
-    :param load_iab: True to load interim assessment blocks
+    :param load_ica: True to load ICAs
+    :param load_iab: True to load IABs
     :param load_items: True to load items, False to ignore item data
     :return: loaded assessments
     """
@@ -40,8 +40,8 @@ def load_assessments_file(file, load_sum, load_ica, load_iab, load_items):
 
     :param file: path of file to read
     :param load_sum: True to load summative assessments
-    :param load_ica: True to load interim comprehensive assessments
-    :param load_iab: True to load interim assessment blocks
+    :param load_ica: True to load ICAs
+    :param load_iab: True to load IABs
     :param load_items: True to load items, False to ignore item data
     :return: loaded assessments
     """
@@ -95,13 +95,18 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
             alt_defs = cfg.ALT_SCORE_DEFINITIONS[asmt.subject_code]
             asmt.alts = [__getScorable(row, 'Alt' + str(i), alt_def['code'], alt_def['name'])
                          for (i, alt_def) in enumerate(alt_defs, start=1)]
+            for alt, alt_def in zip(asmt.alts, alt_defs):
+                alt.weight = alt_def['weight']
 
         # claims
         if asmt.is_iab() or asmt.subject_code not in cfg.CLAIM_DEFINITIONS:
             asmt.claims = []
         else:
-            asmt.claims = [Scorable(claim['code'], claim['name'], asmt.overall.score_min, asmt.overall.score_max)
-                           for claim in cfg.CLAIM_DEFINITIONS[asmt.subject_code]]
+            claim_defs = cfg.CLAIM_DEFINITIONS[asmt.subject_code]
+            asmt.claims = [Scorable(claim_def['code'], claim_def['name'], asmt.overall.score_min, asmt.overall.score_max)
+                           for claim_def in claim_defs]
+            for claim, claim_def in zip(asmt.claims, claim_defs):
+                claim.weight = claim_def['weight']
 
         # if items are being parsed, create segment and list
         if parse_item:
@@ -147,11 +152,11 @@ def __load_row(row, asmt: Assessment, parse_asmt, parse_item):
 
 def __mapAssessmentType(type, subtype):
     if subtype == 'IAB':
-        return 'INTERIM ASSESSMENT BLOCK'
+        return 'IAB'
     if subtype == 'ICA':
-        return 'INTERIM COMPREHENSIVE'
+        return 'ICA'
     if subtype == 'SUM' or subtype == 'summative':
-        return 'SUMMATIVE'
+        return 'SUM'
     raise Exception('Unexpected assessment type {}-{}'.format(type, subtype))
 
 

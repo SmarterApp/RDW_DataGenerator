@@ -49,8 +49,8 @@ if __name__ == '__main__':
     if not (args.gen_sum or args.gen_ica or args.gen_iab):
         print('No assessment package types selected. Please specify at least one')
         print('  --gen_sum  Summative assessment package')
-        print('  --gen_ica  Interim comprehensive assessment package')
-        print('  --gen_iab  Interim assessment block package')
+        print('  --gen_ica  Interim comprehensive assessment (ICA) package')
+        print('  --gen_iab  Interim assessment block (IAB) package')
         exit()
 
     worker = WorkerManager(args)
