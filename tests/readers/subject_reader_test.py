@@ -16,6 +16,11 @@ def test_reading_ELPAC():
     assert subject.code == 'ELPAC'
     assert len(subject.alts) == 2
     assert len(subject.claims) == 4
+    assert len(subject.types) == 1
+    sum = subject.types['SUM']
+    assert sum.overall_scoring.perf_levels == 4
+    assert sum.alt_scoring.perf_levels == 4
+    assert sum.claim_scoring.perf_levels == 3
 
 
 if __name__ == '__main__':

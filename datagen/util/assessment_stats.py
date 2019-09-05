@@ -1,4 +1,3 @@
-# like sum, but with multiplication
 import itertools
 import math
 import random
@@ -239,7 +238,9 @@ def random_subscores(score: int, weights: [float], score_min: int, score_max: in
 
         assert min_ <= max_, '{} {}'.format(min_, max_)
 
-        claim = random.randint(min_, max_)
+        # try to lean towards the score for each claim
+        claim = int(random.triangular(min_, max_, score)) if min_ < score < max_ else random.randint(min_, max_)
+
         subscores.append(claim)
 
         remaining_score -= claim * claim_weight
@@ -275,3 +276,10 @@ def claim_perf_lvl(claim_score: int, claim_error: int, perf_cut_point: int):
     if round(claim_score - 1.5 * claim_error) >= perf_cut_point:
         return 3
     return 2
+
+
+def even_cuts(min_value: int, max_value: int, levels: int):
+    """Return list of cut points evenly distributed between min/max. List includes min/max.
+    """
+    step = int((max_value - min_value) / levels)
+    return [min_value + (step * i) for i in range(levels)] + [max_value]

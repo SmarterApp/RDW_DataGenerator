@@ -14,7 +14,7 @@ from datagen.model.assessmentoutcome import AssessmentOutcome
 from datagen.model.score import Score
 from datagen.model.student import Student
 from datagen.model.targetscore import TargetScore
-from datagen.util.assessment_stats import random_subscores, performance_level
+from datagen.util.assessment_stats import random_subscores, performance_level, even_cuts
 from datagen.util.assessment_stats import random_stderr, claim_perf_lvl, score_given_capability
 from datagen.util.id_gen import IDGen
 
@@ -134,14 +134,25 @@ def generate_assessment_outcome(date_taken: datetime.date,
 
     # generate claim scores if indicated
     if assessment.claims and len(assessment.claims) > 0:
+        # use the overall min/max score for claims (since we don't have any other values to use)
+        min_score = assessment.overall.score_min
+        max_score = assessment.overall.score_max
+
         claim_weights = [claim_def.weight for claim_def in assessment.claims]
-        claim_scores = random_subscores(overall.score, claim_weights, assessment.overall.score_min, assessment.overall.score_max)
+        claim_scores = random_subscores(overall.score, claim_weights, min_score, max_score)
+
+        # non-SB claims need cut-points to calculate their level; we don't have information on
+        # that so just assume an even distribution between min/max values.
+        # We need to get the number of claim performance levels from the subject definition.
+        levels = assessment.subject.types[assessment.type].claim_scoring.perf_levels
+        claim_cuts = even_cuts(min_score, max_score, levels)
+
         sao.claim_scores = []
         for claim, claim_score in zip(assessment.claims, claim_scores):
-            stderr = random_stderr(claim_score, assessment.overall.score_min, assessment.overall.score_max)
+            stderr = random_stderr(claim_score, min_score, max_score)
             claim_level = claim_perf_lvl(claim_score, stderr, assessment.overall.cut_points[1]) \
-                if assessment.subject.sbac_claim_levels else performance_level(claim_score, assessment.overall.get_cuts())
-            sao.claim_scores.append(Score(claim.code, claim_score, stderr, claim_level) \
+                if assessment.subject.sbac_claim_levels else performance_level(claim_score, claim_cuts)
+            sao.claim_scores.append(Score(claim.code, claim_score, stderr, claim_level)
                 if assessment.subject.emit_claim_score else Score(claim.code, None, None, claim_level))
 
     # for summative assessments, if the items have target information, generate target residuals
@@ -156,3 +167,5 @@ def generate_assessment_outcome(date_taken: datetime.date,
                              for t in targets.keys()]
 
     return sao
+
+

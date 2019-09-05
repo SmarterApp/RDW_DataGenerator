@@ -6,10 +6,11 @@ A reader for subject XML files.
 import glob
 from distutils.util import strtobool
 from xml.etree import ElementTree
+from xml.etree.ElementTree import Element
 
 from datagen.generators.subject import set_custom_defaults
 from datagen.model.scorable import Scorable
-from datagen.model.subject import Subject
+from datagen.model.subject import Subject, SubjectAssessmentType, SubjectScoring
 
 
 def load_subjects(glob_pattern: str):
@@ -45,8 +46,12 @@ def load_subject_file(file: str):
     types = root.find('./AssessmentTypes')
     if types:
         for type in types:
-            code = type.get('code')
-            subject.types.append(code.upper())
+            code = type.get('code').upper()
+            assessment_type = SubjectAssessmentType(code)
+            assessment_type.overall_scoring = __extract_scoring(type.find('./OverallScoring'))
+            assessment_type.alt_scoring = __extract_scoring(type.find('./AltScoring'))
+            assessment_type.claim_scoring = __extract_scoring(type.find('./ClaimScoring'))
+            subject.types[code] = assessment_type
 
     altscores = root.find('./AltScores')
     if altscores:
@@ -65,3 +70,10 @@ def load_subject_file(file: str):
             subject.claims.append(Scorable(claim.get('code'), claim.get('name')))
 
     return subject
+
+
+def __extract_scoring(element: Element):
+    if element:
+        levels = element.findall('.//PerformanceLevel')
+        return SubjectScoring(len(levels), min_score = element.get('minScore'), max_score = element.get('maxScore'))
+    return None

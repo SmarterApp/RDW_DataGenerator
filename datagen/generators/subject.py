@@ -2,7 +2,7 @@
 Generate default subjects
 """
 from datagen.model.scorable import Scorable
-from datagen.model.subject import Subject
+from datagen.model.subject import Subject, SubjectAssessmentType, SubjectScoring
 
 CLAIM_DEFINITIONS = {'Math': [{'code': '1', 'name': 'Concepts & Procedures', 'weight': .4},
                               {'code': 'SOCK_2', 'name': 'Problem Solving and Modeling & Data Analysis', 'weight': .45},
@@ -20,7 +20,9 @@ def generate_default_subjects() -> [Subject]:
 
 def __generate_math() -> Subject:
     subject = Subject('Math')
-    subject.types = ['SUM', 'ICA', 'IAB']
+    subject.types['SUM'] = __generate_sum_assessment_type()
+    subject.types['ICA'] = __generate_ica_assessment_type()
+    subject.types['IAB'] = __generate_iab_assessment_type()
     subject.overall = Scorable('Overall', 'Overall', 1000, 3500)
     subject.claims = [Scorable(claim_def['code'], claim_def['name']) for claim_def in CLAIM_DEFINITIONS['Math']]
     set_custom_defaults(subject)
@@ -29,11 +31,33 @@ def __generate_math() -> Subject:
 
 def __generate_ela() -> Subject:
     subject = Subject('ELA')
-    subject.types = ['SUM', 'ICA', 'IAB']
+    subject.types['SUM'] = __generate_sum_assessment_type()
+    subject.types['ICA'] = __generate_ica_assessment_type()
+    subject.types['IAB'] = __generate_iab_assessment_type()
     subject.overall = Scorable('Overall', 'Overall', 1000, 3500)
     subject.claims = [Scorable(claim_def['code'], claim_def['name']) for claim_def in CLAIM_DEFINITIONS['ELA']]
     set_custom_defaults(subject)
     return subject
+
+
+def __generate_sum_assessment_type():
+    assessment_type = SubjectAssessmentType('SUM')
+    assessment_type.overall_scoring = SubjectScoring(4)
+    assessment_type.claim_scoring = SubjectScoring(3)
+    return assessment_type
+
+
+def __generate_ica_assessment_type():
+    assessment_type = SubjectAssessmentType('ICA')
+    assessment_type.overall_scoring = SubjectScoring(4)
+    assessment_type.claim_scoring = SubjectScoring(3)
+    return assessment_type
+
+
+def __generate_iab_assessment_type():
+    assessment_type = SubjectAssessmentType('IAB')
+    assessment_type.overall_scoring = SubjectScoring(3)
+    return assessment_type
 
 
 def set_custom_defaults(subject: Subject):

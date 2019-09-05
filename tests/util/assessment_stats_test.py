@@ -3,7 +3,8 @@
 """
 import pytest
 
-from datagen.util.assessment_stats import DemographicLevels, Stats, score_given_capability, performance_level
+from datagen.util.assessment_stats import DemographicLevels, Stats, score_given_capability, performance_level, \
+    random_subscores
 from datagen.util.assessment_stats import RandomLevelByDemographics, Properties, GradeLevels
 from datagen.util.assessment_stats import random_capability
 from datagen.util.weighted_choice import weighted_choice
@@ -143,3 +144,18 @@ def test_score_given_capability_with_six_levels():
     _assert_score_given_capability(2.0, [2300, 2400, 2500, 2600, 2700, 2800, 2900], 2600, 15, 3.5, 0.3)
     _assert_score_given_capability(3.0, [2300, 2400, 2500, 2600, 2700, 2800, 2900], 2750, 15, 5.0, 0.3)
     _assert_score_given_capability(3.99, [2300, 2400, 2500, 2600, 2700, 2800, 2900], 2899, 15, 6.0, 0.3)
+
+
+def test_random_subscores():
+    subscores = random_subscores(1200, [0.5, 0.5], 1100, 1950)
+    subscores = random_subscores(1300, [0.25, 0.25, 0.25, 0.25], 1100, 1950)
+    subscores = random_subscores(1400, [0.2, 0.2, 0.2, 0.2, 0.2], 1100, 1950)
+    subscores = random_subscores(1500, [0.5, 0.5], 1100, 1950)
+    subscores = random_subscores(1600, [0.5, 0.5], 1100, 1950)
+    subscores = random_subscores(1700, [0.5, 0.5], 1100, 1950)
+    subscores = random_subscores(1800, [0.5, 0.5], 1100, 1950)
+    subscores = random_subscores(1900, [0.5, 0.5], 1100, 1950)
+
+
+if __name__ == '__main__':
+    test_random_subscores()
