@@ -67,8 +67,11 @@ python -m datagen.generate_data --gen_sum --xml_out --pkg_source ./in/src/*.ELPA
 ### Building
 
 The artifact for this project is a docker image. No eggs or wheels or anything like that.
-Assuming you have Docker installed and DockerHub configured, you can build and push the image:
+Assuming you have Docker installed and DockerHub configured, you can build and push the image.
+You'll need to `docker login` with credentials that can push to fwsbac.
 ```bash
+docker login -u fwsbacrdw 
+
 docker build -t fwsbac/rdw-datagen:latest .
 docker push fwsbac/rdw-datagen
 ```
