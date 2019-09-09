@@ -132,14 +132,20 @@ def test_sort_schools_by_grade():
                                                        midl_school_2, high_school])
 
     # Tests
-    assert len(schools_by_grade.keys()) == 10
+    assert len(schools_by_grade.keys()) == 13
+    assert len(schools_by_grade[0]) == 3
+    assert len(schools_by_grade[1]) == 3
+    assert len(schools_by_grade[2]) == 3
     assert len(schools_by_grade[3]) == 3
     assert len(schools_by_grade[4]) == 3
     assert len(schools_by_grade[5]) == 3
     assert len(schools_by_grade[6]) == 2
     assert len(schools_by_grade[7]) == 2
     assert len(schools_by_grade[8]) == 2
+    assert len(schools_by_grade[9]) == 1
+    assert len(schools_by_grade[10]) == 1
     assert len(schools_by_grade[11]) == 1
+    assert len(schools_by_grade[12]) == 1
 
 
 def test_set_up_schools_with_grades():
@@ -164,3 +170,8 @@ def test_set_up_schools_with_grades():
     assert len(schools_with_grades[midl_school_1]) == 3
     assert len(schools_with_grades[midl_school_2]) == 3
     assert len(schools_with_grades[high_school]) == 1
+
+
+if __name__ == '__main__':
+    test_sort_schools_by_grade()
+
