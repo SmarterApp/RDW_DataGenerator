@@ -24,9 +24,6 @@ from datagen.readers.subject_reader import load_subjects
 from datagen.readers.tabulator_reader import load_assessments
 from datagen.util.id_gen import IDGen
 
-# These are global regardless of team
-GRADES_OF_CONCERN = {3, 4, 5, 6, 7, 8, 11}  # Made as a set for intersection later
-
 
 class WorkerManager(Worker):
     def __init__(self, args):
@@ -211,7 +208,7 @@ class WorkerManager(Worker):
         years = self.__years(assessments)
 
         # start with "standard" SB grades and add any grade found in the assessments
-        hierarchy_grades = GRADES_OF_CONCERN
+        hierarchy_grades = {3, 4, 5, 6, 7, 8, 11}
         hierarchy_grades.update(self.__grades(assessments))
 
         # calculate the progress bar max and start the progress

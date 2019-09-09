@@ -44,7 +44,7 @@ VERY_FEAT_ELEM = 7 * BASE_ELEM
 SCHOOL_TYPES = {
     'High School':
         {'type': 'High School',
-         'grades': [11],
+         'grades': [9, 10, 11, 12],
          'students': {'min': 300, 'max': 400, 'avg': 350},
          'group_size': 40
          },
@@ -68,7 +68,7 @@ SCHOOL_TYPES = {
          },
     'Poor High School':
         {'type': 'High School',
-         'grades': [11],
+         'grades': [9, 10, 11, 12],
          'students': {'min': 300, 'max': 400, 'avg': 350},
          'group_size': 50,
          'adjust_pld': -0.45
@@ -89,7 +89,7 @@ SCHOOL_TYPES = {
          },
     'Good High School':
         {'type': 'High School',
-         'grades': [11],
+         'grades': [9, 10, 11, 12],
          'students': {'min': 300, 'max': 400, 'avg': 350},
          'group_size': 30,
          'adjust_pld': 0.35
@@ -110,7 +110,7 @@ SCHOOL_TYPES = {
          },
     'Big High School':
         {'type': 'High School',
-         'grades': [11],
+         'grades': [9, 10, 11, 12],
          'students': {'min': 600, 'max': 800, 'avg': 700},
          'group_size': 40
          },
@@ -128,13 +128,13 @@ SCHOOL_TYPES = {
          },
     'UDL High School':
         {'type': 'High School',
-         'grades': [11],
+         'grades': [9, 10, 11, 12],
          'students': {'min': 999, 'max': 1001, 'avg': 1000},
          'group_size': 40
          },
     'Tiny High School':
         {'type': 'High School',
-         'grades': [11],
+         'grades': [9, 10, 11, 12],
          'students': {'min': 5, 'max': 10, 'avg': 7},
          'group_size': 10
          },
