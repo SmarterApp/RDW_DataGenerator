@@ -23,5 +23,6 @@ cover
 coverage.xml
 nosetests.xml
 
+coverage/
 out/
 out.*/

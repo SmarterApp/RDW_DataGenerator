@@ -94,6 +94,13 @@
       "parentEntityType": "DISTRICT", 
       "entityName": "Three Rivers",
       "parentEntityId": "88800130000000"
+    },
+    {
+      "entityId": "88800140014001",
+      "entityType": "INSTITUTION",
+      "parentEntityType": "DISTRICT",
+      "entityName": "Bitra Hold",
+      "parentEntityId": "88800140000000"
     }
   ]
 }
