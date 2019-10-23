@@ -206,10 +206,12 @@ class WorkerManager(Worker):
 
         # get range of years from assessment packages
         years = self.__years(assessments)
+        print('School years: {}'.format(years))
 
         # start with "standard" SB grades and add any grade found in the assessments
         hierarchy_grades = {3, 4, 5, 6, 7, 8, 11}
         hierarchy_grades.update(self.__grades(assessments))
+        print('Hierarchy grades: {}'.format(hierarchy_grades))
 
         # calculate the progress bar max and start the progress
         progress_max = len(hier_gen.set_up_schools_with_grades(schools, hierarchy_grades)) * len(years)
