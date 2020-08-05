@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This is a fake subject to test lots of Alt Scores, Trait Scores, etc. -->
+<Subject code="Science" name="Science">
+  <Messages>
+    <Message key="sum.performance-info"><![CDATA[Student scores on the Science assessment are assigned to one of four achievement levels based on the scale score.]]></Message>
+    <Message key="trait.purpose.BIOLAB.name">Biology Lab</Message>
+    <Message key="trait.purpose.BIOLAB.description">Biology Laboratory Design and Analysis</Message>
+    <Message key="trait.purpose.CHEMLAB.name">Chemistry Lab</Message>
+    <Message key="trait.purpose.CHEMLAB.description">Chemistry Laboratory Design and Analysis</Message>
+    <Message key="trait.category.DESIGN.name">Design</Message>
+    <Message key="trait.category.DESIGN.0">The response demonstrates little or no understanding of lab design.</Message>
+    <Message key="trait.category.DESIGN.1">The response demonstrates a partial understanding of lab design.</Message>
+    <Message key="trait.category.DESIGN.2">The response demonstrates an adequate understanding of lab design.</Message>
+    <Message key="trait.category.DESIGN.3">The response demonstrates exemplary lab design.</Message>
+    <Message key="trait.category.TECHNIQUE.name">Technique</Message>
+    <Message key="trait.category.TECHNIQUE.0">Technique 0/4</Message>
+    <Message key="trait.category.TECHNIQUE.1">Technique 1/4</Message>
+    <Message key="trait.category.TECHNIQUE.2">Technique 2/4</Message>
+    <Message key="trait.category.TECHNIQUE.3">Technique 3/4</Message>
+    <Message key="trait.category.TECHNIQUE.4">Technique 4/4</Message>
+    <Message key="trait.category.ANALYSIS.name">Analysis</Message>
+    <Message key="trait.category.ANALYSIS.0">Analysis 0/3</Message>
+    <Message key="trait.category.ANALYSIS.1">Analysis 1/3</Message>
+    <Message key="trait.category.ANALYSIS.2">Analysis 2/3</Message>
+    <Message key="trait.category.ANALYSIS.3">Analysis 3/3</Message>
+  </Messages>
+  <AssessmentTypes>
+    <AssessmentType code="sum" name="Summative" longName="Big Science Summative" targetReport="false" printedReport="false">
+      <OverallScoring name="Overall" minScore="1000" maxScore="2000">
+        <PerformanceLevels standardCutoff="3">
+          <PerformanceLevel level="1" name="Level 1" shortName="Level 1" suffix="" color="gray-darkest"/>
+          <PerformanceLevel level="2" name="Level 2" shortName="Level 2" suffix="" color="red-dark"/>
+          <PerformanceLevel level="3" name="Level 3" shortName="Level 3" suffix="" color="cerulean"/>
+          <PerformanceLevel level="4" name="Level 4" shortName="Level 4" suffix="" color="yellow-gold"/>
+        </PerformanceLevels>
+      </OverallScoring>
+      <AltScoring name="Subject" minScore="1000" maxScore="2000">
+        <PerformanceLevels>
+          <PerformanceLevel level="1" name="Level 1" shortName="Level 1" suffix="" color="maroon"/>
+          <PerformanceLevel level="2" name="Level 2" shortName="Level 2" suffix="" color="orange"/>
+          <PerformanceLevel level="3" name="Level 3" shortName="Level 3" suffix="" color="blue"/>
+          <PerformanceLevel level="4" name="Level 4" shortName="Level 4" suffix="" color="green"/>
+        </PerformanceLevels>
+      </AltScoring>
+    </AssessmentType>
+  </AssessmentTypes>
+  <Traits>
+    <!-- see Messages for purpose/category names, description and performance text -->
+    <Trait code="BIOLAB_DESIGN" purpose="BIOLAB" category="DESIGN" maxScore="3" />
+    <Trait code="BIOLAB_TECHNIQUE" purpose="BIOLAB" category="TECHNIQUE" maxScore="4" />
+    <Trait code="BIOLAB_ANALYSIS" purpose="BIOLAB" category="ANALYSIS" maxScore="3" />
+    <Trait code="CHEMLAB_DESIGN" purpose="CHEMLAB" category="DESIGN" maxScore="3" />
+    <Trait code="CHEMLAB_TECHNIQUE" purpose="CHEMLAB" category="TECHNIQUE" maxScore="4" />
+    <Trait code="CHEMLAB_ANALYSIS" purpose="CHEMLAB" category="ANALYSIS" maxScore="3" />
+  </Traits>
+  <AltScores>
+    <AltScore code="PHYS" name="Physics" displayOrder="1">
+      <Icon>fa-balance-scale</Icon>
+    </AltScore>
+    <AltScore code="CHEM" name="Chemistry" displayOrder="2">
+      <Icon>fa-flask</Icon>
+    </AltScore>
+    <AltScore code="BIO" name="Biology" displayOrder="3">
+      <Icon>fa-bug</Icon>
+    </AltScore>
+    <AltScore code="GEO" name="Geology" displayOrder="4">
+      <Icon>fa-globe</Icon>
+    </AltScore>
+    <AltScore code="ASTRO" name="Astronomy" displayOrder="5">
+      <Icon>fa-sun-o</Icon>
+    </AltScore>
+  </AltScores>
+</Subject>

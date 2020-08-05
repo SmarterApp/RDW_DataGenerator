@@ -222,7 +222,9 @@ def generate_response(aid: AssessmentOutcomeItemData, item: AssessmentItem, capa
         aid.page_time = 1000 * randrange(120, 600)
         if correct:
             aid.response_value = _generate_wer_response(randint(3, 8))
-            aid.sub_scores = [randrange(1, 5), randrange(1, 5), randrange(0, 3)]
+            # score for organization and evidence = round(4 * capability / 4.0) = round(capability)
+            aid.sub_scores = [round(capability), round(capability), randrange(0, 3)] if capability \
+                else [randrange(1,5), randrange(1,5), randrange(0,3)]
         else:
             aid.response_value = _generate_wer_response(1)
             aid.sub_scores = [randrange(0, 2), randrange(0, 2), 0]

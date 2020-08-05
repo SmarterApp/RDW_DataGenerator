@@ -11,6 +11,7 @@ from xml.etree.ElementTree import Element
 from datagen.generators.subject import set_custom_defaults
 from datagen.model.scorable import Scorable
 from datagen.model.subject import Subject, SubjectAssessmentType, SubjectScoring
+from datagen.model.trait import Trait
 
 
 def load_subjects(glob_pattern: str):
@@ -54,10 +55,9 @@ def load_subject_file(file: str):
             subject.types[code] = assessment_type
 
     altscores = root.find('./AltScores')
-    if altscores:
+    if altscores and len(altscores) > 0:
+        subject.alts = []
         for altscore in altscores:
-            if not subject.alts:
-                subject.alts = []
             subject.alts.append(Scorable(altscore.get('code'), altscore.get('name')))
 
     claims = root.find('./Claims')
@@ -68,6 +68,13 @@ def load_subject_file(file: str):
             if not subject.claims:
                 subject.claims = []
             subject.claims.append(Scorable(claim.get('code'), claim.get('name')))
+
+    traits = root.find('./Traits')
+    if traits and len(traits) > 0:
+        subject.traits = []
+        for trait in traits:
+            subject.traits.append(
+                Trait(trait.get('code'), trait.get('purpose'), trait.get('category'), int(trait.get('maxScore'))))
 
     return subject
 
