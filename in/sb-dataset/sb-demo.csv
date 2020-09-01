@@ -1,0 +1,4 @@
+state_id,state_code,state_name,state_type,district_id,district_name,district_type,school_id,school_name,school_type,school_interims
+99,OT,Other Tenant,tiny,99900010000000,Demo District,Tiny,99900010000001,Demo Elementary,Elementary School,TRUE
+99,OT,Other Tenant,tiny,99900010000000,Demo District,Tiny,99900010000002,Demo Middle,Middle School,TRUE
+99,OT,Other Tenant,tiny,99900010000000,Demo District,Tiny,99900010000003,Demo High School,High School,TRUE
