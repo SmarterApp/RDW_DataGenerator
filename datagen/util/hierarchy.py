@@ -49,9 +49,13 @@ def generate_hierarchy(type, name, code, id_gen: IDGen):
             districts.append(district)
 
             # Create the schools for the district
-            school_count = random.triangular(district.config['school_counts']['min'],
-                                             district.config['school_counts']['max'],
-                                             district.config['school_counts']['avg'])
+            if district.config['school_counts']['min'] < district.config['school_counts']['avg']:
+                school_count = random.triangular(district.config['school_counts']['min'],
+                                                 district.config['school_counts']['max'],
+                                                 district.config['school_counts']['avg'])
+            else:
+                school_count = district.config['school_counts']['min']
+
             convert_config_school_count_to_ratios(district.config)
             for school_type, school_type_ratio in district.config['school_types_and_ratios'].items():
                 school_type_count = max(int(school_count * school_type_ratio), 1)  # Make sure at least 1

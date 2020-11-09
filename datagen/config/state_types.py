@@ -47,10 +47,10 @@ STATE_TYPES = {
          'id': '06'
          },
     'demo':
-        {'district_types_and_counts': [('Demo', 2)],
+        {'district_types_and_counts': [('Demo', 1), ('Tiny', 10)],
          'subject_skip_percentages': {'Math': .04, 'ELA': .03},
          'demographics': 'california',
-         'id': '06'
+         'id': '00'
          },
     'uat':
         {'district_types_and_counts': [('Small Good', 1),

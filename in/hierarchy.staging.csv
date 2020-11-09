@@ -1,0 +1,8 @@
+state_id,state_code,state_name,state_type,district_id,district_name,district_type,school_id,school_name,school_type,school_interims
+06,CA,California,demo,99999930000000,Demo CDE District Three,Demo,99999939999993,Demo CDE School Three,High School,true
+06,CA,California,demo,99999940000000,Demo CDE District Two,Demo,99999949999994,Demo CDE School Two,Middle School,true
+06,CA,California,demo,99999950000000,Demo Pilot District One,Demo,99999959999995,Demo Pilot School One,Elementary School,true
+06,CA,California,demo,99999960000000,Demo CDE District,Demo,99999969999996,Demo CDE School,Middle School,true
+06,CA,California,demo,99999900000000,Demo CDE District Six,Demo,99999909999990,Demo CDE School Six,Middle School,true
+06,CA,California,demo,99999910000000,Demo CDE District Five,Demo,99999919999991,Demo CDE School Five,Elementary School,true
+06,CA,California,demo,99999920000000,Demo CDE District Four,Demo,99999929999992,Demo CDE School Four,Elementary School,true
