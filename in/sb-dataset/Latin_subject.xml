@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Subject code="Latin" name="Latin Proficiency">
+  <Messages>
+    <Message key="sum.performance-info"><![CDATA[Student scores on the Latin Proficiency assessments are assigned to one of four achievement levels based on the scale score.]]></Message>
+  </Messages>
+  <AssessmentTypes>
+    <AssessmentType code="sum" name="Summative" longName="Summative" targetReport="false" printedReport="true">
+      <OverallScoring name="Overall - General" minScore="1150" maxScore="2150">
+        <PerformanceLevels standardCutoff="3">
+          <PerformanceLevel level="1" name="Level 1" shortName="Level 1" color="maroon"/>
+          <PerformanceLevel level="2" name="Level 2" shortName="Level 2" color="sb-iab-yellow"/>
+          <PerformanceLevel level="3" name="Level 3" shortName="Level 3" color="blue"/>
+          <PerformanceLevel level="4" name="Level 4" shortName="Level 4" color="green"/>
+        </PerformanceLevels>
+      </OverallScoring>
+      <ClaimScoring name="Domain">
+        <PerformanceLevels>
+          <PerformanceLevel level="1" name="Progressing" shortName="Progressing" suffix="Standard" color="sb-iab-yellow"/>
+          <PerformanceLevel level="2" name="Well Developed" shortName="Developed" suffix="Well" color="blue"/>
+        </PerformanceLevels>
+      </ClaimScoring>
+    </AssessmentType>
+  </AssessmentTypes>
+  <ReportGrades>
+    <ReportGrade code="05">
+      <ReportAssessmentTypes>
+        <ReportAssessmentType code="sum">
+          <ClaimAchievementMessage><![CDATA[{0}''s results are also reported out into the five domains (i.e., areas) that together make up Latin proficiency: Translation, Grammar and Syntax, Reading Comprehension, Vocabulary and Listening and Speaking. To view a description of the student's achievement level claim (i.e., area), select either [Progressing], or [Well Developed] from the student-level selections available in the table below.]]></ClaimAchievementMessage>
+          <ReportPerformanceLevels>
+            <ReportPerformanceLevel level="1"><![CDATA[{0} did not meet the standard for Latin proficiency needed for likely success in future coursework.]]></ReportPerformanceLevel>
+            <ReportPerformanceLevel level="2"><![CDATA[{0} nearly met the standard for Latin proficiency needed for likely success in future coursework.]]></ReportPerformanceLevel>
+            <ReportPerformanceLevel level="3"><![CDATA[{0} has made progress and met the standard for Latin proficiency. {0} appears ready for future coursework.]]></ReportPerformanceLevel>
+            <ReportPerformanceLevel level="4"><![CDATA[{0} has made progress and exceeded the standard for Latin proficiency. {0} appears ready for future coursework.]]></ReportPerformanceLevel>
+          </ReportPerformanceLevels>
+          <ReportClaims>
+            <ReportClaim code="LAT_T">
+              <ReportPerformanceLevels>
+                <ReportPerformanceLevel level="1"><![CDATA[{0} demonstrates some ability to translate simple sentences and passages with the use of repetition to assist comprehension.]]></ReportPerformanceLevel>
+                <ReportPerformanceLevel level="2"><![CDATA[{0} demonstrates a thorough ability to translate simple sentences and passages with the use of repetition to assist comprehension.]]></ReportPerformanceLevel>
+              </ReportPerformanceLevels>
+            </ReportClaim>
+            <ReportClaim code="LAT_G">
+              <ReportPerformanceLevels>
+                <ReportPerformanceLevel level="1"><![CDATA[{0} demonstrates some ability to understand and identify basic Latin declensions, conjugations, and sentence structure.]]></ReportPerformanceLevel>
+                <ReportPerformanceLevel level="2"><![CDATA[{0} demonstrates a thorough ability to understand and identify basic Latin declensions, conjugations, and sentence structure.]]></ReportPerformanceLevel>
+              </ReportPerformanceLevels>
+            </ReportClaim>
+            <ReportClaim code="LAT_R">
+              <ReportPerformanceLevels>
+                <ReportPerformanceLevel level="1"><![CDATA[{0} demonstrates some ability to read closely and analytically understand a range of Latin words, phrases, simple sentences, and dialogues.]]></ReportPerformanceLevel>
+                <ReportPerformanceLevel level="2"><![CDATA[{0} demonstrates a thorough ability to read closely and analytically understand a range of Latin words, phrases, simple sentences, and dialogues.]]></ReportPerformanceLevel>
+              </ReportPerformanceLevels>
+            </ReportClaim>
+            <ReportClaim code="LAT_V">
+              <ReportPerformanceLevels>
+                <ReportPerformanceLevel level="1"><![CDATA[{0} demonstrates some knowledge of Latin vocabulary to explain the meaning of Latin words and phrases in context.]]></ReportPerformanceLevel>
+                <ReportPerformanceLevel level="2"><![CDATA[{0} demonstrates a thorough knowledge of Latin vocabulary to explain the meaning of Latin words and phrases in context.]]></ReportPerformanceLevel>
+              </ReportPerformanceLevels>
+            </ReportClaim>
+            <ReportClaim code="LAT_L">
+              <ReportPerformanceLevels>
+                <ReportPerformanceLevel level="1"><![CDATA[{0} demonstrates some ability to understand simple Latin phrases spoken aloud, as well as engage in a short dialogue.]]></ReportPerformanceLevel>
+                <ReportPerformanceLevel level="2"><![CDATA[{0} demonstrates a thorough ability to understand simple Latin phrases spoken aloud, as well as engage in a short dialogue.]]></ReportPerformanceLevel>
+              </ReportPerformanceLevels>
+            </ReportClaim>
+          </ReportClaims>
+        </ReportAssessmentType>
+      </ReportAssessmentTypes>
+    </ReportGrade>
+    <ReportGrade code="08">
+      <ReportAssessmentTypes>
+        <ReportAssessmentType code="sum">
+          <ClaimAchievementMessage><![CDATA[{0}''s results are also reported out into the five domains (i.e., areas) that together make up Latin proficiency: Translation, Grammar and Syntax, Reading Comprehension, Vocabulary and Listening and Speaking. To view a description of the student's achievement level claim (i.e., area), select either [Progressing], or [Well Developed] from the student-level selections available in the table below.]]></ClaimAchievementMessage>
+          <ReportPerformanceLevels>
+            <ReportPerformanceLevel level="1"><![CDATA[{0} did not meet the standard for Latin proficiency needed for likely success in future coursework.]]></ReportPerformanceLevel>
+            <ReportPerformanceLevel level="2"><![CDATA[{0} nearly met the standard for Latin proficiency needed for likely success in future coursework.]]></ReportPerformanceLevel>
+            <ReportPerformanceLevel level="3"><![CDATA[{0} has made progress and met the standard for Latin proficiency. {0} appears ready for future coursework.]]></ReportPerformanceLevel>
+            <ReportPerformanceLevel level="4"><![CDATA[{0} has made progress and exceeded the standard for Latin proficiency. {0} appears ready for future coursework.]]></ReportPerformanceLevel>
+          </ReportPerformanceLevels>
+          <ReportClaims>
+            <ReportClaim code="LAT_T">
+              <ReportPerformanceLevels>
+                <ReportPerformanceLevel level="1"><![CDATA[{0} demonstrates some ability to translate simple sentences and passages with the use of repetition to assist comprehension.]]></ReportPerformanceLevel>
+                <ReportPerformanceLevel level="2"><![CDATA[{0} demonstrates a thorough ability to translate simple sentences and passages with the use of repetition to assist comprehension.]]></ReportPerformanceLevel>
+              </ReportPerformanceLevels>
+            </ReportClaim>
+            <ReportClaim code="LAT_G">
+              <ReportPerformanceLevels>
+                <ReportPerformanceLevel level="1"><![CDATA[{0} demonstrates some ability to understand and identify basic Latin declensions, conjugations, and sentence structure.]]></ReportPerformanceLevel>
+                <ReportPerformanceLevel level="2"><![CDATA[{0} demonstrates a thorough ability to understand and identify basic Latin declensions, conjugations, and sentence structure.]]></ReportPerformanceLevel>
+              </ReportPerformanceLevels>
+            </ReportClaim>
+            <ReportClaim code="LAT_R">
+              <ReportPerformanceLevels>
+                <ReportPerformanceLevel level="1"><![CDATA[{0} demonstrates some ability to read closely and analytically understand a range of Latin words, phrases, simple sentences, and dialogues.]]></ReportPerformanceLevel>
+                <ReportPerformanceLevel level="2"><![CDATA[{0} demonstrates a thorough ability to read closely and analytically understand a range of Latin words, phrases, simple sentences, and dialogues.]]></ReportPerformanceLevel>
+              </ReportPerformanceLevels>
+            </ReportClaim>
+            <ReportClaim code="LAT_V">
+              <ReportPerformanceLevels>
+                <ReportPerformanceLevel level="1"><![CDATA[{0} demonstrates some knowledge of Latin vocabulary to explain the meaning of Latin words and phrases in context.]]></ReportPerformanceLevel>
+                <ReportPerformanceLevel level="2"><![CDATA[{0} demonstrates a thorough knowledge of Latin vocabulary to explain the meaning of Latin words and phrases in context.]]></ReportPerformanceLevel>
+              </ReportPerformanceLevels>
+            </ReportClaim>
+            <ReportClaim code="LAT_L">
+              <ReportPerformanceLevels>
+                <ReportPerformanceLevel level="1"><![CDATA[{0} demonstrates some ability to understand simple Latin phrases spoken aloud, as well as engage in a short dialogue.]]></ReportPerformanceLevel>
+                <ReportPerformanceLevel level="2"><![CDATA[{0} demonstrates a thorough ability to understand simple Latin phrases spoken aloud, as well as engage in a short dialogue.]]></ReportPerformanceLevel>
+              </ReportPerformanceLevels>
+            </ReportClaim>
+          </ReportClaims>
+        </ReportAssessmentType>
+      </ReportAssessmentTypes>
+    </ReportGrade>
+    <ReportGrade code="09">
+      <ReportAssessmentTypes>
+        <ReportAssessmentType code="sum">
+          <ClaimAchievementMessage><![CDATA[{0}''s results are also reported out into the five domains (i.e., areas) that together make up Latin proficiency: Translation, Grammar and Syntax, Reading Comprehension, Vocabulary and Listening and Speaking. To view a description of the student's achievement level claim (i.e., area), select either [Progressing], or [Well Developed] from the student-level selections available in the table below.]]></ClaimAchievementMessage>
+          <ReportPerformanceLevels>
+            <ReportPerformanceLevel level="1"><![CDATA[{0} did not meet the standard for Latin proficiency needed for likely success in future coursework.]]></ReportPerformanceLevel>
+            <ReportPerformanceLevel level="2"><![CDATA[{0} nearly met the standard for Latin proficiency needed for likely success in future coursework.]]></ReportPerformanceLevel>
+            <ReportPerformanceLevel level="3"><![CDATA[{0} has made progress and met the standard for Latin proficiency. {0} appears ready for future coursework.]]></ReportPerformanceLevel>
+            <ReportPerformanceLevel level="4"><![CDATA[{0} has made progress and exceeded the standard for Latin proficiency. {0} appears ready for future coursework.]]></ReportPerformanceLevel>
+          </ReportPerformanceLevels>
+          <ReportClaims>
+            <ReportClaim code="LAT_T">
+              <ReportPerformanceLevels>
+                <ReportPerformanceLevel level="1"><![CDATA[{0} demonstrates some knowledge of Roman culture and literary conventions, as well as Latin morphology to translate Latin text to English.]]></ReportPerformanceLevel>
+                <ReportPerformanceLevel level="2"><![CDATA[{0} demonstrates a thorough knowledge of Roman culture and literary conventions, as well as Latin morphology to translate Latin text to English.]]></ReportPerformanceLevel>
+              </ReportPerformanceLevels>
+            </ReportClaim>
+            <ReportClaim code="LAT_G">
+              <ReportPerformanceLevels>
+                <ReportPerformanceLevel level="1"><![CDATA[{0} demonstrates some ability to identify grammatical forms and syntactic structures, as well as identifying stylistic features in Latin poetry and prose.]]></ReportPerformanceLevel>
+                <ReportPerformanceLevel level="2"><![CDATA[{0} demonstrates a thorough ability to identify grammatical forms and syntactic structures, as well as identifying stylistic features in Latin poetry and prose.]]></ReportPerformanceLevel>
+              </ReportPerformanceLevels>
+            </ReportClaim>
+            <ReportClaim code="LAT_R">
+              <ReportPerformanceLevels>
+                <ReportPerformanceLevel level="1"><![CDATA[{0} demonstrates some ability to read closely and analytically understand a range of Latin texts (e.g., poetry, dialogues, speeches) of moderate complexity.]]></ReportPerformanceLevel>
+                <ReportPerformanceLevel level="2"><![CDATA[{0} demonstrates a thorough ability to read closely and analytically understand a range of Latin texts (e.g., poetry, dialogues, speeches) of moderate complexity. {0} uses knowledge of authors or literary conventions to demonstrate understanding.]]></ReportPerformanceLevel>
+              </ReportPerformanceLevels>
+            </ReportClaim>
+            <ReportClaim code="LAT_V">
+              <ReportPerformanceLevels>
+                <ReportPerformanceLevel level="1"><![CDATA[{0} demonstrates some contextual knowledge of vocabulary to make connections to other disciplines as well as comparisons between Latin and English usages.]]></ReportPerformanceLevel>
+                <ReportPerformanceLevel level="2"><![CDATA[{0} demonstrates a thorough contextual knowledge of vocabulary to make connections to other disciplines as well as comparisons between Latin and English usages.]]></ReportPerformanceLevel>
+              </ReportPerformanceLevels>
+            </ReportClaim>
+            <ReportClaim code="LAT_L">
+              <ReportPerformanceLevels>
+                <ReportPerformanceLevel level="1"><![CDATA[{0} demonstrates some listening and speaking skills to articulate a claim or thesis in Latin as part of a dialogue.]]></ReportPerformanceLevel>
+                <ReportPerformanceLevel level="2"><![CDATA[{0} demonstrates effective listening and speaking skills to articulate a claim or thesis in Latin as part of a dialogue.]]></ReportPerformanceLevel>
+              </ReportPerformanceLevels>
+            </ReportClaim>
+          </ReportClaims>
+        </ReportAssessmentType>
+      </ReportAssessmentTypes>
+    </ReportGrade>
+    <ReportGrade code="10">
+      <ReportAssessmentTypes>
+        <ReportAssessmentType code="sum">
+          <ClaimAchievementMessage><![CDATA[{0}''s results are also reported out into the five domains (i.e., areas) that together make up Latin proficiency: Translation, Grammar and Syntax, Reading Comprehension, Vocabulary and Listening and Speaking. To view a description of the student's achievement level claim (i.e., area), select either [Progressing], or [Well Developed] from the student-level selections available in the table below.]]></ClaimAchievementMessage>
+          <ReportPerformanceLevels>
+            <ReportPerformanceLevel level="1"><![CDATA[{0} did not meet the standard for Latin proficiency needed for likely success in future coursework.]]></ReportPerformanceLevel>
+            <ReportPerformanceLevel level="2"><![CDATA[{0} nearly met the standard for Latin proficiency needed for likely success in future coursework.]]></ReportPerformanceLevel>
+            <ReportPerformanceLevel level="3"><![CDATA[{0} has made progress and met the standard for Latin proficiency. {0} appears ready for future coursework.]]></ReportPerformanceLevel>
+            <ReportPerformanceLevel level="4"><![CDATA[{0} has made progress and exceeded the standard for Latin proficiency. {0} appears ready for future coursework.]]></ReportPerformanceLevel>
+          </ReportPerformanceLevels>
+          <ReportClaims>
+            <ReportClaim code="LAT_T">
+              <ReportPerformanceLevels>
+                <ReportPerformanceLevel level="1"><![CDATA[{0} demonstrates some knowledge of Roman culture and literary conventions, as well as Latin morphology to translate Latin text to English.]]></ReportPerformanceLevel>
+                <ReportPerformanceLevel level="2"><![CDATA[{0} demonstrates a thorough knowledge of Roman culture and literary conventions, as well as Latin morphology to translate Latin text to English.]]></ReportPerformanceLevel>
+              </ReportPerformanceLevels>
+            </ReportClaim>
+            <ReportClaim code="LAT_G">
+              <ReportPerformanceLevels>
+                <ReportPerformanceLevel level="1"><![CDATA[{0} demonstrates some ability to identify grammatical forms and syntactic structures, as well as identifying stylistic features in Latin poetry and prose.]]></ReportPerformanceLevel>
+                <ReportPerformanceLevel level="2"><![CDATA[{0} demonstrates a thorough ability to identify grammatical forms and syntactic structures, as well as identifying stylistic features in Latin poetry and prose.]]></ReportPerformanceLevel>
+              </ReportPerformanceLevels>
+            </ReportClaim>
+            <ReportClaim code="LAT_R">
+              <ReportPerformanceLevels>
+                <ReportPerformanceLevel level="1"><![CDATA[{0} demonstrates some ability to read closely and analytically understand a range of Latin texts (e.g., poetry, dialogues, speeches) of moderate complexity.]]></ReportPerformanceLevel>
+                <ReportPerformanceLevel level="2"><![CDATA[{0} demonstrates a thorough ability to read closely and analytically understand a range of Latin texts (e.g., poetry, dialogues, speeches) of moderate complexity. {0} uses knowledge of authors or literary conventions to demonstrate understanding.]]></ReportPerformanceLevel>
+              </ReportPerformanceLevels>
+            </ReportClaim>
+            <ReportClaim code="LAT_V">
+              <ReportPerformanceLevels>
+                <ReportPerformanceLevel level="1"><![CDATA[{0} demonstrates some contextual knowledge of vocabulary to make connections to other disciplines as well as comparisons between Latin and English usages.]]></ReportPerformanceLevel>
+                <ReportPerformanceLevel level="2"><![CDATA[{0} demonstrates a thorough contextual knowledge of vocabulary to make connections to other disciplines as well as comparisons between Latin and English usages.]]></ReportPerformanceLevel>
+              </ReportPerformanceLevels>
+            </ReportClaim>
+            <ReportClaim code="LAT_L">
+              <ReportPerformanceLevels>
+                <ReportPerformanceLevel level="1"><![CDATA[{0} demonstrates some listening and speaking skills to articulate a claim or thesis in Latin as part of a dialogue.]]></ReportPerformanceLevel>
+                <ReportPerformanceLevel level="2"><![CDATA[{0} demonstrates effective listening and speaking skills to articulate a claim or thesis in Latin as part of a dialogue.]]></ReportPerformanceLevel>
+              </ReportPerformanceLevels>
+            </ReportClaim>
+          </ReportClaims>
+        </ReportAssessmentType>
+      </ReportAssessmentTypes>
+    </ReportGrade>
+    <ReportGrade code="11">
+      <ReportAssessmentTypes>
+        <ReportAssessmentType code="sum">
+          <ClaimAchievementMessage><![CDATA[{0}''s results are also reported out into the five domains (i.e., areas) that together make up Latin proficiency: Translation, Grammar and Syntax, Reading Comprehension, Vocabulary and Listening and Speaking. To view a description of the student's achievement level claim (i.e., area), select either [Progressing], or [Well Developed] from the student-level selections available in the table below.]]></ClaimAchievementMessage>
+          <ReportPerformanceLevels>
+            <ReportPerformanceLevel level="1"><![CDATA[{0} did not meet the standard for Latin proficiency needed for likely success in future coursework.]]></ReportPerformanceLevel>
+            <ReportPerformanceLevel level="2"><![CDATA[{0} nearly met the standard for Latin proficiency needed for likely success in future coursework.]]></ReportPerformanceLevel>
+            <ReportPerformanceLevel level="3"><![CDATA[{0} has made progress and met the standard for Latin proficiency. {0} appears ready for future coursework.]]></ReportPerformanceLevel>
+            <ReportPerformanceLevel level="4"><![CDATA[{0} has made progress and exceeded the standard for Latin proficiency. {0} appears ready for future coursework.]]></ReportPerformanceLevel>
+          </ReportPerformanceLevels>
+          <ReportClaims>
+            <ReportClaim code="LAT_T">
+              <ReportPerformanceLevels>
+                <ReportPerformanceLevel level="1"><![CDATA[{0} demonstrates some knowledge of Roman culture and literary conventions, as well as Latin morphology to translate Latin text to English.]]></ReportPerformanceLevel>
+                <ReportPerformanceLevel level="2"><![CDATA[{0} demonstrates a thorough knowledge of Roman culture and literary conventions, as well as Latin morphology to translate Latin text to English.]]></ReportPerformanceLevel>
+              </ReportPerformanceLevels>
+            </ReportClaim>
+            <ReportClaim code="LAT_G">
+              <ReportPerformanceLevels>
+                <ReportPerformanceLevel level="1"><![CDATA[{0} demonstrates some ability to identify grammatical forms and syntactic structures, as well as identifying stylistic features in Latin poetry and prose.]]></ReportPerformanceLevel>
+                <ReportPerformanceLevel level="2"><![CDATA[{0} demonstrates a thorough ability to identify grammatical forms and syntactic structures, as well as identifying stylistic features in Latin poetry and prose.]]></ReportPerformanceLevel>
+              </ReportPerformanceLevels>
+            </ReportClaim>
+            <ReportClaim code="LAT_R">
+              <ReportPerformanceLevels>
+                <ReportPerformanceLevel level="1"><![CDATA[{0} demonstrates some ability to read closely and analytically understand a range of Latin texts (e.g., poetry, dialogues, speeches) of moderate complexity.]]></ReportPerformanceLevel>
+                <ReportPerformanceLevel level="2"><![CDATA[{0} demonstrates a thorough ability to read closely and analytically understand a range of Latin texts (e.g., poetry, dialogues, speeches) of moderate complexity. {0} uses knowledge of authors or literary conventions to demonstrate understanding.]]></ReportPerformanceLevel>
+              </ReportPerformanceLevels>
+            </ReportClaim>
+            <ReportClaim code="LAT_V">
+              <ReportPerformanceLevels>
+                <ReportPerformanceLevel level="1"><![CDATA[{0} demonstrates some contextual knowledge of vocabulary to make connections to other disciplines as well as comparisons between Latin and English usages.]]></ReportPerformanceLevel>
+                <ReportPerformanceLevel level="2"><![CDATA[{0} demonstrates a thorough contextual knowledge of vocabulary to make connections to other disciplines as well as comparisons between Latin and English usages.]]></ReportPerformanceLevel>
+              </ReportPerformanceLevels>
+            </ReportClaim>
+            <ReportClaim code="LAT_L">
+              <ReportPerformanceLevels>
+                <ReportPerformanceLevel level="1"><![CDATA[{0} demonstrates some listening and speaking skills to articulate a claim or thesis in Latin as part of a dialogue.]]></ReportPerformanceLevel>
+                <ReportPerformanceLevel level="2"><![CDATA[{0} demonstrates effective listening and speaking skills to articulate a claim or thesis in Latin as part of a dialogue.]]></ReportPerformanceLevel>
+              </ReportPerformanceLevels>
+            </ReportClaim>
+          </ReportClaims>
+        </ReportAssessmentType>
+      </ReportAssessmentTypes>
+    </ReportGrade>
+  </ReportGrades>
+  <Claims>
+    <Claim code="LAT_T" name="Translation" displayOrder=" 1" scorable="true" organizational="false">
+      <Icon>fa-language</Icon>
+      <Description>Translation</Description>
+    </Claim>
+    <Claim code="LAT_G" name="Grammar and Syntax" displayOrder=" 2" scorable="true" organizational="false">
+      <Icon>fa-pencil</Icon>
+      <Description>Grammar and Syntax</Description>
+    </Claim>
+    <Claim code="LAT_R" name="Reading Comprehension" displayOrder=" 3" scorable="true" organizational="false">
+      <Icon>fa-book</Icon>
+      <Description>Reading Comprehension</Description>
+    </Claim>
+    <Claim code="LAT_V" name="Vocabulary" displayOrder=" 4" scorable="true" organizational="false">
+      <Icon>fa-font</Icon>
+      <Description>Vocabulary</Description>
+    </Claim>
+    <Claim code="LAT_L" name="Listening and Speaking" displayOrder=" 5" scorable="true" organizational="false">
+      <Icon>fa-headphones</Icon>
+      <Description>Listening and Speaking</Description>
+    </Claim>
+  </Claims>
+</Subject>

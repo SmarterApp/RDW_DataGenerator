@@ -13,7 +13,7 @@ class Subject:
     """
 
     # using slots here only to avoid bugs due to typos etc.
-    __slots__ = ('code', 'types', 'overall', 'alts', 'claims',
+    __slots__ = ('code', 'types', 'overall', 'alts', 'claims', 'traits',
                  'emit_overall_stderr', 'emit_claim_score', 'sbac_claim_levels', 'el_adjacent')
 
     def __init__(self, code: str):
@@ -22,6 +22,7 @@ class Subject:
         self.overall = None     # Scorable
         self.alts = None        # alt scoring Scorables
         self.claims = None      # claim scoring Scorables (only for scorable claims)
+        self.traits = None      # collection of Trait
         self.emit_overall_stderr = True     # ELPAC scoring doesn't include overall stderr
         self.emit_claim_score = True        # ELPAC scoring doesn't include claim scores
         self.sbac_claim_levels = True       # SmarterBalanced claim levels are 1-3 based on +-1.5 stderr

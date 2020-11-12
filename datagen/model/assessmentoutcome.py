@@ -14,7 +14,7 @@ class AssessmentOutcome:
     __slots__ = ('guid student assessment date_taken start_date status_date submit_date '
                  'rec_id school result_status '
                  'server database client_name status completeness admin_condition session '
-                 'overall alt_scores claim_scores target_scores '
+                 'overall alt_scores claim_scores trait_scores target_scores '
                  'acc_asl_video_embed acc_print_on_demand_items_nonembed acc_noise_buffer_nonembed '
                  'acc_braile_embed acc_closed_captioning_embed acc_text_to_speech_embed acc_abacus_nonembed '
                  'acc_alternate_response_options_nonembed acc_calculator_nonembed acc_multiplication_table_nonembed '
@@ -42,6 +42,7 @@ class AssessmentOutcome:
         self.overall = None             # single overall Score
         self.alt_scores = None          # list of Scores
         self.claim_scores = None        # list of Scores
+        self.trait_scores = None        # list of Scores (not great but good enough)
         self.target_scores = None       # list of TargetScores
         self.acc_asl_video_embed = 0
         self.acc_print_on_demand_items_nonembed = 0

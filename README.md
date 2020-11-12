@@ -104,3 +104,11 @@ Create EC2 instance using Amazon Linux or CentOS image. Then ...
 #### Update the student responses for EQ, MI, TI, HTQ items
 The generator has been modified to provide student responses for these item types (based on the config file in https://github.com/SmarterApp/AP_ItemMaintenanceTools/tree/master/RemediateTrtItemResponse). 
 Currently this is for practice items only (many are based on the actual item key); it will have to be made to work for operational items too at some point. And perhaps it could be driven by a configuration file or even modified tabulator output to make updates easier.
+
+### Data Sets
+Two generated data set inputs have been preserved for posterity:
+* sb-dataset.zip
+* ca-dataset.zip
+The zip files contain the input that was used to generate the test results.
+For sb-dataset, the output is also included in the zip file. The zip files
+are password protected, you'll need to get that from somebody who knows.

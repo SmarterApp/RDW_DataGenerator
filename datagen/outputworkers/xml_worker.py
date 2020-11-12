@@ -200,9 +200,12 @@ class XmlWorker(Worker):
         if not asmt.is_iab() and outcome.claim_scores:
             for score in outcome.claim_scores:
                 self._add_scale_score(opportunity, score.code, score.score, score.stderr, score.perf_lvl)
-        if asmt.is_summative() and outcome.target_scores:
+        if outcome.target_scores:
             for target_score in outcome.target_scores:
                 self._add_residual_score(opportunity, target_score.id, target_score.student_residual, target_score.standard_met_residual)
+        if outcome.trait_scores:
+            for trait_score in outcome.trait_scores:
+                self._add_trait_score(opportunity, trait_score.code, trait_score.score)
 
         for item_data in outcome.item_data:
             item = SubElement(opportunity, 'Item')
@@ -279,6 +282,9 @@ class XmlWorker(Worker):
         if perf_lvl:
             self._add_score(parent, measure, 'PerformanceLevel', perf_lvl, '')
 
+    def _add_trait_score(self, parent, code, score):
+        self._add_score(parent, code, 'RawScore', score, None).set('conditionCode', '')
+
     def _add_residual_score(self, parent, measure, student_residual, standard_met_residual):
         self._add_score(parent, measure, 'StudentRelativeResidualScore', student_residual, 0.0)
         self._add_score(parent, measure, 'StandardMetRelativeResidualScore', standard_met_residual, 0.0)
@@ -289,6 +295,7 @@ class XmlWorker(Worker):
         score.set('measureLabel', label)
         score.set('value', str(value))
         score.set('standardError', str(stderr) if stderr else '')
+        return score
 
     def _add_score_info(self, parent, dimension, points):
         scoreInfo = SubElement(parent, 'ScoreInfo')

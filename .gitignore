@@ -1,10 +1,9 @@
-# OS generated files #
-######################
+# Python generated files, including virtual env #
 *.egg-info
 *.egg
+venv*/
 
 # IDE generated files #
-#######################
 __pycache__
 .coverage
 */build/
@@ -14,11 +13,6 @@ __pycache__
 .settings/
 .idea
 
-#########################
-# csv's will be ignored #
-# added gitignore file  # 
-# to the csv directory  #
-#########################
 cover
 coverage.xml
 nosetests.xml
@@ -26,3 +20,4 @@ nosetests.xml
 coverage/
 out/
 out.*/
+datasets/*

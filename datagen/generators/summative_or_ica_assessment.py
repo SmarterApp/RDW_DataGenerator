@@ -115,13 +115,26 @@ def generate_assessment_outcome(date_taken: datetime.date,
 
     # use the student capability to generate an overall score and performance level
     overall = Score('Overall')
-    overall.score, overall.perf_lvl = \
-        score_given_capability(student.capability[assessment.subject.code], assessment.overall.get_cuts())
+    overall.score, overall.perf_lvl = score_given_capability(student.capability[assessment.subject.code], assessment.overall.get_cuts())
     overall.stderr = random_stderr(overall.score, assessment.overall.score_min, assessment.overall.score_max) if assessment.subject.emit_overall_stderr else None
     sao.overall = overall
 
-    # generate alt scores if indicated
-    # note that we're using the overall min/max scores; some day we should use alt-specific values
+    _generate_alt_scores(sao, assessment, overall)
+    _generate_claim_scores(sao, assessment, overall)
+    _generate_trait_scores(sao, assessment, student)
+    _generate_target_scores(sao, assessment, student)
+
+    return sao
+
+
+def _generate_alt_scores(sao: AssessmentOutcome, assessment: Assessment, overall: Score):
+    """Modify the assessment outcome to add alt scores if indicated.
+    Note that we're using the overall min/max scores; some day we should use alt-specific values.
+
+    :param sao: AssessmentOutcome to enhance with alt scores
+    :param assessment: assessment
+    :param overall: overall score
+    """
     if assessment.alts and len(assessment.alts) > 0:
         sao.alt_scores = []
         alt_weights = [alt_def.weight for alt_def in assessment.alts]
@@ -132,7 +145,14 @@ def generate_assessment_outcome(date_taken: datetime.date,
                       random_stderr(alt_score, assessment.overall.score_min, assessment.overall.score_max),
                       performance_level(alt_score, alt.get_cuts())))
 
-    # generate claim scores if indicated
+
+def _generate_claim_scores(sao: AssessmentOutcome, assessment: Assessment, overall: Score):
+    """Modify the assessment outcome to add claim scores if indicated.
+
+    :param sao: AssessmentOutcome to enhance with alt scores
+    :param assessment: assessment
+    :param overall: overall score
+    """
     if assessment.claims and len(assessment.claims) > 0:
         # use the overall min/max score for claims (since we don't have any other values to use)
         min_score = assessment.overall.score_min
@@ -153,19 +173,51 @@ def generate_assessment_outcome(date_taken: datetime.date,
             claim_level = claim_perf_lvl(claim_score, stderr, assessment.overall.cut_points[1]) \
                 if assessment.subject.sbac_claim_levels else performance_level(claim_score, claim_cuts)
             sao.claim_scores.append(Score(claim.code, claim_score, stderr, claim_level)
-                if assessment.subject.emit_claim_score else Score(claim.code, None, None, claim_level))
+                                    if assessment.subject.emit_claim_score else Score(claim.code, None, None, claim_level))
 
+
+def _generate_trait_scores(sao: AssessmentOutcome, assessment: Assessment, student: Student):
+    """Modify the assessment outcome to add trait scores if indicated.
+    Note: if this is a legacy SmarterBalanced assessment with WER items, there may be a WER item
+    with subscores already generated. If so, copy those scores at the exam level. If not then
+    generate the exam-level trait scores.
+
+    :param sao: AssessmentOutcome to enhance with alt scores
+    :param assessment: assessment
+    :param overall: overall score
+    """
+    if assessment.is_summative() and assessment.subject.traits:
+        # check if there is an item response with sub_scores to copy scores from
+        item = next((item for item in sao.item_data if len(item.sub_scores) == 3), None)
+        # WER item sub_scores are ordered: Organization, Evidence, Conventions
+        # the traits should have categories ORG, EVI, CON if everything is set up properly
+        # for now, hard-code the relationship
+        score_indices = {'ORG': 0, 'EVI': 1, 'CON': 2}
+
+        # randomly select a purpose (simulates CAT giving students different questions)
+        purpose = random.choice(assessment.subject.traits).purpose
+
+        sao.trait_scores = []
+        for trait in (trait for trait in assessment.subject.traits if trait.purpose == purpose):
+            score = item.sub_scores[score_indices[trait.category]] if item and trait.category in score_indices \
+                else round(trait.max_score * student.capability[assessment.subject.code] / 4.0)
+            sao.trait_scores.append(Score(trait.code, score))
+
+
+def _generate_target_scores(sao: AssessmentOutcome, assessment: Assessment, student: Student):
+    """Modify the assessment outcome to add target scores if indicated.
+    NOTE: these are really fake values, with no real correlation to overall/item scores:
+     * student_residual - since everything is generated uniformly, this should be really close to 0
+     * standard_met_residual - this is based on student capability so offset uniform distribution
+
+    :param sao: AssessmentOutcome to enhance with alt scores
+    :param assessment: assessment
+    :param overall: overall score
+    """
     # for summative assessments, if the items have target information, generate target residuals
-    # NOTE: these are really fake values, with no real correlation to overall/item scores:
-    #   student_residual - since everything is generated uniformly, this should be really close to 0
-    #   standard_met_residual - this is based on student capability so offset uniform distribution
     if assessment.is_summative() and assessment.item_bank and any(item.target for item in assessment.item_bank):
         # collect the unique targets from all items
         targets = Counter(item.target for item in assessment.item_bank if item.target)
         offset = (student.capability[assessment.subject.code] - 2.0) / 2.0
         sao.target_scores = [TargetScore(t, random.uniform(-0.1, +0.1), random.triangular(-1.0, +1.0, offset))
                              for t in targets.keys()]
-
-    return sao
-
-

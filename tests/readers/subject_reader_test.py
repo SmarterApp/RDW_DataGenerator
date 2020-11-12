@@ -23,5 +23,12 @@ def test_reading_ELPAC():
     assert sum.claim_scoring.perf_levels == 3
 
 
+def test_reading_Science():
+    subject = load_subject_file(join(test_data_dir, 'Science_subject.xml'))
+    assert subject.code == 'Science'
+    assert len(subject.alts) == 5
+    assert len(subject.traits) == 6
+
+
 if __name__ == '__main__':
     test_reading_ELPAC()
