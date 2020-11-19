@@ -188,7 +188,7 @@ def _generate_trait_scores(sao: AssessmentOutcome, assessment: Assessment, stude
     """
     if assessment.is_summative() and assessment.subject.traits:
         # check if there is an item response with sub_scores to copy scores from
-        item = next((item for item in sao.item_data if len(item.sub_scores) == 3), None)
+        item = next((item for item in sao.item_data if (item.sub_scores and len(item.sub_scores)) == 3), None)
         # WER item sub_scores are ordered: Organization, Evidence, Conventions
         # the traits should have categories ORG, EVI, CON if everything is set up properly
         # for now, hard-code the relationship
