@@ -306,7 +306,7 @@ class XmlWorker(Worker):
         return scoreInfo
 
     def _map_asmt_type(self, value):
-        return 'Summative' if 'summative' in value.lower() else 'Interim'
+        return 'Summative' if 'sum' in value.lower() else 'Interim'
 
     def _map_gender(self, value):
         if 'female' == value.lower(): return 'Female'
