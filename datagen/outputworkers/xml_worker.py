@@ -205,7 +205,7 @@ class XmlWorker(Worker):
                 self._add_residual_score(opportunity, target_score.id, target_score.student_residual, target_score.standard_met_residual)
         if outcome.trait_scores:
             for trait_score in outcome.trait_scores:
-                self._add_trait_score(opportunity, trait_score.code, trait_score.score)
+                self._add_trait_score(opportunity, trait_score.code, trait_score.score, trait_score.condition_code)
 
         for item_data in outcome.item_data:
             item = SubElement(opportunity, 'Item')
@@ -282,8 +282,8 @@ class XmlWorker(Worker):
         if perf_lvl:
             self._add_score(parent, measure, 'PerformanceLevel', perf_lvl, '')
 
-    def _add_trait_score(self, parent, code, score):
-        self._add_score(parent, code, 'RawScore', score, None).set('conditionCode', '')
+    def _add_trait_score(self, parent, code, score, condition_code):
+        self._add_score(parent, code, 'RawScore', score, None).set('conditionCode', condition_code)
 
     def _add_residual_score(self, parent, measure, student_residual, standard_met_residual):
         self._add_score(parent, measure, 'StudentRelativeResidualScore', student_residual, 0.0)
