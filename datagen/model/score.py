@@ -11,7 +11,7 @@ class Score:
     __slots__ = ('code', 'score', 'stderr', 'perf_lvl', 'condition_code')
 
     def __init__(self, code: str, score: int = None, stderr: int = None, perf_lvl: int = None,
-                 /, condition_code: str = ''):
+                 condition_code: str = ''):
         self.code = code
         self.score = score
         self.stderr = stderr
