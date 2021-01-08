@@ -179,29 +179,25 @@ def _generate_claim_scores(sao: AssessmentOutcome, assessment: Assessment, overa
 def _generate_trait_scores(sao: AssessmentOutcome, assessment: Assessment, student: Student):
     """Modify the assessment outcome to add trait scores if indicated.
     Note: if this is a legacy SmarterBalanced assessment with WER items, there may be a WER item
-    with subscores already generated. If so, copy those scores at the exam level. If not then
-    generate the exam-level trait scores.
+    with subscores already generated. We were using these item subscores here at the exam level, but
+    now we will generate new exam-level trait scores regardless.
 
     :param sao: AssessmentOutcome to enhance with alt scores
     :param assessment: assessment
     :param overall: overall score
     """
     if assessment.is_summative() and assessment.subject.traits:
-        # check if there is an item response with sub_scores to copy scores from
-        item = next((item for item in sao.item_data if (item.sub_scores and len(item.sub_scores)) == 3), None)
-        # WER item sub_scores are ordered: Organization, Evidence, Conventions
-        # the traits should have categories ORG, EVI, CON if everything is set up properly
-        # for now, hard-code the relationship
-        score_indices = {'ORG': 0, 'EVI': 1, 'CON': 2}
+        # List of possible condition codes to use when score is 0
+        condition_codes = ['B', 'L', 'I', 'M', 'T']
 
         # randomly select a purpose (simulates CAT giving students different questions)
         purpose = random.choice(assessment.subject.traits).purpose
 
         sao.trait_scores = []
         for trait in (trait for trait in assessment.subject.traits if trait.purpose == purpose):
-            score = item.sub_scores[score_indices[trait.category]] if item and trait.category in score_indices \
-                else round(trait.max_score * student.capability[assessment.subject.code] / 4.0)
-            sao.trait_scores.append(Score(trait.code, score))
+            score = int((trait.max_score + 1) * student.capability[assessment.subject.code] / 4.0)
+            condition_code = '' if score != 0 else random.choice(condition_codes)
+            sao.trait_scores.append(Score(trait.code, score, condition_code=condition_code))
 
 
 def _generate_target_scores(sao: AssessmentOutcome, assessment: Assessment, student: Student):
